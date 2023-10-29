@@ -31,10 +31,46 @@ class Piece {
         this->y = y;
         this->team = team;
     }
-
-    virtual void movePiece() = 0;
+    void movePiece(int x, int y);
     virtual vector<pair<int, int>> generatePaths() = 0;
 };
+
+Piece* board[9][10] = {
+
+};
+
+void Piece::movePiece(int x, int y) {
+    vector<pair<int, int>> paths = generatePaths();
+    for (int i = 0; i < paths.size(); i++) {
+        if (paths[i].first == x && paths[i].second == y) {
+            board[x][y] = board[this->x][this->y];
+            board[this->x][this->y] = nullptr;
+            this->x = x;
+            this->y = y;
+            break;
+        }
+    }
+}
+
+
+void mainMenu();
+void setupBoard(int han_setup, int cho_setup);
+void printBoard();
+Piece* choosePiece(int player);
+bool isMovable(int x, int y, char team);
+void kill();
+void choCheckWin();
+void undo();
+
+
+bool isMovable(int x, int y, char team) {
+    if (board[x][y] == nullptr || board[x][y]->team == team) return false;
+    else return true;
+}
+
+void kill() {
+
+}
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
@@ -44,11 +80,37 @@ class Rook : public Piece {
         else letter = 'r';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        
-        return paths;
+        vector<pair<int, int>> validMoves;
+        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        for (int i = 0; i < 4; i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+            while (x >= 0 && x < 9 && y >= 0 && y < 10) {
+                if (isMovable(x, y, this->team)) {
+                    validMoves.push_back(make_pair(x, y));
+                    break;
+                } else {
+                    validMoves.push_back(make_pair(x, y));
+                    x += directions[i][0];
+                    y += directions[i][1];
+                }
+            }
+        }
+        return validMoves;
+    }
+
+    void movePiece(int x, int y) {
+        vector<pair<int, int>> paths = generatePaths();
+        for (int i = 0; i < paths.size(); i++) {
+            if (paths[i].first == x && paths[i].second == y) {
+                board[x][y] = board[this->x][this->y];
+                board[this->x][this->y] = nullptr;
+                this->x = x;
+                this->y = y;
+                break;
+            }
+        }
     }
 };
 
@@ -59,7 +121,6 @@ class Cannon : public Piece {
         else letter = 'c';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
         return paths;
@@ -73,7 +134,6 @@ class Knight : public Piece {
         else letter = 'n';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
         return paths;
@@ -87,7 +147,6 @@ class Elephant : public Piece {
         else letter = 'e';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
         return paths;
@@ -101,10 +160,18 @@ class King : public Piece {
         else letter = 'k';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        return paths;
+        vector<pair<int, int>> validMoves;
+        int directions[8][2] = {{0, 1}, {1, 0},  {0, -1}, {-1, 0},
+                                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        for (int i = 0; i < 8; i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+            if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
+                !isMovable(x, y, this->team))
+                validMoves.push_back(make_pair(x, y));
+        }
+        return validMoves;
     }
 };
 
@@ -115,10 +182,18 @@ class Guard : public Piece {
         else letter = 'g';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        return paths;
+        vector<pair<int, int>> validMoves;
+        int directions[8][2] = {{0, 1}, {1, 0},  {0, -1}, {-1, 0},
+                                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        for (int i = 0; i < 8; i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+            if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
+                !isMovable(x, y, this->team))
+                validMoves.push_back(make_pair(x, y));
+        }
+        return validMoves;
     }
 };
 
@@ -129,21 +204,32 @@ class Pawn : public Piece {
         else letter = 'p';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        
-        return paths;
+        vector<pair<int, int>> validMoves;
+        if (this->team == 'C') {
+            if (this->x + 1 < 9 && board[this->x + 1][this->y]->team == 'H')
+                validMoves.push_back(make_pair(this->x + 1, this->y));
+            if (this->x - 1 >= 0 && board[this->x - 1][this->y]->team == 'H')
+                validMoves.push_back(make_pair(this->x - 1, this->y));
+            if (this->y + 1 < 10 && board[this->x][this->y + 1]->team == 'H')
+                validMoves.push_back(make_pair(this->x, this->y + 1));
+        } else {
+            if (this->x + 1 < 9 && board[this->x + 1][this->y]->team == 'C')
+                validMoves.push_back(make_pair(this->x + 1, this->y));
+            if (this->x - 1 >= 0 && board[this->x - 1][this->y]->team == 'C')
+                validMoves.push_back(make_pair(this->x - 1, this->y));
+            if (this->y - 1 >= 0 && board[this->x][this->y - 1]->team == 'C')
+                validMoves.push_back(make_pair(this->x, this->y - 1));
+        }
+        return validMoves;
     }
-};
-
-
-
-
-
-Piece* board[9][10] = {
 
 };
+
+
+
+
+
 
 stack<Piece*> previous;
 
@@ -178,22 +264,77 @@ string msg[] = {
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
+<<<<<<< HEAD
+
+=======
 void mainMenu();
 void setupBoard(int han_setup, int cho_setup);
 void printBoard();
 Piece* choosePiece(int player);
 bool isMovable(int x, int y, char team);
 void kill();
-void choCheckWin();
+bool choCheckWin();
 void undo();
+>>>>>>> b96737bc1197cda98e15dc81c175b1762c4ad53c
 
 
 int main() {
+<<<<<<< HEAD
     mainMenu();
     setupInitialPieces();
     setupBoard(game, game.han);
     setupBoard(game, game.cho);
+=======
+    int num, han_setup, cho_setup;
+    Piece* chosen;
+>>>>>>> 803b848fb2a391b64e13f4ae80e9988ae647726b
 
+    mainMenu();
+    //remove_piece_num();
+    //setupBoard(han_setup, cho_setup); 수정필요
+    //remove_select_piece(num);
+    if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
+        while (true) {
+            // 한나라 턴
+            printBoard(); // 보드출력
+            chosen = choosePiece(2); // 기물선택
+            chosen->movePiece(); // 기물이동
+            printBoard(); // 이동후 보드출력
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+
+            // 초나라 턴
+            printBoard();
+            chosen = choosePiece(1); 
+            chosen->movePiece();
+            printBoard();
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+        }
+    }
+    else { // 제거할 기물이 0개
+        while (true) {
+            // 한나라 턴
+            printBoard(); // 보드출력
+            chosen = choosePiece(1); // 기물선택
+            chosen->movePiece(); // 기물이동
+            printBoard(); // 이동후 보드출력
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+
+            // 초나라 턴
+            printBoard();
+            chosen = choosePiece(2); 
+            chosen->movePiece();
+            printBoard();
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+        }
+    }
     return 0;
 }
 
@@ -204,6 +345,7 @@ void mainMenu() {
     
 }
 
+<<<<<<< HEAD
 void setupInitialPieces() {
     // 한나라의 기본 기물 배치
     board[0][0] = new Rook(0, 0, 'H');
@@ -330,5 +472,37 @@ void setupBoard(Game& game, Player& player) {
                 cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
+=======
+
+// 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
+Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
+    int tmpx, tmpy;
+    string coord;
+
+    while (true) {
+        cout << msg[6] << endl << ">>>";
+        getline(cin, coord);
+
+        // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
+        if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
+            cout << msg[21] << msg[20] << endl;
+            continue;
+        }
+
+        tmpx = coord[0] - '0';
+        tmpy = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
+
+        if (board[tmpx][tmpy] == nullptr) {
+            cout << msg[21] << msg[20] << endl;
+            continue;
+        }
+
+        if ((player == 2 && board[tmpx][tmpy]->team == '초') || (player == 1 && board[tmpx][tmpy]->team == '한')) {
+            cout << msg[25] << msg[20] << endl;
+            continue;
+        }
+
+        return board[tmpx][tmpy];
+>>>>>>> 803b848fb2a391b64e13f4ae80e9988ae647726b
     }
 }
