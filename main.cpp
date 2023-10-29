@@ -31,10 +31,46 @@ class Piece {
         this->y = y;
         this->team = team;
     }
-
-    virtual void movePiece() = 0;
+    void movePiece(int x, int y);
     virtual vector<pair<int, int>> generatePaths() = 0;
 };
+
+Piece* board[9][10] = {
+
+};
+
+void Piece::movePiece(int x, int y) {
+    vector<pair<int, int>> paths = generatePaths();
+    for (int i = 0; i < paths.size(); i++) {
+        if (paths[i].first == x && paths[i].second == y) {
+            board[x][y] = board[this->x][this->y];
+            board[this->x][this->y] = nullptr;
+            this->x = x;
+            this->y = y;
+            break;
+        }
+    }
+}
+
+
+void mainMenu();
+void setupBoard(int han_setup, int cho_setup);
+void printBoard();
+Piece* choosePiece(int player);
+bool isMovable(int x, int y, char team);
+void kill();
+void choCheckWin();
+void undo();
+
+
+bool isMovable(int x, int y, char team) {
+    if (board[x][y] == nullptr || board[x][y]->team == team) return false;
+    else return true;
+}
+
+void kill() {
+
+}
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
@@ -44,11 +80,37 @@ class Rook : public Piece {
         else letter = 'r';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        
-        return paths;
+        vector<pair<int, int>> validMoves;
+        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        for (int i = 0; i < 4; i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+            while (x >= 0 && x < 9 && y >= 0 && y < 10) {
+                if (isMovable(x, y, this->team)) {
+                    validMoves.push_back(make_pair(x, y));
+                    break;
+                } else {
+                    validMoves.push_back(make_pair(x, y));
+                    x += directions[i][0];
+                    y += directions[i][1];
+                }
+            }
+        }
+        return validMoves;
+    }
+
+    void movePiece(int x, int y) {
+        vector<pair<int, int>> paths = generatePaths();
+        for (int i = 0; i < paths.size(); i++) {
+            if (paths[i].first == x && paths[i].second == y) {
+                board[x][y] = board[this->x][this->y];
+                board[this->x][this->y] = nullptr;
+                this->x = x;
+                this->y = y;
+                break;
+            }
+        }
     }
 };
 
@@ -59,7 +121,6 @@ class Cannon : public Piece {
         else letter = 'c';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
         return paths;
@@ -73,7 +134,6 @@ class Knight : public Piece {
         else letter = 'n';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
         return paths;
@@ -87,7 +147,6 @@ class Elephant : public Piece {
         else letter = 'e';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
         return paths;
@@ -101,10 +160,18 @@ class King : public Piece {
         else letter = 'k';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        return paths;
+        vector<pair<int, int>> validMoves;
+        int directions[8][2] = {{0, 1}, {1, 0},  {0, -1}, {-1, 0},
+                                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        for (int i = 0; i < 8; i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+            if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
+                !isMovable(x, y, this->team))
+                validMoves.push_back(make_pair(x, y));
+        }
+        return validMoves;
     }
 };
 
@@ -115,10 +182,18 @@ class Guard : public Piece {
         else letter = 'g';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        return paths;
+        vector<pair<int, int>> validMoves;
+        int directions[8][2] = {{0, 1}, {1, 0},  {0, -1}, {-1, 0},
+                                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        for (int i = 0; i < 8; i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+            if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
+                !isMovable(x, y, this->team))
+                validMoves.push_back(make_pair(x, y));
+        }
+        return validMoves;
     }
 };
 
@@ -129,21 +204,32 @@ class Pawn : public Piece {
         else letter = 'p';
     }
 
-    void movePiece() override {}
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        
-        return paths;
+        vector<pair<int, int>> validMoves;
+        if (this->team == 'C') {
+            if (this->x + 1 < 9 && board[this->x + 1][this->y]->team == 'H')
+                validMoves.push_back(make_pair(this->x + 1, this->y));
+            if (this->x - 1 >= 0 && board[this->x - 1][this->y]->team == 'H')
+                validMoves.push_back(make_pair(this->x - 1, this->y));
+            if (this->y + 1 < 10 && board[this->x][this->y + 1]->team == 'H')
+                validMoves.push_back(make_pair(this->x, this->y + 1));
+        } else {
+            if (this->x + 1 < 9 && board[this->x + 1][this->y]->team == 'C')
+                validMoves.push_back(make_pair(this->x + 1, this->y));
+            if (this->x - 1 >= 0 && board[this->x - 1][this->y]->team == 'C')
+                validMoves.push_back(make_pair(this->x - 1, this->y));
+            if (this->y - 1 >= 0 && board[this->x][this->y - 1]->team == 'C')
+                validMoves.push_back(make_pair(this->x, this->y - 1));
+        }
+        return validMoves;
     }
-};
-
-
-
-
-
-Piece* board[9][10] = {
 
 };
+
+
+
+
+
 
 stack<Piece*> previous;
 
@@ -183,6 +269,7 @@ string msg[] = {
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
+
 void mainMenu();
 void setupBoard(int han_setup, int cho_setup);
 void printBoard();
@@ -193,13 +280,17 @@ bool choCheckWin();
 void undo();
 
 
+
 int main() {
     int num, han_setup, cho_setup;
-    Piece* chosen = nullptr;
+    Piece* chosen;
 
     mainMenu();
     //remove_piece_num();
-    //setupBoard(han_setup, cho_setup); 수정필요
+    mainMenu();
+    setupInitialPieces();
+    setupBoard(game, game.han);
+    setupBoard(game, game.cho);
     //remove_select_piece(num);
     if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
         while (true) {
@@ -256,6 +347,134 @@ void mainMenu() {
     
 }
 
+void setupInitialPieces() {
+    // 한나라의 기본 기물 배치
+    board[0][0] = new Rook(0, 0, 'H');
+    board[8][0] = new Rook(8, 0, 'H');
+    board[1][2] = new Cannon(1, 2, 'H');
+    board[7][2] = new Cannon(7, 2, 'H');
+    board[3][0] = new Guard(3, 0, 'H');
+    board[5][0] = new Guard(5, 0, 'H');
+    board[4][1] = new King(4, 1, 'H');
+    for (int i = 0; i < 9; i += 2) {
+        board[i][3] = new Pawn(i, 3, 'H');
+    }
+
+    // 초나라의 기본 기물 배치
+    board[0][9] = new Rook(0, 9, 'C');
+    board[8][9] = new Rook(8, 9, 'C');
+    board[1][7] = new Cannon(1, 7, 'C');
+    board[7][7] = new Cannon(7, 7, 'C');
+    board[3][9] = new Guard(3, 9, 'C');
+    board[5][9] = new Guard(5, 9, 'C');
+    board[4][8] = new King(4, 8, 'C');
+    for (int i = 0; i < 9; i += 2) {
+        board[i][6] = new Pawn(i, 6, 'C');
+    }
+}
+
+string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
+
+void setupBoard(Game& game, Player& player) {
+
+    if (&player == &game.han) {
+        while (true) { // while문
+            int num;
+            cout << "    <한나라 포진>\n\n"
+                << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
+                << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
+                << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
+                << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
+            cout << "원하는 포진을 입력하세요\n" << ">>>";
+            cin >> num;
+            if (num > 0 && num < 5) { // if문
+                switch (num) { // switch문
+                case 1:
+                    cout << "한나라가 1. 마상상마 포진을 선택하였습니다.\n\n";
+                    board[1][0] = new Knight(1, 0, 'H');
+                    board[6][0] = new Knight(7, 0, 'H');
+                    board[2][0] = new Elephant(2, 0, 'H');
+                    board[7][0] = new Elephant(6, 0, 'H');
+                    break;
+                case 2:
+                    cout << "한나라가 2. 마상마상 포진을 선택하였습니다.\n\n";
+                    board[1][0] = new Knight(1, 0, 'H');
+                    board[6][0] = new Knight(6, 0, 'H');
+                    board[2][0] = new Elephant(2, 0, 'H');
+                    board[7][0] = new Elephant(7, 0, 'H');
+                    break;
+                case 3:
+                    cout << "한나라가 3. 상마상마 포진을 선택하였습니다.\n\n";
+                    board[2][0] = new Knight(2, 0, 'H');
+                    board[7][0] = new Knight(7, 0, 'H');
+                    board[1][0] = new Elephant(1, 0, 'H');
+                    board[6][0] = new Elephant(6, 0, 'H');
+                    break;
+                case 4:
+                    cout << "한나라가 4. 상마마상 포진을 선택하였습니다.\n\n";
+                    board[2][0] = new Knight(2, 0, 'H');
+                    board[6][0] = new Knight(6, 0, 'H');
+                    board[1][0] = new Elephant(1, 0, 'H');
+                    board[7][0] = new Elephant(7, 0, 'H');
+                    break;
+                } // switch문
+                break;
+            } // if문
+            else {
+                cout << "해당되는 포진이 없습니다.\n";
+            }
+        } // while문
+    }
+
+    else if (&player == &game.cho) {
+        while (true) { // while문
+            int num;
+            cout << "    <초나라 포진>\n\n"
+                << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
+                << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
+                << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
+                << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
+            cout << "원하는 포진을 입력하세요\n" << ">>>";
+            cin >> num;
+            if (num > 0 && num < 5) { // if문
+                switch (num) { // switch문
+                case 1:
+                    cout << "초나라가 1. 마상상마 포진을 선택하였습니다.\n\n";
+                    board[1][9] = new Knight(1, 9, 'C');
+                    board[7][9] = new Knight(7, 9, 'C');
+                    board[2][9] = new Elephant(2, 9, 'C');
+                    board[6][9] = new Elephant(6, 9, 'C');
+                    break;
+                case 2:
+                    cout << "초나라가 2. 마상마마 포진을 선택하였습니다.\n\n";
+                    board[1][9] = new Knight(1, 9, 'C');
+                    board[6][9] = new Knight(6, 9, 'C');
+                    board[2][9] = new Elephant(2, 9, 'C');
+                    board[7][9] = new Elephant(7, 9, 'C');
+                    break;
+                case 3:
+                    cout << "초나라가 3. 상마상마 포진을 선택하였습니다.\n\n";
+                    board[2][9] = new Knight(2, 9, 'C');
+                    board[7][9] = new Knight(7, 9, 'C');
+                    board[1][9] = new Elephant(1, 9, 'C');
+                    board[6][9] = new Elephant(6, 9, 'C');
+                    break;
+                case 4:
+                    cout << "초나라가 4. 상마마상 포진을 선택하였습니다.\n\n";
+                    board[2][9] = new Knight(2, 9, 'C');
+                    board[6][9] = new Knight(6, 9, 'C');
+                    board[1][9] = new Elephant(1, 9, 'C');
+                    board[7][9] = new Elephant(7, 9, 'C');
+                    break;
+                } // switch문
+                break;
+            } // if문
+            else {
+                cout << "해당되는 포진이 없습니다.\n";
+            }
+        } // while문
+    }
+}
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
 Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
@@ -295,4 +514,5 @@ Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
 
         return board[tmpx][tmpy];
     }
+
 }
