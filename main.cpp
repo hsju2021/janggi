@@ -226,10 +226,6 @@ class Pawn : public Piece {
 };
 
 
-
-
-
-
 stack<Piece*> previous;
 
 
