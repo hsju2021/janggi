@@ -52,6 +52,8 @@ void Piece::movePiece(int x, int y) {
     }
 }
 
+Game game;
+
 void mainMenu();
 void setupBoard(int han_setup, int cho_setup);
 void printBoard();
