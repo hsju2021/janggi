@@ -184,13 +184,60 @@ void printBoard();
 Piece* choosePiece(int player);
 bool isMovable(int x, int y, char team);
 void kill();
-void choCheckWin();
+bool choCheckWin();
 void undo();
 
 
 int main() {
-    mainMenu();
+    int num, han_setup, cho_setup;
+    Piece* chosen;
 
+    mainMenu();
+    //remove_piece_num();
+    //setupBoard(han_setup, cho_setup); 수정필요
+    //remove_select_piece(num);
+    if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
+        while (true) {
+            // 한나라 턴
+            printBoard(); // 보드출력
+            chosen = choosePiece(2); // 기물선택
+            chosen->movePiece(); // 기물이동
+            printBoard(); // 이동후 보드출력
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+
+            // 초나라 턴
+            printBoard();
+            chosen = choosePiece(1); 
+            chosen->movePiece();
+            printBoard();
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+        }
+    }
+    else { // 제거할 기물이 0개
+        while (true) {
+            // 한나라 턴
+            printBoard(); // 보드출력
+            chosen = choosePiece(1); // 기물선택
+            chosen->movePiece(); // 기물이동
+            printBoard(); // 이동후 보드출력
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+
+            // 초나라 턴
+            printBoard();
+            chosen = choosePiece(2); 
+            chosen->movePiece();
+            printBoard();
+
+            if(choCheckWin()) break; // 승패여부 처리
+            cout << endl; //턴 넘기기 메세지 처리 필요
+        }
+    }
     return 0;
 }
 
@@ -199,4 +246,37 @@ void mainMenu() {
     // clear the console
     system("clear");
     
+}
+
+
+// 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
+Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
+    int tmpx, tmpy;
+    string coord;
+
+    while (true) {
+        cout << msg[6] << endl << ">>>";
+        getline(cin, coord);
+
+        // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
+        if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
+            cout << msg[21] << msg[20] << endl;
+            continue;
+        }
+
+        tmpx = coord[0] - '0';
+        tmpy = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
+
+        if (board[tmpx][tmpy] == nullptr) {
+            cout << msg[21] << msg[20] << endl;
+            continue;
+        }
+
+        if ((player == 2 && board[tmpx][tmpy]->team == '초') || (player == 1 && board[tmpx][tmpy]->team == '한')) {
+            cout << msg[25] << msg[20] << endl;
+            continue;
+        }
+
+        return board[tmpx][tmpy];
+    }
 }
