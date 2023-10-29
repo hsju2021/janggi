@@ -167,13 +167,18 @@ string msg[] = {
     "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n",
     "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n",
     "점수 총합 : 초나라 {score}점, 한나라 {score}점\n",
-    "한나라가 {setup} 포진을 선택하였습니다.\n",
+    "{player}나라가 {setup} 포진을 선택하였습니다.\n",
     "{player}나라 ‘{piece}’이(가) {player}나라 ‘{piece}’을(를) 잡았습니다.\n ",
     "존재하지 않는 메뉴입니다. ",
     "다시 입력해 주세요.\n",
     "해당 좌표에 기물이 존재하지 않거나 옳지 않은 입력입니다. ",
     "불가능한 이동입니다. ",
-    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n"
+    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n",
+    "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n",
+    "{num}(을)를 입력받았습니다.\n",
+    "{player}는 포진 선택과정을 진행하세요.\n",
+    "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
+    "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
 };
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
@@ -190,7 +195,7 @@ void undo();
 
 int main() {
     int num, han_setup, cho_setup;
-    Piece* chosen;
+    Piece* chosen = nullptr;
 
     mainMenu();
     //remove_piece_num();
@@ -201,6 +206,9 @@ int main() {
             // 한나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(2); // 기물선택
+            if (chosen == nullptr) {
+                // 종료처리
+            }
             chosen->movePiece(); // 기물이동
             printBoard(); // 이동후 보드출력
 
@@ -257,6 +265,14 @@ Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
     while (true) {
         cout << msg[6] << endl << ">>>";
         getline(cin, coord);
+        if (!coord.compare("quit")) {
+            return nullptr;
+        }
+
+        if (!coord.compare("cancel")) {
+            //무르기 처리
+            undo();
+        }
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
@@ -272,7 +288,7 @@ Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
             continue;
         }
 
-        if ((player == 2 && board[tmpx][tmpy]->team == '초') || (player == 1 && board[tmpx][tmpy]->team == '한')) {
+        if ((player == 2 && board[tmpx][tmpy]->team == 'C') || (player == 1 && board[tmpx][tmpy]->team == 'H')) {
             cout << msg[25] << msg[20] << endl;
             continue;
         }
