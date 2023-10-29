@@ -52,14 +52,13 @@ void Piece::movePiece(int x, int y) {
     }
 }
 
-
 void mainMenu();
 void setupBoard(int han_setup, int cho_setup);
 void printBoard();
 Piece* choosePiece(int player);
 bool isMovable(int x, int y, char team);
 void kill();
-void choCheckWin();
+bool choCheckWin();
 void undo();
 
 
@@ -253,54 +252,32 @@ string msg[] = {
     "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n",
     "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n",
     "점수 총합 : 초나라 {score}점, 한나라 {score}점\n",
-    "{player}나라가 {setup} 포진을 선택하였습니다.\n",
+    "한나라가 {setup} 포진을 선택하였습니다.\n",
     "{player}나라 ‘{piece}’이(가) {player}나라 ‘{piece}’을(를) 잡았습니다.\n ",
     "존재하지 않는 메뉴입니다. ",
     "다시 입력해 주세요.\n",
     "해당 좌표에 기물이 존재하지 않거나 옳지 않은 입력입니다. ",
     "불가능한 이동입니다. ",
-    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n",
-    "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n",
-    "{num}(을)를 입력받았습니다.\n",
-    "{player}는 포진 선택과정을 진행하세요.\n",
-    "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
-    "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
+    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n"
 };
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
-
-void mainMenu();
-void setupBoard(int han_setup, int cho_setup);
-void printBoard();
-Piece* choosePiece(int player);
-bool isMovable(int x, int y, char team);
-void kill();
-bool choCheckWin();
-void undo();
-
-
-
 int main() {
-    int num, han_setup, cho_setup;
+    int num, x, y;
     Piece* chosen;
 
-    mainMenu();
-    //remove_piece_num();
     mainMenu();
     setupInitialPieces();
     setupBoard(game, game.han);
     setupBoard(game, game.cho);
-    //remove_select_piece(num);
+
     if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
         while (true) {
             // 한나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(2); // 기물선택
-            if (chosen == nullptr) {
-                // 종료처리
-            }
-            chosen->movePiece(); // 기물이동
+            chosen->movePiece(x,y); // 기물이동
             printBoard(); // 이동후 보드출력
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -309,7 +286,7 @@ int main() {
             // 초나라 턴
             printBoard();
             chosen = choosePiece(1); 
-            chosen->movePiece();
+            chosen->movePiece(x,y);
             printBoard();
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -321,7 +298,7 @@ int main() {
             // 한나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(1); // 기물선택
-            chosen->movePiece(); // 기물이동
+            chosen->movePiece(x,y); // 기물이동
             printBoard(); // 이동후 보드출력
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -330,7 +307,7 @@ int main() {
             // 초나라 턴
             printBoard();
             chosen = choosePiece(2); 
-            chosen->movePiece();
+            chosen->movePiece(x,y);
             printBoard();
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -340,6 +317,11 @@ int main() {
     return 0;
 }
 
+void setupInitialPieces() {
+    // 한나라의 기본 기물 배치
+    board[0][0] = new Rook(0, 0, 'H');
+	cout << "해당되는 포진이 없습니다.\n";
+}
 
 void mainMenu() {
     // clear the console
@@ -347,134 +329,6 @@ void mainMenu() {
     
 }
 
-void setupInitialPieces() {
-    // 한나라의 기본 기물 배치
-    board[0][0] = new Rook(0, 0, 'H');
-    board[8][0] = new Rook(8, 0, 'H');
-    board[1][2] = new Cannon(1, 2, 'H');
-    board[7][2] = new Cannon(7, 2, 'H');
-    board[3][0] = new Guard(3, 0, 'H');
-    board[5][0] = new Guard(5, 0, 'H');
-    board[4][1] = new King(4, 1, 'H');
-    for (int i = 0; i < 9; i += 2) {
-        board[i][3] = new Pawn(i, 3, 'H');
-    }
-
-    // 초나라의 기본 기물 배치
-    board[0][9] = new Rook(0, 9, 'C');
-    board[8][9] = new Rook(8, 9, 'C');
-    board[1][7] = new Cannon(1, 7, 'C');
-    board[7][7] = new Cannon(7, 7, 'C');
-    board[3][9] = new Guard(3, 9, 'C');
-    board[5][9] = new Guard(5, 9, 'C');
-    board[4][8] = new King(4, 8, 'C');
-    for (int i = 0; i < 9; i += 2) {
-        board[i][6] = new Pawn(i, 6, 'C');
-    }
-}
-
-string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
-
-void setupBoard(Game& game, Player& player) {
-
-    if (&player == &game.han) {
-        while (true) { // while문
-            int num;
-            cout << "    <한나라 포진>\n\n"
-                << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
-                << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
-                << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
-                << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << "원하는 포진을 입력하세요\n" << ">>>";
-            cin >> num;
-            if (num > 0 && num < 5) { // if문
-                switch (num) { // switch문
-                case 1:
-                    cout << "한나라가 1. 마상상마 포진을 선택하였습니다.\n\n";
-                    board[1][0] = new Knight(1, 0, 'H');
-                    board[6][0] = new Knight(7, 0, 'H');
-                    board[2][0] = new Elephant(2, 0, 'H');
-                    board[7][0] = new Elephant(6, 0, 'H');
-                    break;
-                case 2:
-                    cout << "한나라가 2. 마상마상 포진을 선택하였습니다.\n\n";
-                    board[1][0] = new Knight(1, 0, 'H');
-                    board[6][0] = new Knight(6, 0, 'H');
-                    board[2][0] = new Elephant(2, 0, 'H');
-                    board[7][0] = new Elephant(7, 0, 'H');
-                    break;
-                case 3:
-                    cout << "한나라가 3. 상마상마 포진을 선택하였습니다.\n\n";
-                    board[2][0] = new Knight(2, 0, 'H');
-                    board[7][0] = new Knight(7, 0, 'H');
-                    board[1][0] = new Elephant(1, 0, 'H');
-                    board[6][0] = new Elephant(6, 0, 'H');
-                    break;
-                case 4:
-                    cout << "한나라가 4. 상마마상 포진을 선택하였습니다.\n\n";
-                    board[2][0] = new Knight(2, 0, 'H');
-                    board[6][0] = new Knight(6, 0, 'H');
-                    board[1][0] = new Elephant(1, 0, 'H');
-                    board[7][0] = new Elephant(7, 0, 'H');
-                    break;
-                } // switch문
-                break;
-            } // if문
-            else {
-                cout << "해당되는 포진이 없습니다.\n";
-            }
-        } // while문
-    }
-
-    else if (&player == &game.cho) {
-        while (true) { // while문
-            int num;
-            cout << "    <초나라 포진>\n\n"
-                << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
-                << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
-                << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
-                << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << "원하는 포진을 입력하세요\n" << ">>>";
-            cin >> num;
-            if (num > 0 && num < 5) { // if문
-                switch (num) { // switch문
-                case 1:
-                    cout << "초나라가 1. 마상상마 포진을 선택하였습니다.\n\n";
-                    board[1][9] = new Knight(1, 9, 'C');
-                    board[7][9] = new Knight(7, 9, 'C');
-                    board[2][9] = new Elephant(2, 9, 'C');
-                    board[6][9] = new Elephant(6, 9, 'C');
-                    break;
-                case 2:
-                    cout << "초나라가 2. 마상마마 포진을 선택하였습니다.\n\n";
-                    board[1][9] = new Knight(1, 9, 'C');
-                    board[6][9] = new Knight(6, 9, 'C');
-                    board[2][9] = new Elephant(2, 9, 'C');
-                    board[7][9] = new Elephant(7, 9, 'C');
-                    break;
-                case 3:
-                    cout << "초나라가 3. 상마상마 포진을 선택하였습니다.\n\n";
-                    board[2][9] = new Knight(2, 9, 'C');
-                    board[7][9] = new Knight(7, 9, 'C');
-                    board[1][9] = new Elephant(1, 9, 'C');
-                    board[6][9] = new Elephant(6, 9, 'C');
-                    break;
-                case 4:
-                    cout << "초나라가 4. 상마마상 포진을 선택하였습니다.\n\n";
-                    board[2][9] = new Knight(2, 9, 'C');
-                    board[6][9] = new Knight(6, 9, 'C');
-                    board[1][9] = new Elephant(1, 9, 'C');
-                    board[7][9] = new Elephant(7, 9, 'C');
-                    break;
-                } // switch문
-                break;
-            } // if문
-            else {
-                cout << "해당되는 포진이 없습니다.\n";
-            }
-        } // while문
-    }
-}
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
 Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
@@ -514,5 +368,4 @@ Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
 
         return board[tmpx][tmpy];
     }
-
 }
