@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 
+#define BOARD_WIDTH 9
+#define BOARD_HEIGHT 10
+
 using namespace std;
 
 class Player {
@@ -58,15 +61,17 @@ void mainMenu();
 void setupBoard(Game& game, Player& player);
 void printBoard();
 Piece* choosePiece(int player);
-bool isMovable(int x, int y, char team);
+int isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
 void undo();
 void setupInitialPieces();
 
-bool isMovable(int x, int y, char team) {
-    if (board[x][y] == nullptr || board[x][y]->team == team) return false;
-    else return true;
+int isMovable(int x, int y, char team) {
+    if (board[x][y] == nullptr) return 0;
+    else if (board[x][y]->team != team)
+        return 1;
+    else return 2;
 }
 
 void kill() {
@@ -80,22 +85,27 @@ class Rook : public Piece {
         if (team == 'H') letter = 'R';
         else letter = 'r';
     }
-
+    // 가능한 모든 경로를 생성하는 함수
     vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> validMoves;
+        vector<pair<int, int>> validMoves; // 반환할 경로 저장
         int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-        for (int i = 0; i < 4; i++) {
+        // 움직일 수 있는 4방향
+        for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
             int x = this->x + directions[i][0];
             int y = this->y + directions[i][1];
-            while (x >= 0 && x < 9 && y >= 0 && y < 10) {
-                if (isMovable(x, y, this->team)) {
-                    validMoves.push_back(make_pair(x, y));
-                    break;
-                } else {
-                    validMoves.push_back(make_pair(x, y));
+
+            while (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) { // 보드를 벗어나기 전까지 확장
+                int blockCheck = isMovable(x, y, this->team);
+
+                if (blockCheck == 0) { // isMovable로 움직일 수 있는 칸인지 체크
+                    validMoves.push_back(make_pair(x, y)); // 빈 칸일 경우 validMoves에 추가 후 계속 진행
                     x += directions[i][0];
                     y += directions[i][1];
-                }
+                } else if (blockCheck == 1) { // 적 기물을 만났을 경우 validMoves에 추가하고 탐색 종료
+                    validMoves.push_back(make_pair(x, y));
+                    break;
+                } else // 아군 기물을 만났을 경우 탐색 종료
+                    break;
             }
         }
         return validMoves;
@@ -124,6 +134,15 @@ class Knight : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> paths;
+        int moves[8][2] = {{1, 2}, {1, -2}, {-1, 2}, {-1, -2},
+                           {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
+        int blockcheck[8][2] = {{0, 1}, {0, -1}, {0, 1},  {0, -1},
+                                {1, 0}, {1, 0},  {-1, 0}, {-1, 0}};
+        for (int i = 0; i < 8; i++) {
+            int x = this->x + moves[i][0];
+            int y = this->y + moves[i][1];
+            
+        }
         return paths;
     }
 };
