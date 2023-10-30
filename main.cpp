@@ -55,14 +55,14 @@ void Piece::movePiece(int x, int y) {
 Game game;
 
 void mainMenu();
-void setupBoard(int han_setup, int cho_setup);
+void setupBoard(Game& game, Player& player);
 void printBoard();
 Piece* choosePiece(int player);
 bool isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
 void undo();
-
+void setupInitialPieces();
 
 bool isMovable(int x, int y, char team) {
     if (board[x][y] == nullptr || board[x][y]->team == team) return false;
@@ -315,12 +315,6 @@ int main() {
     return 0;
 }
 
-void setupInitialPieces() {
-    // 한나라의 기본 기물 배치
-    board[0][0] = new Rook(0, 0, 'H');
-	cout << "해당되는 포진이 없습니다.\n";
-}
-
 void mainMenu() {
     // clear the console
     system("clear");
@@ -353,7 +347,6 @@ void setupInitialPieces() {
     }
 }
 
-string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
 
 void setupBoard(Game& game, Player& player) {
 
