@@ -60,7 +60,7 @@ Game game;
 void mainMenu();
 void setupBoard(Game& game, Player& player);
 void printBoard();
-Piece* choosePiece(int player);
+Piece* choosePiece(Player& player);
 int isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
@@ -325,10 +325,7 @@ class Pawn : public Piece {
     }
 };
 
-
 stack<Piece*> previous;
-
-
 
 string msg[] = {
     ">>> ",
@@ -354,7 +351,14 @@ string msg[] = {
     "다시 입력해 주세요.\n",
     "해당 좌표에 기물이 존재하지 않거나 옳지 않은 입력입니다. ",
     "불가능한 이동입니다. ",
-    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n"
+    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n",
+    "잘못된 입력입니다. ‘y’또는 ‘Y’를 입력하세요.\n",
+    "상대 플레이어의 기물은 선택할 수 없습니다. ",
+    "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n",
+    "{num}()를 입력받았습니다.\n",
+    "{player}는 포진 선택과정을 진행하세요.\n",
+    "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
+    "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n"
 };
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
@@ -375,7 +379,7 @@ int main() {
         while (true) {
             // 한나라 턴
             printBoard(); // 보드출력
-            chosen = choosePiece(2); // 기물선택
+            chosen = choosePiece(game.han); // 기물선택
             chosen->movePiece(x,y); // 기물이동
             printBoard(); // 이동후 보드출력
 
@@ -384,7 +388,7 @@ int main() {
 
             // 초나라 턴
             printBoard();
-            chosen = choosePiece(1); 
+            chosen = choosePiece(game.cho); 
             chosen->movePiece(x,y);
             printBoard();
 
@@ -398,7 +402,7 @@ int main() {
         while (true) {
             // 초나라 턴
             printBoard(); // 보드출력
-            chosen = choosePiece(1); // 기물선택
+            chosen = choosePiece(game.han); // 기물선택
             chosen->movePiece(x,y); // 기물이동
             printBoard(); // 이동후 보드출력
 
@@ -407,7 +411,7 @@ int main() {
 
             // 한나라 턴
             printBoard();
-            chosen = choosePiece(2); 
+            chosen = choosePiece(game.cho); 
             chosen->movePiece(x,y);
             printBoard();
 
