@@ -175,8 +175,8 @@ class Cannon : public Piece {
         for (int i = 0; i < 4; i++) {
             if ((this->x == starpointsHan[i][0]) && (this->y == starpointsHan[i][1])) {
                 if (board[4][1] != nullptr) {
-                    int x = starpointHan[((i + 2) % 4)][0];
-                    int y = starpointHan[((i + 2) % 4)][1];
+                    int x = starpointsHan[((i + 2) % 4)][0];
+                    int y = starpointsHan[((i + 2) % 4)][1];
                     if (isMovable(x, y, this->team) == 2);
                     else {
                         validMoves.push_back(make_pair(x, y)); // 궁성 가운데 기물이 있을 때 반대쪽 방향 저장
@@ -187,8 +187,8 @@ class Cannon : public Piece {
         for (int i = 0; i < 4; i++) {
             if ((this->x == starpointsCho[i][0]) && (this->y == starpointsCho[i][1])) {
                 if (board[4][8] != nullptr) {
-                    int x = starpointHan[((i + 2) % 4)][0];
-                    int y = starpointHan[((i + 2) % 4)][1];
+                    int x = starpointsHan[((i + 2) % 4)][0];
+                    int y = starpointsHan[((i + 2) % 4)][1];
                     if (isMovable(x, y, this->team) == 2);
                     else {
                         validMoves.push_back(make_pair(x, y)); // 궁성 가운데 기물이 있을 때 반대쪽 방향 저장
