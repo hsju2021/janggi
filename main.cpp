@@ -95,13 +95,13 @@ class Rook : public Piece {
             int y = this->y + directions[i][1];
 
             while (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) { // 보드를 벗어나기 전까지 확장
-                int blockCheck = isMovable(x, y, this->team);
+                int movableFlag = isMovable(x, y, this->team);
 
-                if (blockCheck == 0) { // isMovable로 움직일 수 있는 칸인지 체크
+                if (movableFlag == 0) { // isMovable로 움직일 수 있는 칸인지 체크
                     validMoves.push_back(make_pair(x, y)); // 빈 칸일 경우 validMoves에 추가 후 계속 진행
                     x += directions[i][0];
                     y += directions[i][1];
-                } else if (blockCheck == 1) { // 적 기물을 만났을 경우 validMoves에 추가하고 탐색 종료
+                } else if (movableFlag == 1) { // 적 기물을 만났을 경우 validMoves에 추가하고 탐색 종료
                     validMoves.push_back(make_pair(x, y));
                     break;
                 } else // 아군 기물을 만났을 경우 탐색 종료
@@ -130,8 +130,8 @@ class Cannon : public Piece {
 
             int canJump = 0; // 해당 방향에서 넘을 기물이 있는지 체크
             while (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) { // 보드를 벗어나기 전까지 확장 (한쪽 방향으로)
-                int blockCheck = isMovable(x, y, this->team);
-                if (blockCheck == 0) { // isMoveable로 이동 예정 칸의 상태 체크 (빈칸, 상대기물, 내 기물 3가지 경우로 나누어 수행)
+                int movableFlag = isMovable(x, y, this->team);
+                if (movableFlag == 0) { // isMoveable로 이동 예정 칸의 상태 체크 (빈칸, 상대기물, 내 기물 3가지 경우로 나누어 수행)
                     if (canJump == 1) {
                         validMoves.push_back(make_pair(x, y)); // 빈 칸이고 넘을 기물이 있을 경우 경로에 저장
                         x += directions[i][0];
@@ -139,7 +139,7 @@ class Cannon : public Piece {
                     }
                     // 빈칸인데 넘을 기물이 없다면 다음 탐색 진행
                 }
-                else if (blockCheck == 1) {
+                else if (movableFlag == 1) {
                     if (canJump == 0) { // 이전까지 넘을 기물 없었음
                         canJump = 1; // 해당 방향에 처음으로 넘을 적 기물이 나타남
                     }
@@ -245,9 +245,21 @@ class King : public Piece {
         for (int i = 0; i < 8; i++) {
             int x = this->x + directions[i][0];
             int y = this->y + directions[i][1];
-            if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
-                !isMovable(x, y, this->team))
-                validMoves.push_back(make_pair(x, y));
+            int movableFlag = isMovable(x, y, team);
+
+            if (this->team == 'H') {
+                if (x >= 3 && x <= 5 && y >= 8 && y <= 10) {
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            } else {
+                if (x >= 3 && x <= 5 && y >= 0 && y <= 2) {
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
         }
         return validMoves;
     }
@@ -267,9 +279,21 @@ class Guard : public Piece {
         for (int i = 0; i < 8; i++) {
             int x = this->x + directions[i][0];
             int y = this->y + directions[i][1];
-            if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
-                !isMovable(x, y, this->team))
-                validMoves.push_back(make_pair(x, y));
+            int movableFlag = isMovable(x, y, team);
+
+            if (this->team == 'H') {
+                if (x >= 3 && x <= 5 && y >= 8 && y <= 10) {
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            } else {
+                if (x >= 3 && x <= 5 && y >= 0 && y <= 2) {
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
         }
         return validMoves;
     }
@@ -284,20 +308,8 @@ class Pawn : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
-        if (this->team == 'C') {
-            if (this->x + 1 < 9 && board[this->x + 1][this->y]->team == 'H')
-                validMoves.push_back(make_pair(this->x + 1, this->y));
-            if (this->x - 1 >= 0 && board[this->x - 1][this->y]->team == 'H')
-                validMoves.push_back(make_pair(this->x - 1, this->y));
-            if (this->y + 1 < 10 && board[this->x][this->y + 1]->team == 'H')
-                validMoves.push_back(make_pair(this->x, this->y + 1));
-        } else {
-            if (this->x + 1 < 9 && board[this->x + 1][this->y]->team == 'C')
-                validMoves.push_back(make_pair(this->x + 1, this->y));
-            if (this->x - 1 >= 0 && board[this->x - 1][this->y]->team == 'C')
-                validMoves.push_back(make_pair(this->x - 1, this->y));
-            if (this->y - 1 >= 0 && board[this->x][this->y - 1]->team == 'C')
-                validMoves.push_back(make_pair(this->x, this->y - 1));
+        if (this->team == 'H') {
+            
         }
         return validMoves;
     }
