@@ -66,6 +66,8 @@ void kill();
 bool choCheckWin();
 void undo();
 void setupInitialPieces();
+int remove_piece_num();
+void remove_select_piece(int num);
 
 int isMovable(int x, int y, char team) {
     if (board[x][y] == nullptr) return 0;
@@ -75,6 +77,14 @@ int isMovable(int x, int y, char team) {
 }
 
 void kill() {
+
+}
+
+int remove_piece_num() {
+
+}
+
+void remove_select_piece(int num){
 
 }
 
@@ -313,7 +323,6 @@ class Pawn : public Piece {
         }
         return validMoves;
     }
-
 };
 
 
@@ -351,15 +360,18 @@ string msg[] = {
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
 int main() {
-    int num, x, y;
+    int remove, x, y;
     Piece* chosen;
 
     mainMenu();
     setupInitialPieces();
-    setupBoard(game, game.han);
-    setupBoard(game, game.cho);
+    remove = remove_piece_num();
+    if (remove) { // 제거할 기물이 1개 이상
+        // 한나라, 초나라 포진 과정
+        setupBoard(game, game.han);
+        remove_select_piece(remove);
+        setupBoard(game, game.cho);
 
-    if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
         while (true) {
             // 한나라 턴
             printBoard(); // 보드출력
@@ -381,8 +393,10 @@ int main() {
         }
     }
     else { // 제거할 기물이 0개
+        setupBoard(game, game.han);
+        setupBoard(game, game.cho);
         while (true) {
-            // 한나라 턴
+            // 초나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(1); // 기물선택
             chosen->movePiece(x,y); // 기물이동
@@ -391,7 +405,7 @@ int main() {
             if(choCheckWin()) break; // 승패여부 처리
             cout << endl; //턴 넘기기 메세지 처리 필요
 
-            // 초나라 턴
+            // 한나라 턴
             printBoard();
             chosen = choosePiece(2); 
             chosen->movePiece(x,y);
@@ -401,6 +415,8 @@ int main() {
             cout << endl; //턴 넘기기 메세지 처리 필요
         }
     }
+    
+    
     return 0;
 }
 
@@ -508,7 +524,7 @@ void setupBoard(Game& game, Player& player) {
                     board[6][9] = new Elephant(6, 9, 'C');
                     break;
                 case 2:
-                    cout << "초나라가 2. 마상마마 포진을 선택하였습니다.\n\n";
+                    cout << "초나라가 2. 마상마상 포진을 선택하였습니다.\n\n";
                     board[1][9] = new Knight(1, 9, 'C');
                     board[6][9] = new Knight(6, 9, 'C');
                     board[2][9] = new Elephant(2, 9, 'C');
@@ -539,7 +555,7 @@ void setupBoard(Game& game, Player& player) {
 }
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
-Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
+Piece* choosePiece(Player& player) {
     int tmpx, tmpy;
     string coord;
 
@@ -569,7 +585,7 @@ Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
             continue;
         }
 
-        if ((player == 2 && board[tmpx][tmpy]->team == 'C') || (player == 1 && board[tmpx][tmpy]->team == 'H')) {
+        if ((&player == &game.han && board[tmpx][tmpy]->team == 'C') || (&player == &game.cho && board[tmpx][tmpy]->team == 'H')) {
             cout << msg[25] << msg[20] << endl;
             continue;
         }
