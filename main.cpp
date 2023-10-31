@@ -42,16 +42,21 @@ Piece* board[9][10] = {
 
 };
 
+
 void Piece::movePiece(int x, int y) {
     vector<pair<int, int>> paths = generatePaths();
-    for (int i = 0; i < paths.size(); i++) {
-        if (paths[i].first == x && paths[i].second == y) {
-            board[x][y] = board[this->x][this->y];
-            board[this->x][this->y] = nullptr;
-            this->x = x;
-            this->y = y;
-            break;
+    while(1) {
+        for (int i = 0; i < paths.size(); i++) {
+            if (paths[i].first == x && paths[i].second == y) {
+                board[x][y] = board[this->x][this->y];
+                board[this->x][this->y] = nullptr;
+                this->x = x;
+                this->y = y;
+                return;
+            }
         }
+        cout << "다시 입력해 주세요.\n";
+        cin >> x >> y;
     }
 }
 
