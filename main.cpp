@@ -464,6 +464,7 @@ void mainMenu() {
     
 }
 
+// 김의찬 작성
 void setupInitialPieces() {
     // 한나라의 기본 기물 배치
     board[0][0] = new Rook(0, 0, 'H');
@@ -589,6 +590,89 @@ void setupBoard(Game& game, Player& player) {
                 cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
+       cin.ignore();
+    }
+}
+void remove_select_piece(int num) {
+    vector<string> piecesToRemove;
+    switch (num) {
+    case 1:
+        cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        break;
+    case 2:
+        cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        break;
+    case 3:
+        cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C"); 
+        piecesToRemove.push_back("N");
+        break;
+    case 4:
+        cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        break;
+    case 5:
+        cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        break;
+    case 6:
+        cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        piecesToRemove.push_back("P");
+        break;
+    default:
+        return;
+    }
+    string input;
+    getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
+
+    stringstream ss(input);
+    vector<pair<int, int>> coordinates;
+   
+    string token;
+    while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
+        if (token.size() == 2) {
+            int x = token[0] - 'A';
+            int y = token[1] - '0';
+            coordinates.push_back({ x, y });
+        }
+    }
+    for (const auto& coord : coordinates) {
+        int x = coord.first;
+        int y = coord.second;
+
+        if (board[x][y] && board[x][y]->team == 'H') {
+            string currentPiece(1, board[x][y]->letter);
+            auto it = find(piecesToRemove.begin(), piecesToRemove.end(), currentPiece);
+            if (it != piecesToRemove.end()) {
+                delete board[x][y];
+                board[x][y] = nullptr;
+                piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
+            }
+            else {
+                cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+                return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
+            }
+        }
+        else {
+            cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+            return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
+        }
     }
 }
 
