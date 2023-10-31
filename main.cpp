@@ -119,9 +119,46 @@ class Cannon : public Piece {
         else letter = 'c';
     }
 
-    vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        return paths;
+    // 가능한 모든 경로를 생성하는 함수
+    vector<pair<int, int>> generatePaths() override { // 김종우 수정 사항
+        vector<pair<int, int>> validMoves; // 반환할 경로 저장
+        int directions[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
+        // 움직일 수 있는 4방향
+        for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
+            int x = this->x + directions[i][0];
+            int y = this->y + directions[i][1];
+
+            int canJump = 0; // 해당 방향에서 넘을 기물이 있는지 체크
+            while (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) { // 보드를 벗어나기 전까지 확장 (한쪽 방향으로)
+                int blockCheck = isMovable(x, y, this->team);
+                if (blockCheck == 0) { // isMoveable로 이동 예정 칸의 상태 체크 (빈칸, 상대기물, 내 기물 3가지 경우로 나누어 수행)
+                    if (canJump == 1) {
+                        validMoves.push_back(make_pair(x, y)); // 빈 칸이고 넘을 기물이 있을 경우 경로에 저장
+                        x += directions[i][0];
+                        y += directions[i][1];
+                    }
+                    // 빈칸인데 넘을 기물이 없다면 다음 탐색 진행
+                }
+                else if (blockCheck == 1) {
+                    if (canJump == 0) { // 이전까지 넘을 기물 없었음
+                        canJump = 1; // 해당 방향에 처음으로 넘을 적 기물이 나타남
+                    }
+                    else {
+                        validMoves.push_back(make_pair(x, y)); // canJump == 1이고 (넘을 기물이 있고) 상대방 기물을 만나게 되면 해당 경로 저장
+                        break; // 적 기물을 잡을 수 있는 경우이므로 탐색 종료
+                    }
+                }
+                else {
+                    if (canJump == 0) {
+                        canJump = 1; // 해당 방향에서 처음으로 넘을 내 기물이 나타남
+                    }
+                    else
+                        break; // 넘을 수 있는데 내 기물이 나타나면 해당 방향으로 더이상 이동 불가능 - 탐색 종료
+                }
+
+            }
+        }
+        return validMoves;
     }
 };
 
@@ -132,18 +169,29 @@ class Knight : public Piece {
         else letter = 'n';
     }
 
-    vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        int moves[8][2] = {{1, 2}, {1, -2}, {-1, 2}, {-1, -2},
-                           {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
-        int blockcheck[8][2] = {{0, 1}, {0, -1}, {0, 1},  {0, -1},
-                                {1, 0}, {1, 0},  {-1, 0}, {-1, 0}};
-        for (int i = 0; i < 8; i++) {
-            int x = this->x + moves[i][0];
-            int y = this->y + moves[i][1];
-            
+    vector<pair<int, int>> generatePaths() override { // 김종우 수정 사항
+        vector<pair<int, int>> validMoves;
+        int moves[8][2] = { {1, 2}, {1, -2}, {-1, 2}, {-1, -2},     // knight가 최종적으로 이동하는 위치 8개 (최종 좌표)
+                           {2, 1}, {2, -1}, {-2, 1}, {-2, -1} };
+        int blockcheck[8][2] = { {0, 1}, {0, -1}, {0, 1},  {0, -1}, // knight의 최종 좌표 별 지나가는 좌표 8개
+                                {1, 0}, {1, 0},  {-1, 0}, {-1, 0} };
+        for (int i = 0; i < 8; i++) {   // 8개 좌표 모두 검사
+            int x = this->x + blockcheck[i][0]; // 지나가는 좌표 x, y 값 저장
+            int y = this->y + blockcheck[i][1];
+            if (x >= 0 && x < 9 && y >= 0 && y < 10) {  // 지나가는 좌표가 판을 벗어나는지 검사
+                if (isMovable(x, y, this->team) == 0) { // 지나가는 좌표에 기물이 없어야 다음 단계로 진행
+                    x = this->x + moves[i][0];  // 최종 좌표 x, y 값 저장           
+                    y = this->y + moves[i][1];
+                    if (x >= 0 && x < 9 && y >= 0 && y < 10) {  // 최종 좌표가 판을 벗어나는지 검사
+                        if (isMovable(x, y, this->team) == 2);  // 최종 좌표에 나의 기물이 있다면 다음 탐색 진행
+                        else {
+                            validMoves.push_back(make_pair(x, y)); // 빈 좌표나 적 기물이 있다면 경로에 저장
+                        }
+                    }
+                }
+            }
         }
-        return paths;
+        return validMoves;
     }
 };
 
@@ -154,9 +202,32 @@ class Elephant : public Piece {
         else letter = 'e';
     }
 
-    vector<pair<int, int>> generatePaths() override {
-        vector<pair<int, int>> paths;
-        return paths;
+    vector<pair<int, int>> generatePaths() override { // 김종우 수정 사항
+        vector<pair<int, int>> validMoves;
+        int moves[8][2] = { {2, 3}, {2, -3}, {-2, 3}, {-2, -3},         // Elephant가 최종적으로 이동하는 위치 8개 (최종 좌표)
+                           {3, 2}, {3, -2}, {-3, 2}, {-3, -2} };
+        int blockcheck1[8][2] = { {0, 1}, {0, -1}, {0, 1},  {0, -1},    // Elephant의 최종 좌표 별 첫번째로 지나가는 좌표 8개
+                                 {1, 0}, {1, 0},  {-1, 0}, {-1, 0} };
+        int blockcheck2[8][2] = { {1, 2}, {1, -2}, {-1, 2}, {-1, -2},   // Elephant의 최종 좌표 별 두번째로 지나가는 좌표 8개
+                                 {2, 1}, {2, -1}, {-2, 1}, {-2, -1} };
+        for (int i = 0; i < 8; i++) {
+            int x = this->x + blockcheck1[i][0];    // 첫번째로 지나가는 좌표 x, y값 저장
+            int y = this->y + blockcheck1[i][1];
+            if (x >= 0 && x < 9 && y >= 0 && y < 10 && !isMovable(x, y, this->team)) {  // 첫번째 좌표가 판을 벗어나는지, 해당 좌표가 비었는지 검사
+                x = this->x + blockcheck2[i][0];    // 두번째로 지나가는 좌표 x, y값 저장
+                y = this->y + blockcheck2[i][1];
+                if (x >= 0 && x < 9 && y >= 0 && y < 10 && !isMovable(x, y, this->team)) {  // 두번째 좌표가 판을 벗어나는지, 해당 좌표가 비었는지 검사
+                    x = this->x + moves[i][0];  // 최종 좌표 x, y 값 저장 
+                    y = this->y + moves[i][1];
+                    if (x >= 0 && x < 9 && y >= 0 && y < 10) { // 최종 좌표가 판을 벗어나는지 검사
+                        if (isMovable(x, y, this->team) == 2);  // 최종 좌표에 나의 기물이 있다면 다음 탐색 진행
+                        else
+                            validMoves.push_back(make_pair(x, y)); // 최종 좌표가 비었거나 상대 기물이 있다면 경로 저장
+                    }
+                }
+            }
+        }
+        return validMoves;
     }
 };
 
@@ -492,5 +563,36 @@ Piece* choosePiece(int player) { // player가 1이면 초, 2이면 한
         }
 
         return board[tmpx][tmpy];
+    }
+}
+
+// 김종우 작성 - 보드 출력 
+void printBoard() {
+    int starpoints[10][2] = { {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},   // 궁성 좌표 저장
+                            {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
+    system("clear");    // 프롬프트 clear
+    cout << "   A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
+    for (int row = 0; row < 10; row++) {
+        cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
+        for (int col = 0; col < 9; col++) { // 보드 출력 과정
+            if (board[col][row] != nullptr) {
+                cout << board[col][row]->letter << "|"; // Piece 있으면 letter 출력 + "|"
+            }
+            else {
+                int isStarpoint = 0; // 궁성인지 아닌지 저장 (궁성 아닐 때 빈 자리 출력하기 위해 사용)
+                for (int i = 0; i < 10; i++) {
+                    if ((col == starpoints[i][0]) && (row == starpoints[i][1])) {   // 궁성의 10가지 경우의 수와 비교
+                        cout << "*|";
+                        isStarpoint = 1;
+                        break;
+                    }
+                }
+                if (isStarpoint == 0)
+                    cout << " |";   // 궁성 아닌 빈자리 <공백문자> + "|" 출력
+            }
+        }
+        if (row == 0) { cout << "한나라 score : " << game.han.score; } // 첫째 줄에 한나라 score 출력
+        else if (row == 1) { cout << "초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
+        cout << endl;
     }
 }
