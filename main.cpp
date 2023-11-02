@@ -672,13 +672,13 @@ void remove_select_piece(int num) {
     vector<pair<int, int>> coordinates;
    
     string token;
-    while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
-        if (token.size() == 2) {
-            int x = token[0] - 'A';
-            int y = token[1] - '0';
-            coordinates.push_back({ x, y });
-        }
-    }
+      while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
+       if (token.size() == 2) {
+        int y = token[0] - '0';  // 먼저 숫자를 읽습니다.
+        int x = token[1] - 'A';  // 그 다음 문자를 읽습니다.
+        coordinates.push_back({ x, y });
+       }
+   }
     for (const auto& coord : coordinates) {
         int x = coord.first;
         int y = coord.second;
