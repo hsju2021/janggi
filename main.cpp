@@ -134,10 +134,6 @@ void kill() {
 
 }
 
-int remove_piece_num() {
-
-}
-
 void undo() {
 
 }
@@ -630,6 +626,44 @@ void setupBoard(Game& game, Player& player) {
        cin.ignore();
     }
 }
+
+int remove_piece_num() {
+    int num;
+    while (true) {
+        cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << ">>>";
+        cin >> num;
+        if (num >= 0 && num <= 6) {
+            switch (num) {
+            case 0:
+                cout << "0을 입력받았습니다\n";
+                break;
+            case 1:
+                cout << "1(차)를 입력받았습니다\n";
+                break;
+            case 2:
+                cout << "2(차/포)를 입력받았습니다\n";
+                break;
+            case 3:
+                cout << "3(차/포/마)를 입력받았습니다\n";
+                break;
+            case 4:
+                cout << "4(차/포/마/상)를 입력받았습니다\n";
+                break;
+            case 5:
+                cout << "5(차/포/마/상/사)를 입력받았습니다\n";
+                break;
+            case 6:
+                cout << "6(차/포/마/상/사/졸)를 입력받았습니다\n";
+                break;
+            }
+            return num;
+        }
+        else {
+            cout << "1과 6 사이의 정수를 입력하시오\n";
+        }
+    }
+}
+
 void remove_select_piece(int num) {
     vector<string> piecesToRemove;
     switch (num) {
