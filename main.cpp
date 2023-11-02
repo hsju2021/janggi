@@ -10,6 +10,7 @@
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
+#define MAX_TURN 100
 
 using namespace std;
 
@@ -71,7 +72,7 @@ class Piece {
         this->y = y;
         this->team = team;
     }
-    void movePiece(int x, int y);
+    void movePiece();
     virtual vector<pair<int, int>> generatePaths() = 0;
 
     virtual ~Piece() = default;
@@ -82,30 +83,38 @@ Piece* board[9][10] = {
 };
 
 
-void Piece::movePiece(int x, int y) {
+void Piece::movePiece() {
     vector<pair<int, int>> paths = generatePaths();
+    int tmpx, tmpy;
     string coord;
 
-    while(1) {
-        cout << msg[6] << endl << ">>>";
+    while (1) {
+        // print paths
+        cout << "가능한 경로 : ";
+        for (int i = 0; i < paths.size(); i++) {
+            cout << "(" << paths[i].first << ", " << paths[i].second << ") ";
+        }
+        cout << '\n';
+        cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
         getline(cin, coord);
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
             cout << msg[21] << msg[20] << endl;
-            continue;
+            // continue;
         }
 
+        // 규칙에 맞을 경우 숫자로 변환
+        tmpx = coord[0] - '0';
+        tmpy = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
+
         for (int i = 0; i < paths.size(); i++) {
-            if (paths[i].first == x && paths[i].second == y) {
-                board[x][y] = board[this->x][this->y];
-                board[this->x][this->y] = nullptr;
-                this->x = x;
-                this->y = y;
+            if (paths[i].first == tmpx && paths[i].second == tmpy) {
+                board[tmpx][tmpy] = board[x][y];
+                board[x][y] = nullptr;
                 return;
-            }
+            } 
         }
-        cout << msg[20];
     }
 }
 
@@ -402,8 +411,32 @@ class Pawn : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
+        int hanDirections[3][2] = {{0, -1}, {1, 0}, {-1, 0}};
+        int choDirections[3][2] = {{0, 1}, {1, 0}, {-1, 0}};
         if (this->team == 'H') {
-            
+            for (int i = 0; i < 3; i++) {
+                int x = this->x + hanDirections[i][0];
+                int y = this->y + hanDirections[i][1];
+                int movableFlag = isMovable(x, y, team);
+
+                if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < 3; i++) {
+                int x = this->x + choDirections[i][0];
+                int y = this->y + choDirections[i][1];
+                int movableFlag = isMovable(x, y, team);
+
+                if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
         }
         return validMoves;
     }
@@ -431,7 +464,7 @@ int main() {
             // 한나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
-            chosen->movePiece(x,y); // 기물이동
+            chosen->movePiece(); // 기물이동
             printBoard(); // 이동후 보드출력
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -440,7 +473,7 @@ int main() {
             // 초나라 턴
             printBoard();
             chosen = choosePiece(game.cho); 
-            chosen->movePiece(x,y);
+            chosen->movePiece();
             printBoard();
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -454,7 +487,7 @@ int main() {
             // 초나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
-            chosen->movePiece(x,y); // 기물이동
+            chosen->movePiece(); // 기물이동
             printBoard(); // 이동후 보드출력
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -463,7 +496,7 @@ int main() {
             // 한나라 턴
             printBoard();
             chosen = choosePiece(game.cho); 
-            chosen->movePiece(x,y);
+            chosen->movePiece();
             printBoard();
 
             if(choCheckWin()) break; // 승패여부 처리
