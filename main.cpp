@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <sstream>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
@@ -89,9 +90,7 @@ int remove_piece_num() {
 
 }
 
-void remove_select_piece(int num){
 
-}
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
