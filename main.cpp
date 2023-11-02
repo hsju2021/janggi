@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <windows.h>
+#include <algorithm>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
@@ -94,6 +95,13 @@ int remove_piece_num() {
 
 }
 
+void undo() {
+
+}
+
+bool choCheckWin() {
+    
+}
 
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
