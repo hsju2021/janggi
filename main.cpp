@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <stdlib.h>
+#include <windows.h>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
@@ -37,6 +39,8 @@ class Piece {
     }
     void movePiece(int x, int y);
     virtual vector<pair<int, int>> generatePaths() = 0;
+
+    virtual ~Piece() = default;
 };
 
 Piece* board[9][10] = {
@@ -459,7 +463,23 @@ int main() {
 
 void mainMenu() {
     // clear the console
-    system("clear");
+    string s = "";
+    while (1) {
+        system("clear");
+        cout << "메뉴를 선택하세요." << endl;
+        cout << "1. 게임 실행" << endl;
+        cout << "2. 게임 종료" << endl;
+        cin >> s;
+        if (s != "1" && s != "2") {
+            cout << msg[19]  << endl;
+            cout << msg[20] << endl;
+        }
+        if (s == "2")
+            exit(0);
+        if (s == "1")
+            return;
+        Sleep(1000);
+    }
     
 }
 
