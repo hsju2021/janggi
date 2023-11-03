@@ -803,9 +803,9 @@ Piece* choosePiece(Player& player) {
             continue;
         }
 
-        tmpx = coord[0] - '0';
-        tmpy = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
-
+        tmpx = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
+        tmpy = coord[0] - '0';
+        
         if (board[tmpx][tmpy] == nullptr) {
             cout << msg[21] << msg[20] << endl;
             continue;
