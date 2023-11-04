@@ -552,6 +552,7 @@ void setupInitialPieces() {
     }
 }
 
+string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
 
 void setupBoard(Game& game, Player& player) {
 
@@ -563,33 +564,33 @@ void setupBoard(Game& game, Player& player) {
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << "원하는 포진을 입력하세요\n" << ">>>";
+            cout << msg[2] << msg[0];
             cin >> num;
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
-                    cout << "한나라가 1. 마상상마 포진을 선택하였습니다.\n\n";
+                    cout << "한나라가 " << setup[0] << " 포진을 선택하였습니다.\n\n";
                     board[1][0] = new Knight(1, 0, 'H');
                     board[6][0] = new Knight(7, 0, 'H');
                     board[2][0] = new Elephant(2, 0, 'H');
                     board[7][0] = new Elephant(6, 0, 'H');
                     break;
                 case 2:
-                    cout << "한나라가 2. 마상마상 포진을 선택하였습니다.\n\n";
+                    cout << "한나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
                     board[1][0] = new Knight(1, 0, 'H');
                     board[6][0] = new Knight(6, 0, 'H');
                     board[2][0] = new Elephant(2, 0, 'H');
                     board[7][0] = new Elephant(7, 0, 'H');
                     break;
                 case 3:
-                    cout << "한나라가 3. 상마상마 포진을 선택하였습니다.\n\n";
+                    cout << "한나라가 " << setup[2] << " 포진을 선택하였습니다.\n\n";
                     board[2][0] = new Knight(2, 0, 'H');
                     board[7][0] = new Knight(7, 0, 'H');
                     board[1][0] = new Elephant(1, 0, 'H');
                     board[6][0] = new Elephant(6, 0, 'H');
                     break;
                 case 4:
-                    cout << "한나라가 4. 상마마상 포진을 선택하였습니다.\n\n";
+                    cout << "한나라가 " << setup[3] << " 포진을 선택하였습니다.\n\n";
                     board[2][0] = new Knight(2, 0, 'H');
                     board[6][0] = new Knight(6, 0, 'H');
                     board[1][0] = new Elephant(1, 0, 'H');
@@ -599,10 +600,9 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << "해당되는 포진이 없습니다.\n";
+                cout << msg[23];
             }
         } // while문
-        cin.ignore();
     }
 
     else if (&player == &game.cho) {
@@ -613,33 +613,33 @@ void setupBoard(Game& game, Player& player) {
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << "원하는 포진을 입력하세요\n" << ">>>";
+            cout << msg[2] << msg[0];
             cin >> num;
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
-                    cout << "초나라가 1. 마상상마 포진을 선택하였습니다.\n\n";
+                    cout << "초나라가 " << setup[0] << " 포진을 선택하였습니다.\n\n";
                     board[1][9] = new Knight(1, 9, 'C');
                     board[7][9] = new Knight(7, 9, 'C');
                     board[2][9] = new Elephant(2, 9, 'C');
                     board[6][9] = new Elephant(6, 9, 'C');
                     break;
                 case 2:
-                    cout << "초나라가 2. 마상마상 포진을 선택하였습니다.\n\n";
+                    cout << "초나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
                     board[1][9] = new Knight(1, 9, 'C');
                     board[6][9] = new Knight(6, 9, 'C');
                     board[2][9] = new Elephant(2, 9, 'C');
                     board[7][9] = new Elephant(7, 9, 'C');
                     break;
                 case 3:
-                    cout << "초나라가 3. 상마상마 포진을 선택하였습니다.\n\n";
+                    cout << "초나라가 " << setup[2] << " 포진을 선택하였습니다.\n\n";
                     board[2][9] = new Knight(2, 9, 'C');
                     board[7][9] = new Knight(7, 9, 'C');
                     board[1][9] = new Elephant(1, 9, 'C');
                     board[6][9] = new Elephant(6, 9, 'C');
                     break;
                 case 4:
-                    cout << "초나라가 4. 상마마상 포진을 선택하였습니다.\n\n";
+                    cout << "초나라가 " << setup[3] << " 포진을 선택하였습니다.\n\n";
                     board[2][9] = new Knight(2, 9, 'C');
                     board[6][9] = new Knight(6, 9, 'C');
                     board[1][9] = new Elephant(1, 9, 'C');
@@ -649,95 +649,133 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << "해당되는 포진이 없습니다.\n";
+                cout << msg[23];
             }
         } // while문
-<<<<<<< HEAD
+    }
+    cin.ignore();
+}
 
-        void remove_select_piece(int num) {
-            vector<string> piecesToRemove;
+int remove_piece_num() {
+    int num;
+    while (true) {
+        cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << msg[0];
+        cin >> num;
+        if (num >= 0 && num <= 6) {
             switch (num) {
+            case 0:
+                cout << "0을 입력받았습니다\n";
+                break;
             case 1:
-                cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
+                cout << "1(차)를 입력받았습니다\n";
                 break;
             case 2:
-                cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
+                cout << "2(차/포)를 입력받았습니다\n";
                 break;
             case 3:
-                cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
+                cout << "3(차/포/마)를 입력받았습니다\n";
                 break;
             case 4:
-                cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                piecesToRemove.push_back("E");
+                cout << "4(차/포/마/상)를 입력받았습니다\n";
                 break;
             case 5:
-                cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                piecesToRemove.push_back("E");
-                piecesToRemove.push_back("G");
+                cout << "5(차/포/마/상/사)를 입력받았습니다\n";
                 break;
             case 6:
-                cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                piecesToRemove.push_back("E");
-                piecesToRemove.push_back("G");
-                piecesToRemove.push_back("P");
+                cout << "6(차/포/마/상/사/졸)를 입력받았습니다\n";
                 break;
-            default:
-                return;
             }
-            string input;
-            getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
+            return num;
+        }
+        else {
+            cout << "1과 6 사이의 정수를 입력하시오\n";
+        }
+    }
 
-            stringstream ss(input);
-            vector<pair<int, int>> coordinates;
+}
 
-            string token;
-            while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
-                if (token.size() == 2) {
-                    int x = token[0] - 'A';
-                    int y = token[1] - '0';
-                    coordinates.push_back({ x, y });
-                }
-            }
-            for (const auto& coord : coordinates) {
-                int x = coord.first;
-                int y = coord.second;
+void remove_select_piece(int num) {
+    vector<string> piecesToRemove;
+    switch (num) {
+    case 1:
+        cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        break;
+    case 2:
+        cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        break;
+    case 3:
+        cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        break;
+    case 4:
+        cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        break;
+    case 5:
+        cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        break;
+    case 6:
+        cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        piecesToRemove.push_back("P");
+        break;
+    default:
+        return;
+    }
+    string input;
+    getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
 
-                if (board[x][y] && board[x][y]->team == 'H') {
-                    string currentPiece(1, board[x][y]->letter);
-                    auto it = find(piecesToRemove.begin(), piecesToRemove.end(), currentPiece);
-                    if (it != piecesToRemove.end()) {
-                        delete board[x][y];
-                        board[x][y] = nullptr;
-                        piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
-                    }
-                    else {
-                        cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
-                        return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
-                    }
-                }
-                else {
-                    cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
-                    return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
-                }
+    stringstream ss(input);
+    vector<pair<int, int>> coordinates;
+
+    string token;
+    while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
+        if (token.size() == 2) {
+            int x = token[0] - '0';
+            int y = token[1] - 'A';
+            if (x >= 0 && x < 9 && y >= 0 && y < 10) {
+                coordinates.push_back({ x, y });
             }
         }
-=======
-=======
+    }
+    for (const auto& coord : coordinates) {
+        int x = coord.first;
+        int y = coord.second;
+
+        if (board[x][y] && board[x][y]->team == 'H') {
+            string currentPiece(1, board[x][y]->letter);
+            auto it = find(piecesToRemove.begin(), piecesToRemove.end(), currentPiece);
+            if (it != piecesToRemove.end()) {
+                delete board[x][y];
+                board[x][y] = nullptr;
+                piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
+            }
+            else {
+                cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+                return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
+            }
+        }
+        else {
+            cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+            return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
+        }
     }
 }
 >>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
