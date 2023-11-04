@@ -525,6 +525,7 @@ void setupInitialPieces() {
     }
 }
 
+string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
 
 void setupBoard(Game& game, Player& player) {
 
@@ -681,7 +682,7 @@ void remove_select_piece(int num) {
     case 3:
         cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << msg[0];
         piecesToRemove.push_back("R");
-        piecesToRemove.push_back("C"); 
+        piecesToRemove.push_back("C");
         piecesToRemove.push_back("N");
         break;
     case 4:
@@ -716,13 +717,15 @@ void remove_select_piece(int num) {
 
     stringstream ss(input);
     vector<pair<int, int>> coordinates;
-   
+
     string token;
     while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
         if (token.size() == 2) {
-            int x = token[0] - 'A';
-            int y = token[1] - '0';
-            coordinates.push_back({ x, y });
+            int y = token[0] - '0';
+            int x = token[1] - 'A';  
+            if (x >= 0 && x < 9 && y >= 0 && y < 10) {  // 좌표가 보드 범위 안에 있는지 검사
+                coordinates.push_back({ x, y });
+            }
         }
     }
     for (const auto& coord : coordinates) {
