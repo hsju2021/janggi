@@ -92,7 +92,7 @@ void Piece::movePiece() {
         // print paths
         cout << "가능한 경로 : ";
         for (int i = 0; i < paths.size(); i++) {
-            cout << paths[i].second << ' ' << paths[i].first << endl; 
+            cout << paths[i].second << (char)(paths[i].first + 'A') << ' ';
         }
         cout << '\n';
         cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
@@ -411,15 +411,15 @@ class Pawn : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
-        int hanDirections[3][2] = {{0, -1}, {1, 0}, {-1, 0}};
-        int choDirections[3][2] = {{0, 1}, {1, 0}, {-1, 0}};
+        int hanDirections[3][2] = {{0, 1}, {1, 0}, {-1, 0}};
+        int choDirections[3][2] = {{0, -1}, {1, 0}, {-1, 0}};
         if (this->team == 'H') {
             for (int i = 0; i < 3; i++) {
                 int x = this->x + hanDirections[i][0];
                 int y = this->y + hanDirections[i][1];
-                int movableFlag = isMovable(x, y, team);
 
                 if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
+                    int movableFlag = isMovable(x, y, team);
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
                     }
@@ -429,9 +429,9 @@ class Pawn : public Piece {
             for (int i = 0; i < 3; i++) {
                 int x = this->x + choDirections[i][0];
                 int y = this->y + choDirections[i][1];
-                int movableFlag = isMovable(x, y, team);
-
+                
                 if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
+                    int movableFlag = isMovable(x, y, team);
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
                     }
