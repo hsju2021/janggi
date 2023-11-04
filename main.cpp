@@ -3,9 +3,14 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <sstream>
+#include <stdlib.h>
+#include <windows.h>
+#include <algorithm>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
+#define MAX_TURN 100
 
 using namespace std;
 
@@ -13,10 +18,10 @@ string msg[] = {
     ">>> ",
     "메뉴를 선택하세요.\n",
     "원하는 포진을 선택하세요.\n",
-    "{player}나라의 기물을 선택하세요.\n",
+    "나라의 기물을 선택하세요.\n",
     "{player}나라가 게임을 중단하여 메인 메뉴로 돌아갑니다.\n",
     "‘y’또는 ‘Y’를 입력해주세요.\n",
-    "{player}나라의 기물을 선택하세요.\n",
+    "나라의 기물을 선택하세요.\n",
     "{player}나라 ‘{piece}’을(를) 선택하셨습니다.\n",
     "기물을 다시 선택하려면 “back”을 입력하세요.\n",
     "게임을 중단하려면 “quit”을 입력하세요.\n",
@@ -67,8 +72,10 @@ class Piece {
         this->y = y;
         this->team = team;
     }
-    void movePiece(int x, int y);
+    void movePiece();
     virtual vector<pair<int, int>> generatePaths() = 0;
+
+    virtual ~Piece() = default;
 };
 
 Piece* board[9][10] = {
@@ -76,9 +83,14 @@ Piece* board[9][10] = {
 };
 
 
-void Piece::movePiece(int x, int y) {
+void Piece::movePiece() {
     vector<pair<int, int>> paths = generatePaths();
-    while(1) {
+    int tmpx, tmpy;
+    string coord;
+
+    while (1) {
+        // print paths
+        cout << "가능한 경로 : ";
         for (int i = 0; i < paths.size(); i++) {
             cout << paths[i].second << (char)(paths[i].first + 'A') << ' ';
         }
@@ -100,11 +112,11 @@ void Piece::movePiece(int x, int y) {
             if (paths[i].first == tmpx && paths[i].second == tmpy) {
                 board[tmpx][tmpy] = board[x][y];
                 board[x][y] = nullptr;
+                x = tmpx;
+                y = tmpy;
                 return;
-            }
+            } 
         }
-        cout << "다시 입력해 주세요.\n";
-        cin >> x >> y;
     }
 }
 
@@ -133,13 +145,14 @@ void kill() {
 
 }
 
-int remove_piece_num() {
+void undo() {
 
 }
 
 bool choCheckWin() {
     return false;
 }
+
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
@@ -400,8 +413,32 @@ class Pawn : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
+        int hanDirections[3][2] = {{0, 1}, {1, 0}, {-1, 0}};
+        int choDirections[3][2] = {{0, -1}, {1, 0}, {-1, 0}};
         if (this->team == 'H') {
-            
+            for (int i = 0; i < 3; i++) {
+                int x = this->x + hanDirections[i][0];
+                int y = this->y + hanDirections[i][1];
+
+                if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
+                    int movableFlag = isMovable(x, y, team);
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < 3; i++) {
+                int x = this->x + choDirections[i][0];
+                int y = this->y + choDirections[i][1];
+                
+                if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
+                    int movableFlag = isMovable(x, y, team);
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
         }
         return validMoves;
     }
@@ -409,39 +446,6 @@ class Pawn : public Piece {
 
 stack<Piece*> previous;
 
-string msg[] = {
-    ">>> ",
-    "메뉴를 선택하세요.\n",
-    "원하는 포진을 선택하세요.\n",
-    "{player}나라의 기물을 선택하세요.\n",
-    "{player}나라가 게임을 중단하여 메인 메뉴로 돌아갑니다.\n",
-    "‘y’또는 ‘Y’를 입력해주세요.\n",
-    "{player}나라의 기물을 선택하세요.\n",
-    "{player}나라 ‘{piece}’을(를) 선택하셨습니다.\n",
-    "기물을 다시 선택하려면 “back”을 입력하세요.\n",
-    "게임을 중단하려면 “quit”을 입력하세요.\n",
-    "이동할 좌표를 입력해주세요.\n",
-    "{lose_player}나라의 궁이 잡혔습니다.\n",
-    "{win_player}나라의 승리입니다!\n",
-    "‘y’또는 ‘Y’를 입력하면 메인 메뉴로 돌아갑니다.\n",
-    "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n",
-    "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n",
-    "점수 총합 : 초나라 {score}점, 한나라 {score}점\n",
-    "한나라가 {setup} 포진을 선택하였습니다.\n",
-    "{player}나라 ‘{piece}’이(가) {player}나라 ‘{piece}’을(를) 잡았습니다.\n ",
-    "존재하지 않는 메뉴입니다. ",
-    "다시 입력해 주세요.\n",
-    "해당 좌표에 기물이 존재하지 않거나 옳지 않은 입력입니다. ",
-    "불가능한 이동입니다. ",
-    "해당되는 포진이 없습니다. 1과 4 사이의 정수를 입력하세요.\n",
-    "잘못된 입력입니다. ‘y’또는 ‘Y’를 입력하세요.\n",
-    "상대 플레이어의 기물은 선택할 수 없습니다. ",
-    "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n",
-    "{num}()를 입력받았습니다.\n",
-    "{player}는 포진 선택과정을 진행하세요.\n",
-    "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
-    "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n"
-};
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
@@ -458,20 +462,11 @@ int main() {
         remove_select_piece(remove);
         setupBoard(game, game.cho);
 
-<<<<<<< HEAD
-    mainMenu();
-    //remove_piece_num();
-
-    remove_select_piece(num);
-
-    if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
-=======
->>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
         while (true) {
             // 한나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
-            chosen->movePiece(x,y); // 기물이동
+            chosen->movePiece(); // 기물이동
             printBoard(); // 이동후 보드출력
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -480,7 +475,7 @@ int main() {
             // 초나라 턴
             printBoard();
             chosen = choosePiece(game.cho); 
-            chosen->movePiece(x,y);
+            chosen->movePiece();
             printBoard();
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -494,7 +489,7 @@ int main() {
             // 초나라 턴
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
-            chosen->movePiece(x,y); // 기물이동
+            chosen->movePiece(); // 기물이동
             printBoard(); // 이동후 보드출력
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -503,7 +498,7 @@ int main() {
             // 한나라 턴
             printBoard();
             chosen = choosePiece(game.cho); 
-            chosen->movePiece(x,y);
+            chosen->movePiece();
             printBoard();
 
             if(choCheckWin()) break; // 승패여부 처리
@@ -517,15 +512,27 @@ int main() {
 
 void mainMenu() {
     // clear the console
-    system("clear");
+    string s = "";
+    while (1) {
+        system("cls");
+        cout << "메뉴를 선택하세요." << endl;
+        cout << "1. 게임 실행" << endl;
+        cout << "2. 게임 종료" << endl;
+        cin >> s;
+        if (s != "1" && s != "2") {
+            cout << msg[19]  << endl;
+            cout << msg[20] << endl;
+        }
+        if (s == "2")
+            exit(0);
+        if (s == "1")
+            return;
+        Sleep(1000);
+    }
     
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // 김의찬 작성
-=======
->>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
+// 김의찬 작성
 void setupInitialPieces() {
     // 한나라의 기본 기물 배치
     board[0][0] = new Rook(0, 0, 'H');
@@ -552,7 +559,6 @@ void setupInitialPieces() {
     }
 }
 
-string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
 
 void setupBoard(Game& game, Player& player) {
 
@@ -564,7 +570,7 @@ void setupBoard(Game& game, Player& player) {
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << msg[2] << msg[0];
+            cout << msg[2] << ">>>";
             cin >> num;
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
@@ -600,7 +606,7 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << msg[23];
+                cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
     }
@@ -625,7 +631,7 @@ void setupBoard(Game& game, Player& player) {
                     board[6][9] = new Elephant(6, 9, 'C');
                     break;
                 case 2:
-                    cout << "초나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
+                    cout <<"초나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
                     board[1][9] = new Knight(1, 9, 'C');
                     board[6][9] = new Knight(6, 9, 'C');
                     board[2][9] = new Elephant(2, 9, 'C');
@@ -649,11 +655,11 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << msg[23];
+                cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
+       cin.ignore();
     }
-    cin.ignore();
 }
 
 int remove_piece_num() {
@@ -691,7 +697,6 @@ int remove_piece_num() {
             cout << "1과 6 사이의 정수를 입력하시오\n";
         }
     }
-
 }
 
 void remove_select_piece(int num) {
@@ -709,7 +714,7 @@ void remove_select_piece(int num) {
     case 3:
         cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << msg[0];
         piecesToRemove.push_back("R");
-        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("C"); 
         piecesToRemove.push_back("N");
         break;
     case 4:
@@ -744,17 +749,15 @@ void remove_select_piece(int num) {
 
     stringstream ss(input);
     vector<pair<int, int>> coordinates;
-
+   
     string token;
-    while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
-        if (token.size() == 2) {
-            int x = token[0] - '0';
-            int y = token[1] - 'A';
-            if (x >= 0 && x < 9 && y >= 0 && y < 10) {
-                coordinates.push_back({ x, y });
-            }
-        }
-    }
+      while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
+       if (token.size() == 2) {
+        int y = token[0] - '0';  // 먼저 숫자를 읽습니다.
+        int x = token[1] - 'A';  // 그 다음 문자를 읽습니다.
+        coordinates.push_back({ x, y });
+       }
+   }
     for (const auto& coord : coordinates) {
         int x = coord.first;
         int y = coord.second;
@@ -778,7 +781,6 @@ void remove_select_piece(int num) {
         }
     }
 }
->>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
 Piece* choosePiece(Player& player) {
@@ -786,7 +788,13 @@ Piece* choosePiece(Player& player) {
     string coord;
 
     while (true) {
-        cout << msg[6] << endl << ">>>";
+        string currentTurnTeam;
+        if (&player == &game.han)
+            currentTurnTeam = "한";
+        else
+            currentTurnTeam = "초";
+
+        cout << currentTurnTeam << msg[6] << endl << ">>>";
         getline(cin, coord);
         if (!coord.compare("quit")) {
             return nullptr;
@@ -803,9 +811,9 @@ Piece* choosePiece(Player& player) {
             continue;
         }
 
-        tmpx = coord[0] - '0';
-        tmpy = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
-
+        tmpx = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
+        tmpy = coord[0] - '0';
+        
         if (board[tmpx][tmpy] == nullptr) {
             cout << msg[21] << msg[20] << endl;
             continue;
@@ -824,8 +832,8 @@ Piece* choosePiece(Player& player) {
 void printBoard() {
     int starpoints[10][2] = { {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},   // 궁성 좌표 저장
                             {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
-    system("clear");    // 프롬프트 clear
-    cout << "   A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
+    system("cls");    // 프롬프트 clear
+    cout << "    A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
     for (int row = 0; row < 10; row++) {
         cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
         for (int col = 0; col < 9; col++) { // 보드 출력 과정
