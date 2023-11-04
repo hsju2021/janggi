@@ -4,13 +4,13 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <sstream>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
 
 using namespace std;
 
-Piece* King_Location;
 
 class Player {
    public:
@@ -50,6 +50,7 @@ class Piece {
     virtual vector<pair<int, int>> generatePaths() = 0;
 };
 
+Piece* King_Location;
 class BoardState {
 public:
     Piece* state[9][10];
@@ -95,7 +96,7 @@ Piece* choosePiece(Player& player);
 int isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
-bool choKingDie();
+bool choKingDie(Piece* kingLocation);
 bool isScoreUnder(int score1, int score2);
 bool isTurnOver(int turn);
 bool isKingDie();
@@ -112,17 +113,7 @@ int isMovable(int x, int y, char team) {
     else return 2;
 }
 
-void kill() {
 
-}
-
-int remove_piece_num() {
-
-}
-
-void remove_select_piece(int num){
-
-}
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
@@ -526,7 +517,6 @@ void setupInitialPieces() {
     }
 }
 
-string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
 
 void setupBoard(Game& game, Player& player) {
 
@@ -757,6 +747,7 @@ void remove_select_piece(int num) {
 Piece* choosePiece(Player& player) {
     int tmpx, tmpy;
     string coord;
+    bool h, ch;
 
     while (true) {
         cout << msg[6] << endl << ">>>";
@@ -767,7 +758,7 @@ Piece* choosePiece(Player& player) {
 
         if (!coord.compare("cancel")) {
             //무르기 처리
-            undo();
+            undo(h, ch);
         }
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
