@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <map>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
@@ -937,4 +938,18 @@ void undo(){
                 }
          }
         }
+}
+
+// format(msg[내용], { {"바꿀문자열1", "바꾼후문자열1"}, {"바꿀문자열2", "바꾼후문자열2"}, ... })
+string format(const string& input, const map<string, string>& to) {
+    string result = input;
+    for (const auto& pair : to) {
+        string from = "{" + pair.first + "}";
+        size_t pos = result.find(from);
+        while (pos != string::npos) {
+            result.replace(pos, from.length(), pair.second);
+            pos = result.find(from, pos + pair.second.length());
+        }
+    }
+    return result;
 }
