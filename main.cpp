@@ -92,7 +92,7 @@ void Piece::movePiece() {
         // print paths
         cout << "가능한 경로 : ";
         for (int i = 0; i < paths.size(); i++) {
-            cout << "(" << paths[i].first << ", " << paths[i].second << ") ";
+            cout << paths[i].second << ' ' << paths[i].first << endl; 
         }
         cout << '\n';
         cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
@@ -105,8 +105,8 @@ void Piece::movePiece() {
         }
 
         // 규칙에 맞을 경우 숫자로 변환
-        tmpx = coord[0] - '0';
-        tmpy = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
+        tmpy = coord[0] - '0';
+        tmpx = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a' : coord[1] - 'A';
 
         for (int i = 0; i < paths.size(); i++) {
             if (paths[i].first == tmpx && paths[i].second == tmpy) {
@@ -617,7 +617,7 @@ void setupBoard(Game& game, Player& player) {
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << msg[2] << msg[0]";
+            cout << msg[2] << msg[0];
             cin >> num;
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
