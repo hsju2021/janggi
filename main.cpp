@@ -18,10 +18,10 @@ string msg[] = {
     ">>> ",
     "메뉴를 선택하세요.\n",
     "원하는 포진을 선택하세요.\n",
-    "{player}나라의 기물을 선택하세요.\n",
+    "나라의 기물을 선택하세요.\n",
     "{player}나라가 게임을 중단하여 메인 메뉴로 돌아갑니다.\n",
     "‘y’또는 ‘Y’를 입력해주세요.\n",
-    "{player}나라의 기물을 선택하세요.\n",
+    "나라의 기물을 선택하세요.\n",
     "{player}나라 ‘{piece}’을(를) 선택하셨습니다.\n",
     "기물을 다시 선택하려면 “back”을 입력하세요.\n",
     "게임을 중단하려면 “quit”을 입력하세요.\n",
@@ -112,6 +112,8 @@ void Piece::movePiece() {
             if (paths[i].first == tmpx && paths[i].second == tmpy) {
                 board[tmpx][tmpy] = board[x][y];
                 board[x][y] = nullptr;
+                x = tmpx;
+                y = tmpy;
                 return;
             } 
         }
@@ -148,7 +150,7 @@ void undo() {
 }
 
 bool choCheckWin() {
-    
+    return false;
 }
 
 
@@ -786,7 +788,13 @@ Piece* choosePiece(Player& player) {
     string coord;
 
     while (true) {
-        cout << msg[6] << endl << ">>>";
+        string currentTurnTeam;
+        if (&player == &game.han)
+            currentTurnTeam = "한";
+        else
+            currentTurnTeam = "초";
+
+        cout << currentTurnTeam << msg[6] << endl << ">>>";
         getline(cin, coord);
         if (!coord.compare("quit")) {
             return nullptr;
