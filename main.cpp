@@ -9,6 +9,8 @@
 
 using namespace std;
 
+Piece* King_Location;
+
 class Player {
    public:
     int score;
@@ -29,6 +31,15 @@ class Piece {
     char team;
     char letter;
 
+    Piece(const Piece& other) {
+
+        int x = other.x;
+        int y = other.y;
+        char team = other.team;
+        char letter = other.letter;
+    
+    }
+
     Piece(int x, int y, char team) {
         this->x = x;
         this->y = y;
@@ -37,6 +48,20 @@ class Piece {
     void movePiece(int x, int y);
     virtual vector<pair<int, int>> generatePaths() = 0;
 };
+
+class BoardState {
+public:
+    Piece* state[9][10];
+
+    BoardState(Piece* initialBoard[9][10]) {
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                state[i][j] = initialBoard[i][j]; // here you would need to actually make a copy of the Piece object if it is not a shared immutable object
+            }
+        }
+    }
+};
+
 
 Piece* board[9][10] = {
 
@@ -69,10 +94,15 @@ Piece* choosePiece(Player& player);
 int isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
-void undo();
+bool choKingDie();
+bool isScoreUnder(int score1, int score2);
+bool isTurnOver(int turn);
+bool isKingDie();
+void undo(bool h, bool ch);
 void setupInitialPieces();
 int remove_piece_num();
 void remove_select_piece(int num);
+void boardcopy(Piece* board2[9][10], Piece* board1[9][10]);
 
 int isMovable(int x, int y, char team) {
     if (board[x][y] == nullptr) return 0;
@@ -359,7 +389,8 @@ class Pawn : public Piece {
     }
 };
 
-stack<Piece*> previous;
+
+stack<BoardState> previous;
 
 string msg[] = {
     ">>> ",
@@ -410,17 +441,10 @@ int main() {
         remove_select_piece(remove);
         setupBoard(game, game.cho);
 
-<<<<<<< HEAD
-    mainMenu();
-    //remove_piece_num();
-
-    remove_select_piece(num);
-
-    if (num) { // 제거할 기물이 1개 이상 --> 한나라 선공
-=======
->>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
         while (true) {
             // 한나라 턴
+           
+            previous.push(BoardState(board));
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
             chosen->movePiece(x,y); // 기물이동
@@ -444,6 +468,7 @@ int main() {
         setupBoard(game, game.cho);
         while (true) {
             // 초나라 턴
+            previous.push(BoardState(board));
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
             chosen->movePiece(x,y); // 기물이동
@@ -473,11 +498,7 @@ void mainMenu() {
     
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // 김의찬 작성
-=======
->>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
+// 김의찬 작성
 void setupInitialPieces() {
     // 한나라의 기본 기물 배치
     board[0][0] = new Rook(0, 0, 'H');
@@ -554,7 +575,6 @@ void setupBoard(Game& game, Player& player) {
                 cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
-        cin.ignore();
     }
 
     else if (&player == &game.cho) {
@@ -604,95 +624,91 @@ void setupBoard(Game& game, Player& player) {
                 cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
-<<<<<<< HEAD
-
-        void remove_select_piece(int num) {
-            vector<string> piecesToRemove;
-            switch (num) {
-            case 1:
-                cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                break;
-            case 2:
-                cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                break;
-            case 3:
-                cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                break;
-            case 4:
-                cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                piecesToRemove.push_back("E");
-                break;
-            case 5:
-                cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                piecesToRemove.push_back("E");
-                piecesToRemove.push_back("G");
-                break;
-            case 6:
-                cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 입력하세요.\n" << ">>>";
-                piecesToRemove.push_back("R");
-                piecesToRemove.push_back("C");
-                piecesToRemove.push_back("N");
-                piecesToRemove.push_back("E");
-                piecesToRemove.push_back("G");
-                piecesToRemove.push_back("P");
-                break;
-            default:
-                return;
-            }
-            string input;
-            getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
-
-            stringstream ss(input);
-            vector<pair<int, int>> coordinates;
-
-            string token;
-            while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
-                if (token.size() == 2) {
-                    int x = token[0] - 'A';
-                    int y = token[1] - '0';
-                    coordinates.push_back({ x, y });
-                }
-            }
-            for (const auto& coord : coordinates) {
-                int x = coord.first;
-                int y = coord.second;
-
-                if (board[x][y] && board[x][y]->team == 'H') {
-                    string currentPiece(1, board[x][y]->letter);
-                    auto it = find(piecesToRemove.begin(), piecesToRemove.end(), currentPiece);
-                    if (it != piecesToRemove.end()) {
-                        delete board[x][y];
-                        board[x][y] = nullptr;
-                        piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
-                    }
-                    else {
-                        cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
-                        return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
-                    }
-                }
-                else {
-                    cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
-                    return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
-                }
-            }
-        }
-=======
-=======
+       cin.ignore();
     }
 }
->>>>>>> 4aaa100bbe6b344c8022dca2d885020c262e1aa5
+void remove_select_piece(int num) {
+    vector<string> piecesToRemove;
+    switch (num) {
+    case 1:
+        cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        break;
+    case 2:
+        cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        break;
+    case 3:
+        cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C"); 
+        piecesToRemove.push_back("N");
+        break;
+    case 4:
+        cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        break;
+    case 5:
+        cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        break;
+    case 6:
+        cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 입력하세요.\n" << ">>>";
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        piecesToRemove.push_back("P");
+        break;
+    default:
+        return;
+    }
+    string input;
+    getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
+
+    stringstream ss(input);
+    vector<pair<int, int>> coordinates;
+   
+    string token;
+    while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
+        if (token.size() == 2) {
+            int x = token[0] - 'A';
+            int y = token[1] - '0';
+            coordinates.push_back({ x, y });
+        }
+    }
+    for (const auto& coord : coordinates) {
+        int x = coord.first;
+        int y = coord.second;
+
+        if (board[x][y] && board[x][y]->team == 'H') {
+            string currentPiece(1, board[x][y]->letter);
+            auto it = find(piecesToRemove.begin(), piecesToRemove.end(), currentPiece);
+            if (it != piecesToRemove.end()) {
+                delete board[x][y];
+                board[x][y] = nullptr;
+                piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
+            }
+            else {
+                cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+                return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
+            }
+        }
+        else {
+            cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+            return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
+        }
+    }
+}
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
 Piece* choosePiece(Player& player) {
@@ -763,4 +779,123 @@ void printBoard() {
         else if (row == 1) { cout << "초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
         cout << endl;
     }
+}
+
+bool choCheckWin(){ //남경식
+    if(isKingDie() || isTurnOver(game.turn) || isScoreUnder(game.cho.score, game.han.score)){
+        if(isKingDie()){
+            if(choKingDie(King_Location)){
+                cout << "초나라의 궁이 잡혔습니다.\n";
+                cout << "한나라의 승리입니다!\n";
+                return true;
+            }
+            else{
+                cout << "한나라의 궁이 잡혔습니다.\n";
+                cout << "초나라의 승리입니다!\n";
+                return true;
+            }
+        }
+        else if(isTurnOver(game.turn)){
+            cout << "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n";
+            cout << "점수 총합 : 초나라 " << game.cho.score 
+            << "점, "<<", 한나라 " << game.han.score << "점";
+            if(game.cho.score > game.han.score){
+                cout << "초나라의 승리입니다!\n";
+                return true;
+            }
+            else{
+                cout << "한나라의 승리입니다!\n";
+                return true;
+            }
+        }
+        else{
+            cout <<  "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n";
+             cout << "점수 총합 : 초나라 " << game.cho.score 
+            << "점, "<<", 한나라 " << game.han.score << "점";
+            if(game.cho.score > game.han.score){
+                cout << "초나라의 승리입니다!\n";
+                return true;
+            }
+            else{
+                cout << "한나라의 승리입니다!\n";
+                return true;
+            }
+        }
+    }
+    else{
+        return false;
+    }
+};
+
+bool isKingDie(){ //남경식
+    int count = 0;
+    for(int i=0; i<9; i++){
+        for(int j=0; j<10; j++){
+            typeid(board[i][j]) == typeid(King);
+            King_Location = board[i][j];
+            count++;
+        }
+        if(count == 2){ //모든 좌표에 대해서 king이 2개있는지 확인
+            return false;
+        }
+        else{
+
+            return true;
+        }
+    }
+};
+
+//남경식
+bool isTurnOver(int turn){
+    if(game.turn > 100){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+
+//남경식
+bool isScoreUnder(int score1, int score2){
+    if(score1 <= 30 && score2 <= 30){
+        return true;
+    }
+    else{
+        return false;
+    }
+
+};
+
+//남경식
+bool choKingDie(Piece* piece){
+    if(piece->team == 'C'){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+
+// 남경식
+void boardcopy(Piece* board2[9][10], Piece* board1[9][10]){
+
+    for(int i=0; i<9; i++){
+        for(int j=0; j<10; j++)
+        board2[i][j] = board1[i][j];
+    }
+    return;
+}
+
+//남경식
+void undo(){
+     if (!previous.empty()) {
+        BoardState lastState = previous.top();
+        previous.pop();
+
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                board[i][j] = lastState.state[i][j];
+                }
+         }
+        }
 }
