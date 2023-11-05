@@ -789,7 +789,7 @@ int main() {
                     printBoard(); // 보드출력
                     chosen = choosePiece(game.han); // 기물선택
                     if (chosen->team == '.') {
-                        cout << format(msg[6], { {"player", "한"} }) << cout[15];
+                        cout << format(msg[6], { {"player", "한"} }) << msg[15];
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
