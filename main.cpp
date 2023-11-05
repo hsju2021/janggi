@@ -474,6 +474,7 @@ int main() {
 
         while (true) {
             // 한나라 턴
+            previous.push(BoardState(board));
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
             chosen->movePiece(); // 기물이동
@@ -497,6 +498,7 @@ int main() {
         setupBoard(game, game.cho);
         while (true) {
             // 초나라 턴
+            previous.push(BoardState(board));
             printBoard(); // 보드출력
             chosen = choosePiece(game.han); // 기물선택
             chosen->movePiece(); // 기물이동
