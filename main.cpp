@@ -586,14 +586,15 @@ void setupBoard(Game& game, Player& player) {
 
     if (&player == &game.han) {
         while (true) { // while문
-            int num;
+            string input;
             cout << "    <한나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
             cout << msg[2] << ">>>";
-            cin >> num;
+            getline(cin, input);
+            int num = stoi(input);
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
@@ -635,14 +636,15 @@ void setupBoard(Game& game, Player& player) {
 
     else if (&player == &game.cho) {
         while (true) { // while문
-            int num;
+            string input;
             cout << "    <초나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
             cout << msg[2] << msg[0];
-            cin >> num;
+            getline(cin, input);
+            int num = stoi(input);
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
@@ -685,10 +687,11 @@ void setupBoard(Game& game, Player& player) {
 }
 
 int remove_piece_num() {
-    int num;
+    string input;
     while (true) {
         cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << msg[0];
-        cin >> num;
+        getline(cin, input);
+        int num = stoi(input);
         if (num >= 0 && num <= 6) {
             switch (num) {
             case 0:
