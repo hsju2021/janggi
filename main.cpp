@@ -189,7 +189,7 @@ class Rook : public Piece {
     // 가능한 모든 경로를 생성하는 함수
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves; // 반환할 경로 저장
-        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        int directions[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
         // 움직일 수 있는 4방향
         for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
             int x = this->x + directions[i][0];
@@ -202,12 +202,92 @@ class Rook : public Piece {
                     validMoves.push_back(make_pair(x, y)); // 빈 칸일 경우 validMoves에 추가 후 계속 진행
                     x += directions[i][0];
                     y += directions[i][1];
-                } else if (movableFlag == 1) { // 적 기물을 만났을 경우 validMoves에 추가하고 탐색 종료
+                }
+                else if (movableFlag == 1) { // 적 기물을 만났을 경우 validMoves에 추가하고 탐색 종료
                     validMoves.push_back(make_pair(x, y));
                     break;
-                } else // 아군 기물을 만났을 경우 탐색 종료
+                }
+                else // 아군 기물을 만났을 경우 탐색 종료
                     break;
             }
+        }
+        // 궁성 내부 이동 - 김종우 추가
+        int starpointsHan[4][2] = { {3, 0}, {5, 0}, {5, 2}, {3, 2} };
+        int starpointsCho[4][2] = { {3, 7}, {5, 7}, {5, 9}, {3, 9} };
+        if ((this->x == 4) && (this->y == 1)) { // 차가 가운데 있을 때 (4, 1)
+            for (int i = 0; i < 4; i++) {   // 모서리 이동 가능 확인
+                int x = starpointsHan[i][0];
+                int y = starpointsHan[i][1];
+                if (isMovable(x, y, this->team) == 2);
+                else
+                    validMoves.push_back(make_pair(x, y));
+            }
+        }
+        else if ((this->x == 4) && (this->y == 8)) {    // 차가 가운데 있을 때 (4, 8)
+            for (int i = 0; i < 4; i++) {   // 모서리 이동 가능 확인
+                int x = starpointsCho[i][0];
+                int y = starpointsCho[i][1];
+                if (isMovable(x, y, this->team) == 2);
+                else
+                    validMoves.push_back(make_pair(x, y));
+            }
+        }
+        else {  // 모서리에 차가 있는지 확인
+            if (y <= 2) {   // 한나라
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsHan[i][0];
+                    int y = starpointsHan[i][1];
+                    if ((this->x == x) && (this->y == y)) { // 모서리에 있는지 확인
+                        if (isMovable(4, 1, this->team) == 0) { // 가운데 비었을 때
+                            validMoves.push_back(make_pair(4, 1));
+                            x = starpointsHan[(i + 2) % 4][0];
+                            y = starpointsHan[(i + 2) % 4][1];
+                            if (isMovable(x, y, this->team) == 2) { // 반대편 확인
+                                break;
+                            }
+                            else {
+                                validMoves.push_back(make_pair(x, y));
+                                break;
+                            }
+                        }
+                        else if (isMovable(4, 1, this->team) == 1) {    // 가운데 적 기물있을 때
+                            validMoves.push_back(make_pair(4, 1));
+                            break;
+                        }
+                        else {  // 가운데 내 기물있을 때
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (y >= 7) {
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsCho[i][0];
+                    int y = starpointsCho[i][1];
+                    if ((this->x == x) && (this->y == y)) {
+                        if (isMovable(4, 8, this->team) == 0) { // 가운데 비었을 때
+                            validMoves.push_back(make_pair(4, 8));
+                            x = starpointsHan[(i + 2) % 4][0];
+                            y = starpointsHan[(i + 2) % 4][1];
+                            if (isMovable(x, y, this->team) == 2) { // 반대편 확인
+                                break;
+                            }
+                            else {
+                                validMoves.push_back(make_pair(x, y));
+                                break;
+                            }
+                        }
+                        else if (isMovable(4, 8, this->team) == 1) {    // 가운데 적 기물있을 때
+                            validMoves.push_back(make_pair(4, 8));
+                            break;
+                        }
+                        else {  // 가운데 내 기물있을 때
+                            break;
+                        }
+                    }
+                }
+            }
+            else {}
         }
         return validMoves;
     }
@@ -219,6 +299,14 @@ class Cannon : public Piece {
     Cannon(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'C';
         else letter = 'c';
+    }
+
+    // 해당 기물이 Cannon인지 확인하는 함수 추가
+    bool isCannon(Piece& cannon) {
+        if ((cannon.letter == 'C') or (cannon.letter == 'c')) {
+            return true;
+        }
+        else return false;
     }
 
     // 가능한 모든 경로를 생성하는 함수
@@ -239,11 +327,19 @@ class Cannon : public Piece {
                         x += directions[i][0];
                         y += directions[i][1];
                     }
-                    // 빈칸인데 넘을 기물이 없다면 다음 탐색 진행
+                    else {  // 빈칸인데 넘을 기물이 없다면 다음 탐색 진행
+                        x += directions[i][0];
+                        y += directions[i][1];
+                    }
                 }
                 else if (movableFlag == 1) {
-                    if (canJump == 0) { // 이전까지 넘을 기물 없었음
+                    if (isCannon(*board[x][y])) {
+                        break;
+                    }
+                    else if (canJump == 0) { // 이전까지 넘을 기물 없었음
                         canJump = 1; // 해당 방향에 처음으로 넘을 적 기물이 나타남
+                        x += directions[i][0];
+                        y += directions[i][1];
                     }
                     else {
                         validMoves.push_back(make_pair(x, y)); // canJump == 1이고 (넘을 기물이 있고) 상대방 기물을 만나게 되면 해당 경로 저장
@@ -251,8 +347,13 @@ class Cannon : public Piece {
                     }
                 }
                 else {
-                    if (canJump == 0) {
+                    if (isCannon(*board[x][y])) {
+                        break;
+                    }
+                    else if (canJump == 0) {
                         canJump = 1; // 해당 방향에서 처음으로 넘을 내 기물이 나타남
+                        x += directions[i][0];
+                        y += directions[i][1];
                     }
                     else
                         break; // 넘을 수 있는데 내 기물이 나타나면 해당 방향으로 더이상 이동 불가능 - 탐색 종료
@@ -260,35 +361,58 @@ class Cannon : public Piece {
 
             }
         }
-        
+
         int starpointsHan[4][2] = { {3, 0}, {5, 0}, {5, 2}, {3, 2} };   // 한나라 궁성 모서리 좌표 저장
         int starpointsCho[4][2] = { {3, 7}, {5, 7}, {5, 9}, {3, 9} };   // 한나라 궁성 모서리 좌표 저장
 
         for (int i = 0; i < 4; i++) {
-            if ((this->x == starpointsHan[i][0]) && (this->y == starpointsHan[i][1])) {
-                if (board[4][1] != nullptr) {
+            if ((this->x == starpointsHan[i][0]) && (this->y == starpointsHan[i][1])) { // 모서리 좌표 확인
+                if (board[4][1] != nullptr) {   // 가운데 기물 있는지 확인
+                    if (isCannon(*board[4][1])) {   // 가운데 기물이 cannon인지 확인
+                        break;
+                    }
                     int x = starpointsHan[((i + 2) % 4)][0];
                     int y = starpointsHan[((i + 2) % 4)][1];
-                    if (isMovable(x, y, this->team) == 2);
-                    else {
-                        validMoves.push_back(make_pair(x, y)); // 궁성 가운데 기물이 있을 때 반대쪽 방향 저장
+                    if (isMovable(x, y, this->team) == 0) { // jump했을 때 이동 가능한지 확인
+                        validMoves.push_back(make_pair(x, y));
+                        break;
                     }
+                    else if (isMovable(x, y, this->team) == 1) {
+                        if (isCannon(*board[x][y])) {
+                            break;
+                        }
+                        validMoves.push_back(make_pair(x, y));
+                        break;
+                    }
+                    else break;
                 }
+                else break;
             }
         }
         for (int i = 0; i < 4; i++) {
             if ((this->x == starpointsCho[i][0]) && (this->y == starpointsCho[i][1])) {
                 if (board[4][8] != nullptr) {
-                    int x = starpointsHan[((i + 2) % 4)][0];
-                    int y = starpointsHan[((i + 2) % 4)][1];
-                    if (isMovable(x, y, this->team) == 2);
-                    else {
-                        validMoves.push_back(make_pair(x, y)); // 궁성 가운데 기물이 있을 때 반대쪽 방향 저장
+                    if (isCannon(*board[4][8])) {   // 가운데 기물이 cannon인지 확인
+                        break;
                     }
+                    int x = starpointsCho[((i + 2) % 4)][0];
+                    int y = starpointsCho[((i + 2) % 4)][1];
+                    if (isMovable(x, y, this->team) == 0) { // jump했을 때 이동 가능한지 확인
+                        validMoves.push_back(make_pair(x, y));
+                        break;
+                    }
+                    else if (isMovable(x, y, this->team) == 1) {
+                        if (isCannon(*board[x][y])) {
+                            break;
+                        }
+                        validMoves.push_back(make_pair(x, y));
+                        break;
+                    }
+                    else break;
                 }
+                else break;
             }
         }
-
         return validMoves;
     }
 };
@@ -374,23 +498,79 @@ class King : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
-        int directions[8][2] = {{0, 1}, {1, 0},  {0, -1}, {-1, 0},
-                                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-        for (int i = 0; i < 8; i++) {
+        int starpointsHan[4][2] = { {3, 0}, {5, 0}, {5, 2}, {3, 2} };   // 한나라 궁성 모서리 좌표 저장
+        int starpointsCho[4][2] = { {3, 7}, {5, 7}, {5, 9}, {3, 9} };   // 한나라 궁성 모서리 좌표 저장
+        int directions[4][2] = { {0,1}, {1,0}, {0,-1}, {-1, 0} };
+
+        for (int i = 0; i < 4; i++) {   // 십자 방향 
             int x = this->x + directions[i][0];
             int y = this->y + directions[i][1];
             int movableFlag = isMovable(x, y, team);
 
             if (this->team == 'H') {
-                if (x >= 3 && x <= 5 && y >= 8 && y <= 10) {
+                if (x >= 3 && x <= 5 && y >= 0 && y <= 2) {
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
                     }
                 }
-            } else {
-                if (x >= 3 && x <= 5 && y >= 0 && y <= 2) {
+
+            }
+            else {
+                if (x >= 3 && x <= 5 && y >= 7 && y <= 9) {
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+        }
+        if (this->team == 'H') {    // 한나라
+            if (this->x == 4 && this->y == 1) { // 궁성 가운데
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsHan[i][0];
+                    int y = starpointsHan[i][1];
+                    int movableFlag = isMovable(x, y, team);
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+            else {   // 궁성 모서리
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsHan[i][0];
+                    int y = starpointsHan[i][1];
+                    if (this->x == x && this->y == y) {
+                        int movableFlag = isMovable(4, 1, team);
+                        if (movableFlag == 0 || movableFlag == 1) {
+                            validMoves.push_back(make_pair(4, 1));
+                            break;
+                        }
+                        else break;
+                    }
+                }
+            }
+        }
+        else {  // 초나라
+            if (this->x == 4 && this->y == 8) { // 궁성 가운데
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsCho[i][0];
+                    int y = starpointsCho[i][1];
+                    int movableFlag = isMovable(x, y, team);
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+            else {
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsCho[i][0];
+                    int y = starpointsCho[i][1];
+                    if (this->x == x && this->y == y) {
+                        int movableFlag = isMovable(4, 8, team);
+                        if (movableFlag == 0 || movableFlag == 1) {
+                            validMoves.push_back(make_pair(4, 8));
+                            break;
+                        }
+                        else break;
                     }
                 }
             }
@@ -407,25 +587,81 @@ class Guard : public Piece {
         else letter = 'g';
     }
 
-    vector<pair<int, int>> generatePaths() override {
+   vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
-        int directions[8][2] = {{0, 1}, {1, 0},  {0, -1}, {-1, 0},
-                                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-        for (int i = 0; i < 8; i++) {
+        int starpointsHan[4][2] = { {3, 0}, {5, 0}, {5, 2}, {3, 2} };   // 한나라 궁성 모서리 좌표 저장
+        int starpointsCho[4][2] = { {3, 7}, {5, 7}, {5, 9}, {3, 9} };   // 한나라 궁성 모서리 좌표 저장
+        int directions[4][2] = { {0,1}, {1,0}, {0,-1}, {-1, 0} };
+
+        for (int i = 0; i < 4; i++) {   // 십자 방향 
             int x = this->x + directions[i][0];
             int y = this->y + directions[i][1];
             int movableFlag = isMovable(x, y, team);
 
             if (this->team == 'H') {
-                if (x >= 3 && x <= 5 && y >= 8 && y <= 10) {
+                if (x >= 3 && x <= 5 && y >= 0 && y <= 2) {
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
                     }
                 }
-            } else {
-                if (x >= 3 && x <= 5 && y >= 0 && y <= 2) {
+
+            }
+            else {
+                if (x >= 3 && x <= 5 && y >= 7 && y <= 9) {
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+        }
+        if (this->team == 'H') {    // 한나라
+            if (this->x == 4 && this->y == 1) { // 궁성 가운데
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsHan[i][0];
+                    int y = starpointsHan[i][1];
+                    int movableFlag = isMovable(x, y, team);
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+            else {   // 궁성 모서리
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsHan[i][0];
+                    int y = starpointsHan[i][1];
+                    if (this->x == x && this->y == y) {
+                        int movableFlag = isMovable(4, 1, team);
+                        if (movableFlag == 0 || movableFlag == 1) {
+                            validMoves.push_back(make_pair(4, 1));
+                            break;
+                        }
+                        else break;
+                    }
+                }
+            }
+        }
+        else {  // 초나라
+            if (this->x == 4 && this->y == 8) { // 궁성 가운데
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsCho[i][0];
+                    int y = starpointsCho[i][1];
+                    int movableFlag = isMovable(x, y, team);
+                    if (movableFlag == 0 || movableFlag == 1) {
+                        validMoves.push_back(make_pair(x, y));
+                    }
+                }
+            }
+            else {
+                for (int i = 0; i < 4; i++) {
+                    int x = starpointsCho[i][0];
+                    int y = starpointsCho[i][1];
+                    if (this->x == x && this->y == y) {
+                        int movableFlag = isMovable(4, 8, team);
+                        if (movableFlag == 0 || movableFlag == 1) {
+                            validMoves.push_back(make_pair(4, 8));
+                            break;
+                        }
+                        else break;
                     }
                 }
             }
@@ -444,8 +680,8 @@ class Pawn : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
-        int hanDirections[3][2] = {{0, 1}, {1, 0}, {-1, 0}};
-        int choDirections[3][2] = {{0, -1}, {1, 0}, {-1, 0}};
+        int hanDirections[3][2] = { {0, 1}, {1, 0}, {-1, 0} };
+        int choDirections[3][2] = { {0, -1}, {1, 0}, {-1, 0} };
         if (this->team == 'H') {
             for (int i = 0; i < 3; i++) {
                 int x = this->x + hanDirections[i][0];
@@ -458,11 +694,29 @@ class Pawn : public Piece {
                     }
                 }
             }
-        } else {
+            if ((this->x == 3 || this->x == 5) && this->y == 7) {    // 모서리 있을 때
+                int movableFlag = isMovable(4, 8, team);
+                if (movableFlag == 0 || movableFlag == 1) {
+                    validMoves.push_back(make_pair(4, 8));
+                }
+            }
+            else if (this->x == 4 && this->y == 8) { // 가운데 있을 때
+                int movableFlag = isMovable(3, 9, team);
+                if (movableFlag == 0 || movableFlag == 1) {
+                    validMoves.push_back(make_pair(3, 9));
+                }
+                movableFlag = isMovable(5, 9, team);
+                if (movableFlag == 0 || movableFlag == 1) {
+                    validMoves.push_back(make_pair(5, 9));
+                }
+            }
+            else;
+        }
+        else {
             for (int i = 0; i < 3; i++) {
                 int x = this->x + choDirections[i][0];
                 int y = this->y + choDirections[i][1];
-                
+
                 if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
                     int movableFlag = isMovable(x, y, team);
                     if (movableFlag == 0 || movableFlag == 1) {
@@ -470,6 +724,23 @@ class Pawn : public Piece {
                     }
                 }
             }
+            if ((this->x == 3 || this->x == 5) && this->y == 2) {    // 모서리 있을 때
+                int movableFlag = isMovable(4, 1, team);
+                if (movableFlag == 0 || movableFlag == 1) {
+                    validMoves.push_back(make_pair(4, 1));
+                }
+            }
+            else if (this->x == 4 && this->y == 1) { // 가운데 있을 때
+                int movableFlag = isMovable(3, 0, team);
+                if (movableFlag == 0 || movableFlag == 1) {
+                    validMoves.push_back(make_pair(3, 0));
+                }
+                movableFlag = isMovable(5, 0, team);
+                if (movableFlag == 0 || movableFlag == 1) {
+                    validMoves.push_back(make_pair(5, 0));
+                }
+            }
+            else;
         }
         return validMoves;
     }
