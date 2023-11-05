@@ -534,13 +534,13 @@ int main() {
 
 void mainMenu() {
     // clear the console
-    string s = "";
+    string s;
     while (1) {
         system("cls");
         cout << "메뉴를 선택하세요." << endl;
         cout << "1. 게임 실행" << endl;
         cout << "2. 게임 종료" << endl;
-        cin >> s;
+        getline(cin, s);
         if (s != "1" && s != "2") {
             cout << msg[19]  << endl;
             cout << msg[20] << endl;
