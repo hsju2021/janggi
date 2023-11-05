@@ -483,7 +483,9 @@ int main() {
     if (remove) { // 제거할 기물이 1개 이상
         // 한나라, 초나라 포진 과정
         setupBoard(game, game.han);
+        printBoard(); // 보드출력
         remove_select_piece(remove);
+        printBoard(); // 보드출력
         setupBoard(game, game.cho);
 
         while (true) {
