@@ -8,6 +8,7 @@
 // //#include <windows.h>
 #include <algorithm>
 #include <map>
+#include <cstring>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
@@ -826,7 +827,16 @@ int main() {
                 if (chosen->team == '.') break;
                 printBoard(); // 이동후 보드출력
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
+
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -880,7 +890,15 @@ int main() {
                 
                 printBoard();
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -942,7 +960,15 @@ int main() {
                 
                 printBoard(); // 이동후 보드출력
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -996,7 +1022,15 @@ int main() {
                 
                 printBoard();
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -1458,8 +1492,10 @@ bool choCheckWin(){ //남경식
             }
         }
         else if(isTurnOver(game.turn)){
+
+
             cout << msg[16];
-            cout << format(msg[18], {{"cho_score", to_string(game.cho.score)}, {"han_score", to_string(game.han.score)}});
+            cout << "점수 총합 : 초나라 " << game.cho.score << "점, 한나라 " << game.han.score << "점\n";
             if(game.cho.score > game.han.score){
                 cout << format(msg[14], {{"win_player", "초"}});
                 return true;
@@ -1471,7 +1507,7 @@ bool choCheckWin(){ //남경식
         }
         else{
             cout << msg[17];
-            cout << format(msg[18], {{"cho_score", to_string(game.cho.score)}, {"han_score", to_string(game.han.score)}});
+           cout << "점수 총합 : 초나라 " << game.cho.score << "점, 한나라 " << game.han.score << "점\n";
             if(game.cho.score > game.han.score){
                 cout << format(msg[14], {{"win_player", "초"}});
                 return true;
@@ -1511,7 +1547,7 @@ bool isKingDie(){ //남경식
 
 //남경식
 bool isTurnOver(int turn){
-    return (game.turn >= 100);
+    return (game.turn >= 99);
 };
 
 //남경식
