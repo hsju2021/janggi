@@ -54,7 +54,7 @@ string msg[] = {
 
 class Player {
    public:
-    double score = 60000;
+    double score;
     int* pieces;
     string placement;
 };
@@ -161,6 +161,7 @@ bool isScoreUnder(double score1, double score2);
 bool isTurnOver(int turn);
 bool isKingDie();
 void undo();
+void setup_score();
 void setupInitialPieces();
 int remove_piece_num();
 void remove_select_piece(int num);
@@ -768,6 +769,7 @@ int main() {
             cout << format(msg[32], { {"player", "한"} });
             while (true) {
                 // 한나라 턴
+                previous.push(BoardState(board));
                 printBoard(); // 보드출력
                 chosen = choosePiece(game.han); // 기물선택
                 if (chosen == nullptr) {
@@ -786,6 +788,7 @@ int main() {
                 cout << msg[7] << msg[0];
 
                 // 초나라 턴
+                previous.push(BoardState(board));
                 printBoard();
                 chosen = choosePiece(game.cho);
                 if (chosen == nullptr) {
@@ -807,8 +810,10 @@ int main() {
         else { // 제거할 기물이 0개
             setupBoard(game, game.han);
             setupBoard(game, game.cho);
+            setup_score();
             while (true) {
                 // 초나라 턴
+                previous.push(BoardState(board));
                 printBoard(); // 보드출력
                 chosen = choosePiece(game.han); // 기물선택
                 if (chosen == nullptr) {
@@ -827,6 +832,7 @@ int main() {
                 cout << msg[7] << msg[0];
 
                 // 한나라 턴
+                previous.push(BoardState(board));
                 printBoard();
                 chosen = choosePiece(game.cho);
                 if (chosen == nullptr) {
@@ -1205,6 +1211,8 @@ Piece* choosePiece(Player& player) {
 
 // 김종우 작성 - 보드 출력 
 void printBoard() {
+
+    setup_score();
     int starpoints[10][2] = { {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},   // 궁성 좌표 저장
                             {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
     // system("cls");    // 프롬프트 clear
@@ -1339,4 +1347,26 @@ string format(const string& input, const map<string, string>& to) {
         }
     }
     return result;
+}
+
+void setup_score(){
+
+    game.cho.score = 0;
+    game.han.score = 0;
+
+    for(int i=0; i<9; i++){
+        for(int j=0; j<10; j++){
+            if(board[i][j] == nullptr) continue;
+
+            if(board[i][j]->team == 'C'){
+                game.cho.score += board[i][j]->score;
+            }  
+            else if(board[i][j]->team == 'H'){
+                game.han.score += board[i][j]->score;
+            }
+        }
+    }
+
+    game.han.score += 1.5;
+
 }
