@@ -793,7 +793,7 @@ int main() {
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                            else cout << msg[26];
+                            else cout << msg[26] << msg[0];
                         }
                         break;
                     }
@@ -817,7 +817,7 @@ int main() {
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                        else cout << msg[26] << msg[0];
                     }
                     break;
                 } else if (quitOnMove == 2) {
@@ -830,7 +830,7 @@ int main() {
                 while (true) {
                     getline(cin, input);
                     if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                    else cout << msg[26];
+                    else cout << msg[26] << msg[0];
                 }
 
                 game.turn++;
@@ -845,7 +845,7 @@ int main() {
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                            else cout << msg[26];
+                            else cout << msg[26] << msg[0];
                         }
                         break;
                     }
@@ -869,7 +869,7 @@ int main() {
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                        else cout << msg[26] << msg[0];
                     }
                     break;
                 } else if (quitOnMove == 2) {
@@ -883,7 +883,7 @@ int main() {
                 while (true) {
                     getline(cin, input);
                     if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                    else cout << msg[26];
+                    else cout << msg[26] << msg[0];
                 }
 
                 game.turn++;
@@ -906,7 +906,7 @@ int main() {
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                            else cout << msg[26];
+                            else cout << msg[26] << msg[0];
                         }
                         break;
                     }
@@ -930,7 +930,7 @@ int main() {
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                        else cout << msg[26] << msg[0];
                     }
                     break;
                 } else if (quitOnMove == 2) {
@@ -959,7 +959,7 @@ int main() {
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                            else cout << msg[26];
+                            else cout << msg[26] << msg[0];
                         }
                         break;
                     }
@@ -983,7 +983,7 @@ int main() {
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                        else cout << msg[26] << msg[0];
                     }
                     break;
                 } else if (quitOnMove == 2) {
@@ -997,7 +997,7 @@ int main() {
                 while (true) {
                     getline(cin, input);
                     if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                    else cout << msg[26];
+                    else cout << msg[26] << msg[0];
                 }
 
                 game.turn++;
