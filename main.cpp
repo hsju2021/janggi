@@ -817,11 +817,12 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    continue;
+                    break;
                 }
                         break;
                     }
                 }
+                if (quitOnMove == 2) break;
                 if (chosen->team == '.') break;
                 printBoard(); // 이동후 보드출력
 
@@ -869,11 +870,12 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    continue;
+                    break;
                 }
                         break;
                     }
                 }
+                if (quitOnMove == 2) break;
                 if (chosen->team == '.') break;
                 
                 printBoard();
@@ -930,11 +932,12 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    continue;
+                    break;
                 }
                         break;
                     }
                 }
+                if (quitOnMove == 2) break;
                 if (chosen->team == '.') break;
                 
                 printBoard(); // 이동후 보드출력
@@ -983,11 +986,12 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    continue;
+                    break;
                 }
                         break;
                     }
                 }
+                if (quitOnMove == 2) break;
                 if (chosen->team == '.') break;
                 
                 printBoard();
