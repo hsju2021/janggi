@@ -763,7 +763,9 @@ int main() {
         if (remove >= 1) { // 제거할 기물이 1개 이상
             // 한나라, 초나라 포진 과정
             setupBoard(game, game.han);
+            printBoard();
             remove_select_piece(remove);
+            printBoard();
             setupBoard(game, game.cho);
             cout << format(msg[32], { {"player", "한"} });
             while (true) {
@@ -810,7 +812,7 @@ int main() {
             while (true) {
                 // 초나라 턴
                 printBoard(); // 보드출력
-                chosen = choosePiece(game.han); // 기물선택
+                chosen = choosePiece(game.cho); // 기물선택
                 if (chosen == nullptr) {
                     cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
                     while (true) {
@@ -828,7 +830,7 @@ int main() {
 
                 // 한나라 턴
                 printBoard();
-                chosen = choosePiece(game.cho);
+                chosen = choosePiece(game.han);
                 if (chosen == nullptr) {
                     cout << format(msg[6], { {"player", "한"} });
                     while (true) {
