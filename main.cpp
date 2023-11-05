@@ -1212,7 +1212,7 @@ int remove_piece_num() {
             return num;
         }
         else {
-            cout << "1과 6 사이의 정수를 입력하시오\n";
+            cout << "0과 6 사이의 정수를 입력하시오.\n";
         }
     }
 }
