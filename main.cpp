@@ -958,33 +958,17 @@ bool isKingDie(){ //남경식
 
 //남경식
 bool isTurnOver(int turn){
-    if(game.turn > 100){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return (game.turn > 100);
 };
 
 //남경식
 bool isScoreUnder(int score1, int score2){
-    if(score1 <= 30 && score2 <= 30){
-        return true;
-    }
-    else{
-        return false;
-    }
-
+    return (score1 <= 30 && score2 <= 30);
 };
 
 //남경식
 bool choKingDie(Piece* piece){
-    if(piece->team == 'C'){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return (piece->team == 'C');
 };
 
 //남경식
