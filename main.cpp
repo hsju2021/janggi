@@ -789,7 +789,7 @@ int main() {
                     printBoard(); // 보드출력
                     chosen = choosePiece(game.han); // 기물선택
                     if (chosen->team == '.') {
-                        cout << format(msg[6], { {"player", "한"} });
+                        cout << format(msg[6], { {"player", "한"} }) << cout[15];
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
@@ -816,6 +816,11 @@ int main() {
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
+                while (true) {
+                    getline(cin, input);
+                    if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                    else cout << msg[26];
+                }
 
                 game.turn++;
 
@@ -825,7 +830,7 @@ int main() {
                     printBoard(); // 보드출력
                     chosen = choosePiece(game.cho); // 기물선택
                     if (chosen->team == '.') {
-                        cout << format(msg[6], { {"player", "초"} });
+                        cout << format(msg[6], { {"player", "초"} }) << msg[15];
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
@@ -852,6 +857,11 @@ int main() {
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
+                while (true) {
+                    getline(cin, input);
+                    if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                    else cout << msg[26];
+                }
 
                 game.turn++;
             }
@@ -869,7 +879,7 @@ int main() {
                     printBoard(); // 보드출력
                     chosen = choosePiece(game.cho); // 기물선택
                     if (chosen->team == '.') {
-                        cout << format(msg[6], { {"player", "초"} });
+                        cout << format(msg[6], { {"player", "초"} }) << msg[15];
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
@@ -896,6 +906,11 @@ int main() {
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
+                while (true) {
+                    getline(cin, input);
+                    if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                    else cout << msg[26];
+                }
 
                 game.turn++;
 
@@ -905,7 +920,7 @@ int main() {
                     printBoard(); // 보드출력
                     chosen = choosePiece(game.han); // 기물선택
                     if (chosen->team == '.') {
-                        cout << format(msg[6], { {"player", "한"} });
+                        cout << format(msg[6], { {"player", "한"} }) << msg[15];
                         while (true) {
                             getline(cin, input);
                             if (input.compare("Y") == 0 || input.compare("y") == 0) break;
