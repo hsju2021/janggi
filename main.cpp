@@ -310,7 +310,7 @@ class Cannon : public Piece {
 
     // 해당 기물이 Cannon인지 확인하는 함수 추가
     bool isCannon(Piece& cannon) {
-        if ((cannon.letter == 'C') or (cannon.letter == 'c')) {
+        if ((cannon.letter == 'C') || (cannon.letter == 'c')) {
             return true;
         }
         else return false;
