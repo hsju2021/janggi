@@ -34,9 +34,9 @@ string msg[] = {
     "‘y’또는 ‘Y’를 입력하면 메인 메뉴로 돌아갑니다.\n",
     "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n",
     "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n",
-    "점수 총합 : 초나라 {score}점, 한나라 {score}점\n",
+    "점수 총합 : 초나라 {cho_score}점, 한나라 {han_score}점\n",
     "{player}나라가 {setup} 포진을 선택하였습니다.\n",
-    "{player}나라 ‘{piece}’이(가) {player}나라 ‘{piece}’을(를) 잡았습니다.\n ",
+    "{player1}나라 ‘{piece1}’이(가) {player2}나라 ‘{piece2}’을(를) 잡았습니다.\n ",
     "존재하지 않는 메뉴입니다. ",
     "다시 입력해 주세요.\n",
     "해당 좌표에 기물이 존재하지 않거나 옳지 않은 입력입니다. ",
@@ -1238,20 +1238,17 @@ bool choCheckWin(){ //남경식
     if(isKingDie() || isTurnOver(game.turn) || isScoreUnder(game.cho.score, game.han.score)){
         if(isKingDie()){
             if(choKingDie(King_Location)){
-                cout << "초나라의 궁이 잡혔습니다.\n";
-                cout << "한나라의 승리입니다!\n";
+                cout << format(msg[13], {{"lose_player","초"}}) << format(msg[13], {{"win_player","한"}});
                 return true;
             }
             else{
-                cout << "한나라의 궁이 잡혔습니다.\n";
-                cout << "초나라의 승리입니다!\n";
+                cout << format(msg[13], {{"lose_player","한"}}) << format(msg[13], {{"win_player","초"}});
                 return true;
             }
         }
         else if(isTurnOver(game.turn)){
-            cout << "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n";
-            cout << "점수 총합 : 초나라 " << game.cho.score 
-            << "점, "<<", 한나라 " << game.han.score << "점";
+            cout << msg[16];
+            cout << format(msg[18], {{"cho_score", to_string(game.cho.score)}, {"han_score", to_string(game.han.score)}});
             if(game.cho.score > game.han.score){
                 cout << "초나라의 승리입니다!\n";
                 return true;
