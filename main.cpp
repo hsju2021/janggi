@@ -1228,8 +1228,8 @@ void printBoard() {
                     cout << " |";   // 궁성 아닌 빈자리 <공백문자> + "|" 출력
             }
         }
-        if (row == 0) { cout << "한나라 score : " << game.han.score; } // 첫째 줄에 한나라 score 출력
-        else if (row == 1) { cout << "초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
+        if (row == 0) { cout << " 한나라 score : " << game.han.score; } // 첫째 줄에 한나라 score 출력
+        else if (row == 1) { cout << " 초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
         cout << endl;
     }
 }
@@ -1250,24 +1250,23 @@ bool choCheckWin(){ //남경식
             cout << msg[16];
             cout << format(msg[18], {{"cho_score", to_string(game.cho.score)}, {"han_score", to_string(game.han.score)}});
             if(game.cho.score > game.han.score){
-                cout << "초나라의 승리입니다!\n";
+                cout << format(msg[14], {{"win_player", "초"}});
                 return true;
             }
             else{
-                cout << "한나라의 승리입니다!\n";
+                cout << format(msg[14], {{"win_player", "한"}});
                 return true;
             }
         }
         else{
-            cout <<  "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n";
-             cout << "점수 총합 : 초나라 " << game.cho.score 
-            << "점, "<<", 한나라 " << game.han.score << "점";
+            cout << msg[17];
+            cout << format(msg[18], {{"cho_score", to_string(game.cho.score)}, {"han_score", to_string(game.han.score)}});
             if(game.cho.score > game.han.score){
-                cout << "초나라의 승리입니다!\n";
+                cout << format(msg[14], {{"win_player", "초"}});
                 return true;
             }
             else{
-                cout << "한나라의 승리입니다!\n";
+                cout << format(msg[14], {{"win_player", "한"}});
                 return true;
             }
         }
