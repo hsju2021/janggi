@@ -778,7 +778,7 @@ int main() {
                 printBoard(); // 보드출력
                 chosen = choosePiece(game.han); // 기물선택
                 if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "한"} });
+                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
@@ -799,7 +799,7 @@ int main() {
                 printBoard();
                 chosen = choosePiece(game.cho);
                 if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "초"} });
+                    cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
@@ -828,7 +828,7 @@ int main() {
                 printBoard(); // 보드출력
                 chosen = choosePiece(game.cho); // 기물선택
                 if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
+                    cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
@@ -849,7 +849,7 @@ int main() {
                 printBoard();
                 chosen = choosePiece(game.han);
                 if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "한"} });
+                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
                     while (true) {
                         getline(cin, input);
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
