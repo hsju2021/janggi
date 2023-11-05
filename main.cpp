@@ -474,69 +474,105 @@ stack<BoardState> previous;
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
 int main() {
-    int remove, x, y;
+    int remove;
+    string input;
     Piece* chosen;
 
-    mainMenu();
-    setupInitialPieces();
-    remove = remove_piece_num();
-    if (remove) { // 제거할 기물이 1개 이상
-        // 한나라, 초나라 포진 과정
-        setupBoard(game, game.han);
-        printBoard(); // 보드출력
-        remove_select_piece(remove);
-        printBoard(); // 보드출력
-        setupBoard(game, game.cho);
+    while (true) {
+        mainMenu();
+        setupInitialPieces();
+        remove = remove_piece_num();
+        if (remove >= 1) { // 제거할 기물이 1개 이상
+            // 한나라, 초나라 포진 과정
+            setupBoard(game, game.han);
+            remove_select_piece(remove);
+            setupBoard(game, game.cho);
+            cout << format(msg[6], { {"player", "한"} });
+            while (true) {
+                // 한나라 턴
+                printBoard(); // 보드출력
+                chosen = choosePiece(game.han); // 기물선택
+                if (chosen == nullptr) {
+                    cout << format(msg[6], { {"player", "한"} });
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                }
+                chosen->movePiece(); // 기물이동
+                printBoard(); // 이동후 보드출력
 
-        while (true) {
-            // 한나라 턴
-            previous.push(BoardState(board));
-            printBoard(); // 보드출력
-            chosen = choosePiece(game.han); // 기물선택
-            chosen->movePiece(); // 기물이동
-            printBoard(); // 이동후 보드출력
+                if (choCheckWin()) break; // 승패여부 처리
+                cout << msg[7] << msg[0];
 
-            if(choCheckWin()) break; // 승패여부 처리
-            cout << endl; //턴 넘기기 메세지 처리 필요
+                // 초나라 턴
+                printBoard();
+                chosen = choosePiece(game.cho);
+                if (chosen == nullptr) {
+                    cout << format(msg[6], { {"player", "초"} });
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                }
+                chosen->movePiece();
+                printBoard();
 
-            // 초나라 턴
-            previous.push(BoardState(board));
-            printBoard();
-            chosen = choosePiece(game.cho); 
-            chosen->movePiece();
-            printBoard();
+                if (choCheckWin()) break; // 승패여부 처리
+                cout << msg[7] << msg[0];
+            }
+        }
+        else { // 제거할 기물이 0개
+            setupBoard(game, game.han);
+            setupBoard(game, game.cho);
+            while (true) {
+                // 초나라 턴
+                printBoard(); // 보드출력
+                chosen = choosePiece(game.han); // 기물선택
+                if (chosen == nullptr) {
+                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                }
+                chosen->movePiece(); // 기물이동
+                printBoard(); // 이동후 보드출력
 
-            if(choCheckWin()) break; // 승패여부 처리
-            cout << endl; //턴 넘기기 메세지 처리 필요
+                if (choCheckWin()) break; // 승패여부 처리
+                cout << msg[7] << msg[0];
+
+                // 한나라 턴
+                printBoard();
+                chosen = choosePiece(game.cho);
+                if (chosen == nullptr) {
+                    cout << format(msg[6], { {"player", "한"} });
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                }
+                chosen->movePiece();
+                printBoard();
+
+                if (choCheckWin()) break; // 승패여부 처리
+                cout << msg[7] << msg[0];
+                while (true) {
+                    getline(cin, input);
+                    if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                    else cout << msg[26];
+                }
+            }
         }
     }
-    else { // 제거할 기물이 0개
-        setupBoard(game, game.han);
-        setupBoard(game, game.cho);
-        while (true) {
-            // 초나라 턴
-            previous.push(BoardState(board));
-            printBoard(); // 보드출력
-            chosen = choosePiece(game.han); // 기물선택
-            chosen->movePiece(); // 기물이동
-            printBoard(); // 이동후 보드출력
-
-            if(choCheckWin()) break; // 승패여부 처리
-            cout << endl; //턴 넘기기 메세지 처리 필요
-
-            // 한나라 턴
-            previous.push(BoardState(board));
-            printBoard();
-            chosen = choosePiece(game.cho); 
-            chosen->movePiece();
-            printBoard();
-
-            if(choCheckWin()) break; // 승패여부 처리
-            cout << endl; //턴 넘기기 메세지 처리 필요
-        }
-    }
-    
-    
     return 0;
 }
 
