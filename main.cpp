@@ -113,8 +113,7 @@ void Piece::movePiece() {
         for (int i = 0; i < paths.size(); i++) {
             cout << paths[i].second << (char)(paths[i].first + 'A') << ' ';
         }
-        cout << '\n';
-        cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
+        cout << endl << endl << msg[12] << msg[0];
         getline(cin, coord);
 
         if (coord == "cancel") {
@@ -127,7 +126,7 @@ void Piece::movePiece() {
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
-            cout << msg[21] << msg[20] << endl;
+            cout << msg[24] << msg[22] << endl;
             continue;
         }
 
@@ -144,6 +143,7 @@ void Piece::movePiece() {
                 return;
             } 
         }
+        cout << msg[24] << msg[22] << endl;
     }
 }
 
@@ -542,13 +542,10 @@ void mainMenu() {
     string s;
     while (1) {
         system("cls");
-        cout << "메뉴를 선택하세요." << endl;
-        cout << "1. 게임 실행" << endl;
-        cout << "2. 게임 종료" << endl;
+        cout << msg[1] << msg[2] << msg[3] << msg[0];
         getline(cin, s);
         if (s != "1" && s != "2") {
-            cout << msg[19]  << endl;
-            cout << msg[20] << endl;
+            cout << msg[21] << msg[22];
         }
         if (s == "2")
             exit(0);
@@ -591,23 +588,24 @@ void setupBoard(Game& game, Player& player) {
 
     if (&player == &game.han) {
         while (true) { // while문
+            int num;
             string input;
             cout << "    <한나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << msg[2] << ">>>";
-            getline(cin, input);
-            int num = stoi(input);
-            if (num > 0 && num < 5) { // if문
+            cout << msg[2] << msg[0];
+            getline(cin, input); // 사용자로부터 문자열로 입력을 받습니다.
+            stringstream ss(input); // 입력받은 문자열을 스트림으로 변환합니다.
+            if (ss >> num && num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
                     cout << "한나라가 " << setup[0] << " 포진을 선택하였습니다.\n\n";
                     board[1][0] = new Knight(1, 0, 'H');
-                    board[6][0] = new Knight(7, 0, 'H');
+                    board[7][0] = new Knight(7, 0, 'H');
                     board[2][0] = new Elephant(2, 0, 'H');
-                    board[7][0] = new Elephant(6, 0, 'H');
+                    board[6][0] = new Elephant(6, 0, 'H');
                     break;
                 case 2:
                     cout << "한나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
@@ -634,13 +632,14 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << "해당되는 포진이 없습니다.\n";
+                cout << msg[23];
             }
         } // while문
     }
 
     else if (&player == &game.cho) {
         while (true) { // while문
+            int num;
             string input;
             cout << "    <초나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
@@ -648,9 +647,9 @@ void setupBoard(Game& game, Player& player) {
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
             cout << msg[2] << msg[0];
-            getline(cin, input);
-            int num = stoi(input);
-            if (num > 0 && num < 5) { // if문
+            getline(cin, input); // 사용자로부터 문자열로 입력을 받습니다.
+            stringstream ss(input); // 입력받은 문자열을 스트림으로 변환합니다.
+            if (ss >> num && num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
                     cout << "초나라가 " << setup[0] << " 포진을 선택하였습니다.\n\n";
@@ -660,7 +659,7 @@ void setupBoard(Game& game, Player& player) {
                     board[6][9] = new Elephant(6, 9, 'C');
                     break;
                 case 2:
-                    cout <<"초나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
+                    cout << "초나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
                     board[1][9] = new Knight(1, 9, 'C');
                     board[6][9] = new Knight(6, 9, 'C');
                     board[2][9] = new Elephant(2, 9, 'C');
@@ -684,10 +683,11 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << "해당되는 포진이 없습니다.\n";
+                cout << msg[23];
             }
         } // while문
     }
+    return;
 }
 
 int remove_piece_num() {
@@ -957,33 +957,17 @@ bool isKingDie(){ //남경식
 
 //남경식
 bool isTurnOver(int turn){
-    if(game.turn > 100){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return (game.turn > 100);
 };
 
 //남경식
 bool isScoreUnder(double score1, double score2){
-    if(score1 <= 30 && score2 <= 30){
-        return true;
-    }
-    else{
-        return false;
-    }
-
+    return (score1 <= 30 && score2 <= 30);
 };
 
 //남경식
 bool choKingDie(Piece* piece){
-    if(piece->team == 'C'){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return (piece->team == 'C');
 };
 
 //남경식
