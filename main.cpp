@@ -815,9 +815,9 @@ int main() {
                         if (input.compare("Y") == 0 || input.compare("y") == 0) break;
                         else cout << msg[26] << msg[0];
                     }
-                    break;
+                    continue;
                 } else if (quitOnMove == 2) {
-                    break;
+                    continue;
                 }
                         break;
                     }
@@ -870,7 +870,7 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    break;
+                    continue;
                 }
                         break;
                     }
@@ -932,7 +932,7 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    break;
+                    continue;
                 }
                         break;
                     }
@@ -986,7 +986,7 @@ int main() {
                     }
                     break;
                 } else if (quitOnMove == 2) {
-                    break;
+                    continue;
                 }
                         break;
                     }
