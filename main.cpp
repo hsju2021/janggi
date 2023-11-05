@@ -580,7 +580,7 @@ void mainMenu() {
     // clear the console
     string s;
     while (1) {
-        system("cls");
+        // system("cls");
         cout << msg[1] << msg[2] << msg[3] << msg[0];
         getline(cin, s);
         if (s != "1" && s != "2") {
@@ -929,7 +929,7 @@ Piece* choosePiece(Player& player) {
 void printBoard() {
     int starpoints[10][2] = { {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},   // 궁성 좌표 저장
                             {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
-    system("cls");    // 프롬프트 clear
+    // system("cls");    // 프롬프트 clear
     cout << "    A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
     for (int row = 0; row < 10; row++) {
         cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
@@ -1006,6 +1006,7 @@ bool isKingDie(){ //남경식
     int count = 0;
     for(int i=0; i<9; i++){
         for(int j=0; j<10; j++){
+            if (board[i][j] == nullptr) continue;
             if(board[i][j]->letter == 'K' || board[i][j]->letter == 'k'){
                 King_Location = board[i][j];
                 count++;
