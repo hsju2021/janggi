@@ -5,8 +5,9 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
-//#include <windows.h>
+// //#include <windows.h>
 #include <algorithm>
+#include <map>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 10
@@ -17,12 +18,14 @@ using namespace std;
 string msg[] = {
     ">>> ",
     "메뉴를 선택하세요.\n",
+    "1. 게임 실행\n",
+    "2. 게임 종료\n",
     "원하는 포진을 선택하세요.\n",
-    "나라의 기물을 선택하세요.\n",
+    "{player}나라의 기물을 선택하세요.\n",
     "{player}나라가 게임을 중단하여 메인 메뉴로 돌아갑니다.\n",
     "‘y’또는 ‘Y’를 입력해주세요.\n",
-    "나라의 기물을 선택하세요.\n",
     "{player}나라 ‘{piece}’을(를) 선택하셨습니다.\n",
+    "잘못된 좌표입니다. ",
     "기물을 다시 선택하려면 “back”을 입력하세요.\n",
     "게임을 중단하려면 “quit”을 입력하세요.\n",
     "이동할 좌표를 입력해주세요.\n",
@@ -32,7 +35,7 @@ string msg[] = {
     "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n",
     "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n",
     "점수 총합 : 초나라 {score}점, 한나라 {score}점\n",
-    "한나라가 {setup} 포진을 선택하였습니다.\n",
+    "{player}나라가 {setup} 포진을 선택하였습니다.\n",
     "{player}나라 ‘{piece}’이(가) {player}나라 ‘{piece}’을(를) 잡았습니다.\n ",
     "존재하지 않는 메뉴입니다. ",
     "다시 입력해 주세요.\n",
@@ -42,11 +45,13 @@ string msg[] = {
     "잘못된 입력입니다. ‘y’또는 ‘Y’를 입력하세요.\n",
     "상대 플레이어의 기물은 선택할 수 없습니다. ",
     "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n",
-    "{num}()를 입력받았습니다.\n",
-    "{player}는 포진 선택과정을 진행하세요.\n",
+    "{num}({})를 입력받았습니다.\n",
+    "{player}나라는 포진 선택과정을 진행하세요.\n",
     "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
-    "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n"
+    "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
+    "무르기를 요청하려면 “cancel”을 입력하세요.\n",
 };
+
 class Player {
    public:
     int score;
@@ -112,10 +117,18 @@ void Piece::movePiece() {
         cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
         getline(cin, coord);
 
+        if (coord == "cancel") {
+            return;
+        }
+
+        if (coord == "quit") {
+            exit(0);
+        }
+
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
             cout << msg[21] << msg[20] << endl;
-            // continue;
+            continue;
         }
 
         // 규칙에 맞을 경우 숫자로 변환
@@ -526,13 +539,13 @@ int main() {
 
 void mainMenu() {
     // clear the console
-    string s = "";
+    string s;
     while (1) {
         system("cls");
         cout << "메뉴를 선택하세요." << endl;
         cout << "1. 게임 실행" << endl;
         cout << "2. 게임 종료" << endl;
-        cin >> s;
+        getline(cin, s);
         if (s != "1" && s != "2") {
             cout << msg[19]  << endl;
             cout << msg[20] << endl;
@@ -541,7 +554,7 @@ void mainMenu() {
             exit(0);
         if (s == "1")
             return;
-        //Sleep(1000);
+        Sleep(1000);
     }
     
 }
@@ -578,14 +591,15 @@ void setupBoard(Game& game, Player& player) {
 
     if (&player == &game.han) {
         while (true) { // while문
-            int num;
+            string input;
             cout << "    <한나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
             cout << msg[2] << ">>>";
-            cin >> num;
+            getline(cin, input);
+            int num = stoi(input);
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
@@ -627,14 +641,15 @@ void setupBoard(Game& game, Player& player) {
 
     else if (&player == &game.cho) {
         while (true) { // while문
-            int num;
+            string input;
             cout << "    <초나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
             cout << msg[2] << msg[0];
-            cin >> num;
+            getline(cin, input);
+            int num = stoi(input);
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
@@ -672,15 +687,15 @@ void setupBoard(Game& game, Player& player) {
                 cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
-       cin.ignore();
     }
 }
 
 int remove_piece_num() {
-    int num;
+    string input;
     while (true) {
         cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << msg[0];
-        cin >> num;
+        getline(cin, input);
+        int num = stoi(input);
         if (num >= 0 && num <= 6) {
             switch (num) {
             case 0:
@@ -983,4 +998,18 @@ void undo(){
                 }
          }
         }
+}
+
+// format(msg[내용], { {"바꿀문자열1", "바꾼후문자열1"}, {"바꿀문자열2", "바꾼후문자열2"}, ... })
+string format(const string& input, const map<string, string>& to) {
+    string result = input;
+    for (const auto& pair : to) {
+        string from = "{" + pair.first + "}";
+        size_t pos = result.find(from);
+        while (pos != string::npos) {
+            result.replace(pos, from.length(), pair.second);
+            pos = result.find(from, pos + pair.second.length());
+        }
+    }
+    return result;
 }
