@@ -54,7 +54,7 @@ string msg[] = {
 
 class Player {
    public:
-    int score;
+    double score;
     int* pieces;
     string placement;
 };
@@ -554,7 +554,7 @@ void mainMenu() {
             exit(0);
         if (s == "1")
             return;
-        Sleep(1000);
+        //Sleep(1000);
     }
     
 }
@@ -966,7 +966,7 @@ bool isTurnOver(int turn){
 };
 
 //남경식
-bool isScoreUnder(int score1, int score2){
+bool isScoreUnder(double score1, double score2){
     if(score1 <= 30 && score2 <= 30){
         return true;
     }
