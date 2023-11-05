@@ -487,7 +487,7 @@ int main() {
             setupBoard(game, game.han);
             remove_select_piece(remove);
             setupBoard(game, game.cho);
-            cout << format(msg[6], { {"player", "한"} });
+            cout << format(msg[32], { {"player", "한"} });
             while (true) {
                 // 한나라 턴
                 printBoard(); // 보드출력
@@ -739,7 +739,7 @@ int remove_piece_num() {
     int num;
     string input;
     while (true) {
-        cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << msg[0];
+        cout << msg[28] << msg[0];
         getline(cin, input); // 사용자로부터 문자열로 입력을 받습니다.
         stringstream ss(input); // 입력받은 문자열을 스트림으로 변환합니다.
         if (ss >> num && num >= 0 && num <= 6) {
@@ -891,7 +891,7 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << currentTurnTeam << msg[6] << endl << ">>>";
+        cout << format(msg[5], {{"player", currentTurnTeam}}) << ">>>";
         getline(cin, coord);
         if (!coord.compare("quit")) {
             return nullptr;
@@ -904,7 +904,7 @@ Piece* choosePiece(Player& player) {
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
-            cout << msg[21] << msg[20] << endl;
+            cout << msg[23] << msg[22] << endl;
             continue;
         }
 
@@ -912,12 +912,12 @@ Piece* choosePiece(Player& player) {
         tmpy = coord[0] - '0';
         
         if (board[tmpx][tmpy] == nullptr) {
-            cout << msg[21] << msg[20] << endl;
+            cout << msg[23] << msg[22] << endl;
             continue;
         }
 
         if ((&player == &game.han && board[tmpx][tmpy]->team == 'C') || (&player == &game.cho && board[tmpx][tmpy]->team == 'H')) {
-            cout << msg[25] << msg[20] << endl;
+            cout << msg[27] << msg[22] << endl;
             continue;
         }
 
