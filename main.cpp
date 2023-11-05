@@ -113,8 +113,7 @@ void Piece::movePiece() {
         for (int i = 0; i < paths.size(); i++) {
             cout << paths[i].second << (char)(paths[i].first + 'A') << ' ';
         }
-        cout << '\n';
-        cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
+        cout << endl << endl << msg[12] << msg[0];
         getline(cin, coord);
 
         if (coord == "cancel") {
@@ -127,7 +126,7 @@ void Piece::movePiece() {
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
-            cout << msg[21] << msg[20] << endl;
+            cout << msg[24] << msg[22] << endl;
             continue;
         }
 
@@ -144,6 +143,7 @@ void Piece::movePiece() {
                 return;
             } 
         }
+        cout << msg[24] << msg[22] << endl;
     }
 }
 
@@ -542,13 +542,10 @@ void mainMenu() {
     string s;
     while (1) {
         system("cls");
-        cout << "메뉴를 선택하세요." << endl;
-        cout << "1. 게임 실행" << endl;
-        cout << "2. 게임 종료" << endl;
+        cout << msg[1] << msg[2] << msg[3] << msg[0];
         getline(cin, s);
         if (s != "1" && s != "2") {
-            cout << msg[19]  << endl;
-            cout << msg[20] << endl;
+            cout << msg[21] << msg[22];
         }
         if (s == "2")
             exit(0);
@@ -592,39 +589,44 @@ void setupBoard(Game& game, Player& player) {
     if (&player == &game.han) {
         while (true) { // while문
             string input;
+            cout << format(msg[30], { {"player", "한"} });
             cout << "    <한나라 포진>\n\n"
                 << setup[0] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
                 << setup[1] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
                 << setup[2] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
                 << setup[3] << " 포진" << "\n    A B C D E F G H I" << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
-            cout << msg[2] << ">>>";
+            cout << msg[4] << msg[0];
             getline(cin, input);
             int num = stoi(input);
             if (num > 0 && num < 5) { // if문
                 switch (num) { // switch문
                 case 1:
-                    cout << "한나라가 " << setup[0] << " 포진을 선택하였습니다.\n\n";
+                    cout << format(msg[19], { {"player", "한"}, {"setup", setup[0] } }) << endl;
+                    game.han.placement = setup[0];
                     board[1][0] = new Knight(1, 0, 'H');
                     board[6][0] = new Knight(7, 0, 'H');
                     board[2][0] = new Elephant(2, 0, 'H');
                     board[7][0] = new Elephant(6, 0, 'H');
                     break;
                 case 2:
-                    cout << "한나라가 " << setup[1] << " 포진을 선택하였습니다.\n\n";
+                    cout << format(msg[19], { {"player", "한"}, {"setup", setup[1] } }) << endl;
+                    game.han.placement = setup[1];
                     board[1][0] = new Knight(1, 0, 'H');
                     board[6][0] = new Knight(6, 0, 'H');
                     board[2][0] = new Elephant(2, 0, 'H');
                     board[7][0] = new Elephant(7, 0, 'H');
                     break;
                 case 3:
-                    cout << "한나라가 " << setup[2] << " 포진을 선택하였습니다.\n\n";
+                    cout << format(msg[19], { {"player", "한"}, {"setup", setup[2] } }) << endl;
+                    game.han.placement = setup[2];
                     board[2][0] = new Knight(2, 0, 'H');
                     board[7][0] = new Knight(7, 0, 'H');
                     board[1][0] = new Elephant(1, 0, 'H');
                     board[6][0] = new Elephant(6, 0, 'H');
                     break;
                 case 4:
-                    cout << "한나라가 " << setup[3] << " 포진을 선택하였습니다.\n\n";
+                    cout << format(msg[19], { {"player", "한"}, {"setup", setup[3] } }) << endl;
+                    game.han.placement = setup[3];
                     board[2][0] = new Knight(2, 0, 'H');
                     board[6][0] = new Knight(6, 0, 'H');
                     board[1][0] = new Elephant(1, 0, 'H');
@@ -634,7 +636,7 @@ void setupBoard(Game& game, Player& player) {
                 break;
             } // if문
             else {
-                cout << "해당되는 포진이 없습니다.\n";
+                cout << msg[25];
             }
         } // while문
     }
@@ -691,13 +693,12 @@ void setupBoard(Game& game, Player& player) {
 }
 
 int remove_piece_num() {
-    int num;
     string input;
     while (true) {
         cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << msg[0];
-        getline(cin, input); // 사용자로부터 문자열로 입력을 받습니다.
-        stringstream ss(input); // 입력받은 문자열을 스트림으로 변환합니다.
-        if (ss >> num && num >= 0 && num <= 6) {
+        getline(cin, input);
+        int num = stoi(input);
+        if (num >= 0 && num <= 6) {
             switch (num) {
             case 0:
                 cout << "0을 입력받았습니다\n";
@@ -724,7 +725,7 @@ int remove_piece_num() {
             return num;
         }
         else {
-            cout << "0과 6 사이의 정수를 입력하시오\n";
+            cout << "1과 6 사이의 정수를 입력하시오\n";
         }
     }
 }
@@ -744,7 +745,7 @@ void remove_select_piece(int num) {
     case 3:
         cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << msg[0];
         piecesToRemove.push_back("R");
-        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("C"); 
         piecesToRemove.push_back("N");
         break;
     case 4:
@@ -774,42 +775,20 @@ void remove_select_piece(int num) {
     default:
         return;
     }
-    bool inputValid = true;
+    string input;
+    getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
+
+    stringstream ss(input);
     vector<pair<int, int>> coordinates;
-
-    do {
-        inputValid = true; // 입력 유효성 플래그를 초기화
-        coordinates.clear(); // 좌표 벡터를 초기화
-        string input;
-        getline(cin, input); // 사용자로부터 좌표 문자열을 입력받습니다.
-
-        stringstream ss(input);
-        string token;
-        while (ss >> token) { // 공백을 기준으로 문자열을 분리합니다.
-            if (token.size() == 2 && isdigit(token[0]) && isupper(token[1])) {
-                int y = token[0] - '0'; // 첫 번째 문자를 숫자로 변환
-                int x = token[1] - 'A'; // 두 번째 문자를 알파벳 인덱스로 변환
-                if (x >= 0 && x < 9 && y >= 0 && y < 10) {
-                    coordinates.push_back({ x, y });
-                }
-                else {
-                    inputValid = false; // 좌표 범위를 벗어났습니다.
-                    break;
-                }
-            }
-            else {
-                inputValid = false; // 잘못된 형식입니다.
-                break;
-            }
-        }
-
-        if (!inputValid || coordinates.size() != piecesToRemove.size()) {
-            cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 입력하세요." << endl;
-            return remove_select_piece(num);
-        }
-    } while (!inputValid || coordinates.size() != piecesToRemove.size());
-
-    // 좌표에 따른 기물 제거 로직
+   
+    string token;
+      while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
+       if (token.size() == 2) {
+        int y = token[0] - '0';  // 먼저 숫자를 읽습니다.
+        int x = token[1] - 'A';  // 그 다음 문자를 읽습니다.
+        coordinates.push_back({ x, y });
+       }
+   }
     for (const auto& coord : coordinates) {
         int x = coord.first;
         int y = coord.second;
@@ -823,12 +802,12 @@ void remove_select_piece(int num) {
                 piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
             }
             else {
-                cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 입력하세요." << endl;
+                cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
                 return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
             }
         }
         else {
-            cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 입력하세요." << endl;
+            cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
             return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
         }
     }
