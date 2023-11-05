@@ -112,13 +112,19 @@ void Piece::movePiece() {
         cout << "어느 좌표로 이동하시겠습니까?" << endl << ">>>";
         getline(cin, coord);
 
+        if (coord == "cancel") {
+            return;
+        }
+
+        if (coord == "quit") {
+            exit(0);
+        }
+
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
             cout << msg[21] << msg[20] << endl;
             continue;
         }
-
-        
 
         // 규칙에 맞을 경우 숫자로 변환
         tmpy = coord[0] - '0';
@@ -456,7 +462,7 @@ class Pawn : public Piece {
     }
 };
 
-stack<Piece*> previous;
+stack<BoardState> previous;
 
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
