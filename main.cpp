@@ -789,6 +789,8 @@ int main() {
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
 
+                game.turn++;
+
                 // 초나라 턴
                 previous.push(BoardState(board));
                 printBoard();
@@ -807,6 +809,8 @@ int main() {
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
+
+                game.turn++;
             }
         }
         else { // 제거할 기물이 0개
@@ -833,6 +837,8 @@ int main() {
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
 
+                game.turn++;
+
                 // 한나라 턴
                 previous.push(BoardState(board));
                 printBoard();
@@ -856,6 +862,8 @@ int main() {
                     if (input.compare("Y") == 0 || input.compare("y") == 0) break;
                     else cout << msg[26];
                 }
+
+                game.turn++;
             }
         }
     }
@@ -1184,7 +1192,7 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << format(msg[5], {{"player", currentTurnTeam}}) << ">>>";
+        cout << format(msg[5], {{"player", currentTurnTeam}}) << msg[11] << msg[33] << msg[0];
         getline(cin, coord);
         if (!coord.compare("quit")) {
             return nullptr;
