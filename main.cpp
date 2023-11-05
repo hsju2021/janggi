@@ -157,13 +157,14 @@ int isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
 bool choKingDie(Piece* kingLocation);
-bool isScoreUnder(int score1, int score2);
+bool isScoreUnder(double score1, double score2);
 bool isTurnOver(int turn);
 bool isKingDie();
 void undo();
 void setupInitialPieces();
 int remove_piece_num();
 void remove_select_piece(int num);
+string format(const string& input, const map<string, string>& to);
 
 int isMovable(int x, int y, char team) {
     if (board[x][y] == nullptr) return 0;
