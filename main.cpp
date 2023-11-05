@@ -682,7 +682,6 @@ void setupBoard(Game& game, Player& player) {
                 cout << "해당되는 포진이 없습니다.\n";
             }
         } // while문
-       cin.ignore();
     }
 }
 
