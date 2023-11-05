@@ -78,6 +78,20 @@ class Piece {
     virtual ~Piece() = default;
 };
 
+Piece* King_Location;
+class BoardState {
+public:
+    Piece* state[9][10];
+
+    BoardState(Piece* initialBoard[9][10]) {
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                state[i][j] = initialBoard[i][j]; // here you would need to actually make a copy of the Piece object if it is not a shared immutable object
+            }
+        }
+    }
+};
+
 Piece* board[9][10] = {
 
 };
@@ -129,6 +143,10 @@ Piece* choosePiece(Player& player);
 int isMovable(int x, int y, char team);
 void kill();
 bool choCheckWin();
+bool choKingDie(Piece* kingLocation);
+bool isScoreUnder(int score1, int score2);
+bool isTurnOver(int turn);
+bool isKingDie();
 void undo();
 void setupInitialPieces();
 int remove_piece_num();
@@ -143,14 +161,6 @@ int isMovable(int x, int y, char team) {
 
 void kill() {
 
-}
-
-void undo() {
-
-}
-
-bool choCheckWin() {
-    return false;
 }
 
 
@@ -857,4 +867,115 @@ void printBoard() {
         else if (row == 1) { cout << "초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
         cout << endl;
     }
+}
+
+bool choCheckWin(){ //남경식
+    if(isKingDie() || isTurnOver(game.turn) || isScoreUnder(game.cho.score, game.han.score)){
+        if(isKingDie()){
+            if(choKingDie(King_Location)){
+                cout << "초나라의 궁이 잡혔습니다.\n";
+                cout << "한나라의 승리입니다!\n";
+                return true;
+            }
+            else{
+                cout << "한나라의 궁이 잡혔습니다.\n";
+                cout << "초나라의 승리입니다!\n";
+                return true;
+            }
+        }
+        else if(isTurnOver(game.turn)){
+            cout << "100번의 턴을 진행하여 점수 합산으로 승패를 결정합니다.\n";
+            cout << "점수 총합 : 초나라 " << game.cho.score 
+            << "점, "<<", 한나라 " << game.han.score << "점";
+            if(game.cho.score > game.han.score){
+                cout << "초나라의 승리입니다!\n";
+                return true;
+            }
+            else{
+                cout << "한나라의 승리입니다!\n";
+                return true;
+            }
+        }
+        else{
+            cout <<  "양측 기물의 점수 총합이 30 이하이므로 점수 합산으로 승패를 결정합니다.\n";
+             cout << "점수 총합 : 초나라 " << game.cho.score 
+            << "점, "<<", 한나라 " << game.han.score << "점";
+            if(game.cho.score > game.han.score){
+                cout << "초나라의 승리입니다!\n";
+                return true;
+            }
+            else{
+                cout << "한나라의 승리입니다!\n";
+                return true;
+            }
+        }
+    }
+    else{
+        return false;
+    }
+};
+
+bool isKingDie(){ //남경식
+    int count = 0;
+    for(int i=0; i<9; i++){
+        for(int j=0; j<10; j++){
+            if(typeid(board[i][j]) == typeid(King)){
+                King_Location = board[i][j];
+                count++;
+            }
+            
+        }
+        if(count == 2){ //모든 좌표에 대해서 king이 2개있는지 확인
+            return false;
+        }
+        else{
+
+            return true;
+        }
+    }
+};
+
+//남경식
+bool isTurnOver(int turn){
+    if(game.turn > 100){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+
+//남경식
+bool isScoreUnder(int score1, int score2){
+    if(score1 <= 30 && score2 <= 30){
+        return true;
+    }
+    else{
+        return false;
+    }
+
+};
+
+//남경식
+bool choKingDie(Piece* piece){
+    if(piece->team == 'C'){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
+
+//남경식
+void undo(){
+     if (!previous.empty()) {
+        BoardState lastState = previous.top();
+        previous.pop();
+
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                board[i][j] = lastState.state[i][j];
+                }
+         }
+        }
 }
