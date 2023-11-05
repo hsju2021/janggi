@@ -146,7 +146,7 @@ void Piece::movePiece() {
         cout << msg[24] << msg[22] << endl;
     }
 }
-
+int gamestart;
 Game game;
 
 void mainMenu();
@@ -756,10 +756,11 @@ int main() {
     int remove;
     string input;
     Piece* chosen;
-
+    
     while (true) {
         mainMenu();
         setupInitialPieces();
+        gamestart = 0;
         remove = remove_piece_num();
         if (remove >= 1) { // 제거할 기물이 1개 이상
             // 한나라, 초나라 포진 과정
@@ -768,6 +769,7 @@ int main() {
             remove_select_piece(remove);
             printBoard();
             setupBoard(game, game.cho);
+            gamestart = 1;
             cout << format(msg[32], { {"player", "한"} });
             while (true) {
                 // 한나라 턴
@@ -1233,29 +1235,55 @@ void printBoard() {
     int starpoints[10][2] = { {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},   // 궁성 좌표 저장
                             {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
     system("cls");    // 프롬프트 clear
-    cout << "    A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
-    for (int row = 0; row < 10; row++) {
-        cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
-        for (int col = 0; col < 9; col++) { // 보드 출력 과정
-            if (board[col][row] != nullptr) {
-                cout << board[col][row]->letter << "|"; // Piece 있으면 letter 출력 + "|"
-            }
-            else {
-                int isStarpoint = 0; // 궁성인지 아닌지 저장 (궁성 아닐 때 빈 자리 출력하기 위해 사용)
-                for (int i = 0; i < 10; i++) {
-                    if ((col == starpoints[i][0]) && (row == starpoints[i][1])) {   // 궁성의 10가지 경우의 수와 비교
-                        cout << "*|";
-                        isStarpoint = 1;
-                        break;
-                    }
+    if (gamestart == 0) {
+        cout << "    A B C D E F G H I   " << endl;  // 가장 윗줄 출력 
+        for (int row = 0; row < 10; row++) {
+            cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
+            for (int col = 0; col < 9; col++) { // 보드 출력 과정
+                if (board[col][row] != nullptr) {
+                    cout << board[col][row]->letter << "|"; // Piece 있으면 letter 출력 + "|"
                 }
-                if (isStarpoint == 0)
-                    cout << " |";   // 궁성 아닌 빈자리 <공백문자> + "|" 출력
+                else {
+                    int isStarpoint = 0; // 궁성인지 아닌지 저장 (궁성 아닐 때 빈 자리 출력하기 위해 사용)
+                    for (int i = 0; i < 10; i++) {
+                        if ((col == starpoints[i][0]) && (row == starpoints[i][1])) {   // 궁성의 10가지 경우의 수와 비교
+                            cout << "*|";
+                            isStarpoint = 1;
+                            break;
+                        }
+                    }
+                    if (isStarpoint == 0)
+                        cout << " |";   // 궁성 아닌 빈자리 <공백문자> + "|" 출력
+                }
             }
+            cout << endl;
         }
-        if (row == 0) { cout << " 한나라 score : " << game.han.score; } // 첫째 줄에 한나라 score 출력
-        else if (row == 1) { cout << " 초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
-        cout << endl;
+    }
+    else {
+        cout << "    A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
+        for (int row = 0; row < 10; row++) {
+            cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
+            for (int col = 0; col < 9; col++) { // 보드 출력 과정
+                if (board[col][row] != nullptr) {
+                    cout << board[col][row]->letter << "|"; // Piece 있으면 letter 출력 + "|"
+                }
+                else {
+                    int isStarpoint = 0; // 궁성인지 아닌지 저장 (궁성 아닐 때 빈 자리 출력하기 위해 사용)
+                    for (int i = 0; i < 10; i++) {
+                        if ((col == starpoints[i][0]) && (row == starpoints[i][1])) {   // 궁성의 10가지 경우의 수와 비교
+                            cout << "*|";
+                            isStarpoint = 1;
+                            break;
+                        }
+                    }
+                    if (isStarpoint == 0)
+                        cout << " |";   // 궁성 아닌 빈자리 <공백문자> + "|" 출력
+                }
+            }
+            if (row == 0) { cout << " 한나라 score : " << game.han.score; } // 첫째 줄에 한나라 score 출력
+            else if (row == 1) { cout << " 초나라 score : " << game.cho.score; } // 둘째 줄에 초나라 score 출력
+            cout << endl;
+        }
     }
 }
 
@@ -1335,7 +1363,7 @@ bool isScoreUnder(double score1, double score2){
 
 //남경식
 bool choKingDie(Piece* piece){
-    return (piece->team == 'C');
+    return (piece->team != 'C');
 };
 
 //남경식
