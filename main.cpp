@@ -1393,7 +1393,7 @@ Piece* choosePiece(Player& player) {
         }
         else if(!coord.compare("cancel") && game.turn <= 1){
 
-            cout << "더 이상 무를 수 없습니다. 다시 입력하세요.\n" << msg[0];
+            cout << "더 이상 무를 수 없습니다. 다시 입력하세요.\n";
             continue;
         }
 
