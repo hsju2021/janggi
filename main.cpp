@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
-#include <windows.h>
+// #include <windows.h>
 #include <algorithm>
 
 #define BOARD_WIDTH 9
@@ -101,8 +101,10 @@ void Piece::movePiece() {
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
             cout << msg[21] << msg[20] << endl;
-            // continue;
+            continue;
         }
+
+        
 
         // 규칙에 맞을 경우 숫자로 변환
         tmpy = coord[0] - '0';
@@ -527,7 +529,7 @@ void mainMenu() {
             exit(0);
         if (s == "1")
             return;
-        Sleep(1000);
+        // Sleep(1000);
     }
     
 }
