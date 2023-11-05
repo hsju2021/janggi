@@ -825,7 +825,16 @@ int main() {
                 if (chosen->team == '.') break;
                 printBoard(); // 이동후 보드출력
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
+
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -878,7 +887,15 @@ int main() {
                 
                 printBoard();
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -939,7 +956,15 @@ int main() {
                 
                 printBoard(); // 이동후 보드출력
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -992,7 +1017,15 @@ int main() {
                 
                 printBoard();
 
-                if (choCheckWin()) break; // 승패여부 처리
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                    break; // 승패여부 처리
+                }
                 cout << msg[7] << msg[0];
                 while (true) {
                     getline(cin, input);
@@ -1507,7 +1540,7 @@ bool isKingDie(){ //남경식
 
 //남경식
 bool isTurnOver(int turn){
-    return (game.turn >= 100);
+    return (game.turn >= 99);
 };
 
 //남경식
