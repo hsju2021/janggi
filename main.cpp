@@ -697,12 +697,13 @@ void setupBoard(Game& game, Player& player) {
 }
 
 int remove_piece_num() {
+    int num;
     string input;
     while (true) {
         cout << "초나라는 한나라에서 제거할 기물의 수를 입력하세요. (0~6)\n" << msg[0];
-        getline(cin, input);
-        int num = stoi(input);
-        if (num >= 0 && num <= 6) {
+        getline(cin, input); // 사용자로부터 문자열로 입력을 받습니다.
+        stringstream ss(input); // 입력받은 문자열을 스트림으로 변환합니다.
+        if (ss >> num && num >= 0 && num <= 6) {
             switch (num) {
             case 0:
                 cout << "0을 입력받았습니다\n";
@@ -749,7 +750,7 @@ void remove_select_piece(int num) {
     case 3:
         cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n" << msg[0];
         piecesToRemove.push_back("R");
-        piecesToRemove.push_back("C"); 
+        piecesToRemove.push_back("C");
         piecesToRemove.push_back("N");
         break;
     case 4:
@@ -779,20 +780,42 @@ void remove_select_piece(int num) {
     default:
         return;
     }
-    string input;
-    getline(cin, input);  // 사용자로부터 좌표 문자열을 입력받습니다.
-
-    stringstream ss(input);
+    bool inputValid = true;
     vector<pair<int, int>> coordinates;
-   
-    string token;
-      while (ss >> token) {  // 공백을 기준으로 문자열을 분리합니다.
-       if (token.size() == 2) {
-        int y = token[0] - '0';  // 먼저 숫자를 읽습니다.
-        int x = token[1] - 'A';  // 그 다음 문자를 읽습니다.
-        coordinates.push_back({ x, y });
-       }
-   }
+
+    do {
+        inputValid = true; // 입력 유효성 플래그를 초기화
+        coordinates.clear(); // 좌표 벡터를 초기화
+        string input;
+        getline(cin, input); // 사용자로부터 좌표 문자열을 입력받습니다.
+
+        stringstream ss(input);
+        string token;
+        while (ss >> token) { // 공백을 기준으로 문자열을 분리합니다.
+            if (token.size() == 2 && isdigit(token[0]) && isalpha(token[1])) {
+                int y = token[0] - '0'; // 첫 번째 문자를 숫자로 변환
+                int x = toupper(token[1]) - 'A'; // 두 번째 문자를 알파벳 인덱스로 변환
+                if (x >= 0 && x < 9 && y >= 0 && y < 10) {
+                    coordinates.push_back({ x, y });
+                }
+                else {
+                    inputValid = false; // 좌표 범위를 벗어났습니다.
+                    break;
+                }
+            }
+            else {
+                inputValid = false; // 잘못된 형식입니다.
+                break;
+            }
+        }
+
+        if (!inputValid || coordinates.size() != piecesToRemove.size()) {
+            cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 입력하세요." << endl;
+            return remove_select_piece(num);
+        }
+    } while (!inputValid || coordinates.size() != piecesToRemove.size());
+
+    // 좌표에 따른 기물 제거 로직
     for (const auto& coord : coordinates) {
         int x = coord.first;
         int y = coord.second;
@@ -806,12 +829,12 @@ void remove_select_piece(int num) {
                 piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
             }
             else {
-                cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+                cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 입력하세요." << endl;
                 return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
             }
         }
         else {
-            cout << "잘못된 좌표입니다. 다시 입력하세요." << endl;
+            cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 입력하세요." << endl;
             return remove_select_piece(num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
         }
     }
