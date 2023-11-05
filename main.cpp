@@ -786,6 +786,7 @@ Piece* cancel = new Pawn(1, 1, ',');
 int main() {
     // 컴파일 시 한글 깨짐 해결
     system("chcp 65001");
+    system("cls");
     int remove;
     string input;
     Piece* chosen;
