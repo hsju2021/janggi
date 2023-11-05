@@ -484,6 +484,7 @@ int main() {
             cout << endl; //턴 넘기기 메세지 처리 필요
 
             // 초나라 턴
+            previous.push(BoardState(board));
             printBoard();
             chosen = choosePiece(game.cho); 
             chosen->movePiece();
@@ -508,6 +509,7 @@ int main() {
             cout << endl; //턴 넘기기 메세지 처리 필요
 
             // 한나라 턴
+            previous.push(BoardState(board));
             printBoard();
             chosen = choosePiece(game.cho); 
             chosen->movePiece();
