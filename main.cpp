@@ -764,7 +764,9 @@ int main() {
         if (remove >= 1) { // 제거할 기물이 1개 이상
             // 한나라, 초나라 포진 과정
             setupBoard(game, game.han);
+            printBoard();
             remove_select_piece(remove);
+            printBoard();
             setupBoard(game, game.cho);
             cout << format(msg[32], { {"player", "한"} });
             while (true) {
@@ -815,7 +817,7 @@ int main() {
                 // 초나라 턴
                 previous.push(BoardState(board));
                 printBoard(); // 보드출력
-                chosen = choosePiece(game.han); // 기물선택
+                chosen = choosePiece(game.cho); // 기물선택
                 if (chosen == nullptr) {
                     cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
                     while (true) {
@@ -834,7 +836,7 @@ int main() {
                 // 한나라 턴
                 previous.push(BoardState(board));
                 printBoard();
-                chosen = choosePiece(game.cho);
+                chosen = choosePiece(game.han);
                 if (chosen == nullptr) {
                     cout << format(msg[6], { {"player", "한"} });
                     while (true) {
@@ -881,6 +883,13 @@ void mainMenu() {
 
 // 김의찬 작성
 void setupInitialPieces() {
+    // clear the board
+    for (int i = 0; i < BOARD_WIDTH; i++) {
+        for (int j = 0; j < BOARD_HEIGHT; j++) {
+            board[i][j] = nullptr;
+        }
+    }
+
     // 한나라의 기본 기물 배치
     board[0][0] = new Rook(0, 0, 'H');
     board[8][0] = new Rook(8, 0, 'H');
@@ -1117,7 +1126,7 @@ void remove_select_piece(int num) {
         while (ss >> token) { // 공백을 기준으로 문자열을 분리합니다.
             if (token.size() == 2 && isdigit(token[0]) && isalpha(token[1])) {
                 int y = token[0] - '0'; // 첫 번째 문자를 숫자로 변환
-                int x = toupper(token[1]) - 'A'; // 두 번째 문자를 알파벳 인덱스로 변환
+                int x = toupper(token[1]) - 'A'; // 두 번째문자를 알파벳 인덱스로 변환
                 if (x >= 0 && x < 9 && y >= 0 && y < 10) {
                     coordinates.push_back({ x, y });
                 }
@@ -1215,7 +1224,7 @@ void printBoard() {
     setup_score();
     int starpoints[10][2] = { {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},   // 궁성 좌표 저장
                             {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
-    // system("cls");    // 프롬프트 clear
+    system("cls");    // 프롬프트 clear
     cout << "    A B C D E F G H I   turn : " << game.turn << endl;  // 가장 윗줄 출력 
     for (int row = 0; row < 10; row++) {
         cout << " " << row << " |"; // 세로 숫자 줄 출력 + "|"
