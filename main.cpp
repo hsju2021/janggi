@@ -162,7 +162,7 @@ bool isTurnOver(int turn);
 bool isKingDie();
 void undo();
 void setup_score();
-void setupInitialPieces();
+void setupInitialPieces(Game& game, Player& player);
 int remove_piece_num();
 void remove_select_piece(int num);
 string format(const string& input, const map<string, string>& to);
@@ -759,7 +759,7 @@ int main() {
     
     while (true) {
         mainMenu();
-        setupInitialPieces();
+        setupInitialPieces(game, game.han);
         gamestart = 0;
         remove = remove_piece_num();
         if (remove >= 1) { // 제거할 기물이 1개 이상
@@ -768,6 +768,7 @@ int main() {
             printBoard();
             remove_select_piece(remove);
             printBoard();
+            setupInitialPieces(game, game.cho);
             setupBoard(game, game.cho);
             gamestart = 1;
             cout << format(msg[32], { {"player", "한"} });
@@ -892,36 +893,39 @@ void mainMenu() {
 }
 
 // 김의찬 작성
-void setupInitialPieces() {
-    // clear the board
-    for (int i = 0; i < BOARD_WIDTH; i++) {
-        for (int j = 0; j < BOARD_HEIGHT; j++) {
-            board[i][j] = nullptr;
+void setupInitialPieces(Game& game, Player& player) {
+
+    if (&player == &game.han) {
+        // clear the board
+        for (int i = 0; i < BOARD_WIDTH; i++) {
+            for (int j = 0; j < BOARD_HEIGHT; j++) {
+                board[i][j] = nullptr;
+            }
+        }
+        // 한나라의 기본 기물 배치
+        board[0][0] = new Rook(0, 0, 'H');
+        board[8][0] = new Rook(8, 0, 'H');
+        board[1][2] = new Cannon(1, 2, 'H');
+        board[7][2] = new Cannon(7, 2, 'H');
+        board[3][0] = new Guard(3, 0, 'H');
+        board[5][0] = new Guard(5, 0, 'H');
+        board[4][1] = new King(4, 1, 'H');
+        for (int i = 0; i < 9; i += 2) {
+            board[i][3] = new Pawn(i, 3, 'H');
         }
     }
-
-    // 한나라의 기본 기물 배치
-    board[0][0] = new Rook(0, 0, 'H');
-    board[8][0] = new Rook(8, 0, 'H');
-    board[1][2] = new Cannon(1, 2, 'H');
-    board[7][2] = new Cannon(7, 2, 'H');
-    board[3][0] = new Guard(3, 0, 'H');
-    board[5][0] = new Guard(5, 0, 'H');
-    board[4][1] = new King(4, 1, 'H');
-    for (int i = 0; i < 9; i += 2) {
-        board[i][3] = new Pawn(i, 3, 'H');
-    }
-
-    // 초나라의 기본 기물 배치
-    board[0][9] = new Rook(0, 9, 'C');
-    board[8][9] = new Rook(8, 9, 'C');
-    board[1][7] = new Cannon(1, 7, 'C');
-    board[7][7] = new Cannon(7, 7, 'C');
-    board[3][9] = new Guard(3, 9, 'C');
-    board[5][9] = new Guard(5, 9, 'C');
-    board[4][8] = new King(4, 8, 'C');
-    for (int i = 0; i < 9; i += 2) {
-        board[i][6] = new Pawn(i, 6, 'C');
+    if (&player == &game.cho) {
+        // 초나라의 기본 기물 배치
+        board[0][9] = new Rook(0, 9, 'C');
+        board[8][9] = new Rook(8, 9, 'C');
+        board[1][7] = new Cannon(1, 7, 'C');
+        board[7][7] = new Cannon(7, 7, 'C');
+        board[3][9] = new Guard(3, 9, 'C');
+        board[5][9] = new Guard(5, 9, 'C');
+        board[4][8] = new King(4, 8, 'C');
+        for (int i = 0; i < 9; i += 2) {
+            board[i][6] = new Pawn(i, 6, 'C');
+        }
     }
 }
 
