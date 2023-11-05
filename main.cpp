@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
-#include <windows.h>
+//#include <windows.h>
 #include <algorithm>
 
 #define BOARD_WIDTH 9
@@ -454,7 +454,7 @@ class Pawn : public Piece {
     }
 };
 
-stack<Piece*> previous;
+stack<BoardState> previous;
 
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
@@ -541,7 +541,7 @@ void mainMenu() {
             exit(0);
         if (s == "1")
             return;
-        Sleep(1000);
+        //Sleep(1000);
     }
     
 }
@@ -929,14 +929,15 @@ bool isKingDie(){ //남경식
             }
             
         }
-        if(count == 2){ //모든 좌표에 대해서 king이 2개있는지 확인
+        
+    }
+    if(count == 2){ //모든 좌표에 대해서 king이 2개있는지 확인
             return false;
         }
         else{
 
             return true;
         }
-    }
 };
 
 //남경식
