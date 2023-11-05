@@ -84,7 +84,7 @@ class Piece {
 
     virtual ~Piece() = default;
     
-};;
+};
 
 Piece* King_Location;
 class BoardState {
