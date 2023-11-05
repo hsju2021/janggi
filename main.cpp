@@ -71,7 +71,7 @@ class Piece {
     int x, y;
     char team;
     char letter;
-
+    double score;
     Piece(int x, int y, char team) {
         this->x = x;
         this->y = y;
@@ -181,10 +181,10 @@ void kill() {
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
    public:
-    const double score = 13;
     Rook(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'R';
         else letter = 'r';
+        score = 13;
     }
     // 가능한 모든 경로를 생성하는 함수
     vector<pair<int, int>> generatePaths() override {
@@ -295,10 +295,10 @@ class Rook : public Piece {
 
 class Cannon : public Piece {
    public:
-    const double score = 7;
     Cannon(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'C';
         else letter = 'c';
+        score = 7;
     }
 
     // 해당 기물이 Cannon인지 확인하는 함수 추가
@@ -419,10 +419,10 @@ class Cannon : public Piece {
 
 class Knight : public Piece {
    public:
-    const double score = 5;
     Knight(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'N';
         else letter = 'n';
+        score = 5;
     }
 
     vector<pair<int, int>> generatePaths() override { // 김종우 수정 사항
@@ -453,10 +453,10 @@ class Knight : public Piece {
 
 class Elephant : public Piece {
    public:
-    const double score = 3;
     Elephant(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'E';
         else letter = 'e';
+        score = 3;
     }
 
     vector<pair<int, int>> generatePaths() override { // 김종우 수정 사항
@@ -490,10 +490,10 @@ class Elephant : public Piece {
 
 class King : public Piece {
    public:
-    const double score = 0;
     King(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'K';
         else letter = 'k';
+        score = 0;
     }
 
     vector<pair<int, int>> generatePaths() override {
@@ -581,10 +581,10 @@ class King : public Piece {
 
 class Guard : public Piece {
    public:
-    const double score = 3;
     Guard(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'G';
         else letter = 'g';
+        score = 3;
     }
 
    vector<pair<int, int>> generatePaths() override {
@@ -672,10 +672,10 @@ class Guard : public Piece {
 
 class Pawn : public Piece {
    public:
-    const double score = 2;
     Pawn(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'P';
         else letter = 'p';
+        score = 2;
     }
 
     vector<pair<int, int>> generatePaths() override {
