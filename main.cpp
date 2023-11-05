@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
-// //#include <windows.h>
+#include <windows.h>
 #include <algorithm>
 #include <map>
 #include <cstring>
@@ -161,6 +161,7 @@ int Piece::movePiece() {
                 // ex) 초나라 '졸'이 한나라 '차'를 잡았습니다.
                 if (board[tmpx][tmpy] != nullptr) {
                     cout << this->team2string() << " '" << this->letter2string() << "'이(가) " << board[tmpx][tmpy]->team2string() << " '" << board[tmpx][tmpy]->letter2string() << "'을(를) 잡았습니다." << endl;
+                    Sleep(2000);
                 }
 
                 board[tmpx][tmpy] = board[x][y];
@@ -803,6 +804,7 @@ int main() {
             setupBoard(game, game.cho);
             gamestart = 1;
             cout << format(msg[32], { {"player", "한"} });
+            Sleep(2000);
             while (true) {
                 // 한나라 턴
                 previous.push(BoardState(board));
