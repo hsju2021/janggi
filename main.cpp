@@ -181,6 +181,7 @@ void kill() {
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
    public:
+    const double score = 13;
     Rook(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'R';
         else letter = 'r';
@@ -214,6 +215,7 @@ class Rook : public Piece {
 
 class Cannon : public Piece {
    public:
+    const double score = 7;
     Cannon(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'C';
         else letter = 'c';
@@ -293,6 +295,7 @@ class Cannon : public Piece {
 
 class Knight : public Piece {
    public:
+    const double score = 5;
     Knight(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'N';
         else letter = 'n';
@@ -326,6 +329,7 @@ class Knight : public Piece {
 
 class Elephant : public Piece {
    public:
+    const double score = 3;
     Elephant(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'E';
         else letter = 'e';
@@ -362,6 +366,7 @@ class Elephant : public Piece {
 
 class King : public Piece {
    public:
+    const double score = 0;
     King(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'K';
         else letter = 'k';
@@ -396,6 +401,7 @@ class King : public Piece {
 
 class Guard : public Piece {
    public:
+    const double score = 3;
     Guard(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'G';
         else letter = 'g';
@@ -430,6 +436,7 @@ class Guard : public Piece {
 
 class Pawn : public Piece {
    public:
+    const double score = 2;
     Pawn(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H') letter = 'P';
         else letter = 'p';
