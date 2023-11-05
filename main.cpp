@@ -821,6 +821,7 @@ int main() {
             setupInitialPieces(game, game.cho);
             setupBoard(game, game.cho);
             setup_score();
+            gamestart = 1;
             while (true) {
                 // 초나라 턴
                 previous.push(BoardState(board));
