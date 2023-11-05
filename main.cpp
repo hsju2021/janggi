@@ -818,6 +818,7 @@ int main() {
         }
         else { // 제거할 기물이 0개
             setupBoard(game, game.han);
+            setupInitialPieces(game, game.cho);
             setupBoard(game, game.cho);
             setup_score();
             while (true) {
