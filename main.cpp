@@ -78,10 +78,12 @@ class Piece {
         this->y = y;
         this->team = team;
     }
+
     int movePiece();
     virtual vector<pair<int, int>> generatePaths() = 0;
 
     virtual ~Piece() = default;
+    
 };
 
 Piece* King_Location;
@@ -92,7 +94,7 @@ public:
     BoardState(Piece* initialBoard[9][10]) {
         for (int i = 0; i < 9; ++i) {
             for (int j = 0; j < 10; ++j) {
-                state[i][j] = initialBoard[i][j]; // here you would need to actually make a copy of the Piece object if it is not a shared immutable object
+                state[i][j] = initialBoard[i][j];
             }
         }
     }
@@ -1469,7 +1471,16 @@ void undo(){
             for (int j = 0; j < 10; j++) {
                 board[i][j] = lastState.state[i][j];
                 }
-         }
+            }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                if(board[i][j] != nullptr){
+                    board[i][j]->x = i;
+                    board[i][j]->y = j;
+                    }
+                }
+            }
+
         }
 }
 
