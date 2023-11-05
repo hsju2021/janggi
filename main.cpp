@@ -77,7 +77,7 @@ class Piece {
         this->y = y;
         this->team = team;
     }
-    void movePiece();
+    int movePiece();
     virtual vector<pair<int, int>> generatePaths() = 0;
 
     virtual ~Piece() = default;
@@ -102,7 +102,7 @@ Piece* board[9][10] = {
 };
 
 
-void Piece::movePiece() {
+int Piece::movePiece() {
     vector<pair<int, int>> paths = generatePaths();
     int tmpx, tmpy;
     string coord;
@@ -113,15 +113,18 @@ void Piece::movePiece() {
         for (int i = 0; i < paths.size(); i++) {
             cout << paths[i].second << (char)(paths[i].first + 'A') << ' ';
         }
-        cout << endl << endl << msg[12] << msg[0];
+        cout << endl;
+        cout << "게임을 종료하려면 quit을 입력하세요." << endl;
+        cout << "다른 기물을 선택하려면 back을 입력하세요." << endl;
+        cout << msg[12] << msg[0];
         getline(cin, coord);
 
-        if (coord == "cancel") {
-            return;
+        if (!coord.compare("quit")) {
+            return 1;
         }
 
-        if (coord == "quit") {
-            exit(0);
+        if (!coord.compare("back")) {
+            return 2;
         }
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
@@ -140,7 +143,7 @@ void Piece::movePiece() {
                 board[x][y] = nullptr;
                 x = tmpx;
                 y = tmpy;
-                return;
+                return 0;
             } 
         }
         cout << msg[24] << msg[22] << endl;
@@ -756,6 +759,7 @@ int main() {
     int remove;
     string input;
     Piece* chosen;
+    int quitOnMove;
     
     while (true) {
         mainMenu();
@@ -786,7 +790,19 @@ int main() {
                     }
                     break;
                 }
-                chosen->movePiece(); // 기물이동
+                quitOnMove = chosen->movePiece();  // 기물이동
+                if (quitOnMove == 1) {
+                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                } else if (quitOnMove == 2) {
+                    continue;
+                }
+
                 printBoard(); // 이동후 보드출력
 
                 if (choCheckWin()) break; // 승패여부 처리
@@ -807,7 +823,19 @@ int main() {
                     }
                     break;
                 }
-                chosen->movePiece();
+                quitOnMove = chosen->movePiece();
+                if (quitOnMove == 1) {
+                    cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                } else if (quitOnMove == 2) {
+                    continue;
+                }
+                
                 printBoard();
 
                 if (choCheckWin()) break; // 승패여부 처리
@@ -836,7 +864,19 @@ int main() {
                     }
                     break;
                 }
-                chosen->movePiece(); // 기물이동
+                quitOnMove = chosen->movePiece();  // 기물이동
+                if (quitOnMove == 1) {
+                    cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                } else if (quitOnMove == 2) {
+                    continue;
+                }
+
                 printBoard(); // 이동후 보드출력
 
                 if (choCheckWin()) break; // 승패여부 처리
@@ -857,7 +897,20 @@ int main() {
                     }
                     break;
                 }
-                chosen->movePiece();
+
+                quitOnMove = chosen->movePiece();
+                if (quitOnMove == 1) {
+                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26];
+                    }
+                    break;
+                } else if (quitOnMove == 2) {
+                    continue;
+                }
+
                 printBoard();
 
                 if (choCheckWin()) break; // 승패여부 처리
@@ -1359,7 +1412,7 @@ bool isKingDie(){ //남경식
 
 //남경식
 bool isTurnOver(int turn){
-    return (game.turn > 100);
+    return (game.turn >= 100);
 };
 
 //남경식
