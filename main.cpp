@@ -807,10 +807,6 @@ int main() {
                         if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
                     }
                     else{
-                        break;
-                    }
-                }
-                if (chosen->team == '.') break;
                 quitOnMove = chosen->movePiece();  // 기물이동
                 if (quitOnMove == 1) {
                     cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
@@ -823,6 +819,10 @@ int main() {
                 } else if (quitOnMove == 2) {
                     continue;
                 }
+                        break;
+                    }
+                }
+                if (chosen->team == '.') break;
                 printBoard(); // 이동후 보드출력
 
                 if (choCheckWin()) break; // 승패여부 처리
@@ -859,10 +859,6 @@ int main() {
                         if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
                     }
                     else{
-                        break;
-                    }
-                }
-                if (chosen->team == '.') break;
                 quitOnMove = chosen->movePiece();
                 if (quitOnMove == 1) {
                     cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
@@ -875,6 +871,10 @@ int main() {
                 } else if (quitOnMove == 2) {
                     continue;
                 }
+                        break;
+                    }
+                }
+                if (chosen->team == '.') break;
                 
                 printBoard();
 
@@ -920,10 +920,6 @@ int main() {
                         if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
                     }
                     else{
-                        break;
-                    }
-                }
-                if (chosen->team == '.') break;
                 quitOnMove = chosen->movePiece(); // 기물이동
                 if (quitOnMove == 1) {
                     cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
@@ -936,6 +932,10 @@ int main() {
                 } else if (quitOnMove == 2) {
                     continue;
                 }
+                        break;
+                    }
+                }
+                if (chosen->team == '.') break;
                 
                 printBoard(); // 이동후 보드출력
 
@@ -973,10 +973,6 @@ int main() {
                         if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
                     }
                     else{
-                        break;
-                    }
-                }
-                if (chosen->team == '.') break;
                 quitOnMove = chosen->movePiece();
                 if (quitOnMove == 1) {
                     cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
@@ -989,6 +985,10 @@ int main() {
                 } else if (quitOnMove == 2) {
                     continue;
                 }
+                        break;
+                    }
+                }
+                if (chosen->team == '.') break;
                 
                 printBoard();
 
