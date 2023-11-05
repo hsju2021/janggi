@@ -931,7 +931,7 @@ bool isKingDie(){ //남경식
         }
         
     }
-    if(count == 2){ //모든 좌표에 대해서 king이 2개있는지 확인
+    if(count == 2){ //모든 좌표에 대해서 king이 2개있는지 확인, 수정
             return false;
         }
         else{
