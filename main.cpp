@@ -63,7 +63,7 @@ class Player {
 
 class Game {
    public:
-    int turn = 99;
+    int turn;
     Player cho;
     Player han;
 };
