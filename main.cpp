@@ -784,6 +784,7 @@ Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
 
 int main() {
+    system("chcp 65001");
     int remove;
     string input;
     Piece* chosen;
