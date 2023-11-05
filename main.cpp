@@ -54,7 +54,7 @@ string msg[] = {
 
 class Player {
    public:
-    double score;
+    double score = 60000;
     int* pieces;
     string placement;
 };
