@@ -938,7 +938,7 @@ bool isKingDie(){ //남경식
     int count = 0;
     for(int i=0; i<9; i++){
         for(int j=0; j<10; j++){
-            if(typeid(board[i][j]) == typeid(King)){
+            if(board[i][j]->letter == 'K' || board[i][j]->letter == 'k'){
                 King_Location = board[i][j];
                 count++;
             }
