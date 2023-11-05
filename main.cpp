@@ -50,6 +50,7 @@ string msg[] = {
     "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
     "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
     "무르기를 요청하려면 “cancel”을 입력하세요.\n",
+    "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n"
 };
 
 class Player {
@@ -77,6 +78,7 @@ class Piece {
         this->y = y;
         this->team = team;
     }
+
     void movePiece();
     virtual vector<pair<int, int>> generatePaths() = 0;
 
@@ -752,6 +754,9 @@ stack<BoardState> previous;
 
 string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
 
+Piece* quit = new Pawn(1, 1, '.');
+Piece* cancel = new Pawn(1, 1, ',');
+
 int main() {
     int remove;
     string input;
@@ -772,41 +777,75 @@ int main() {
             while (true) {
                 // 한나라 턴
                 previous.push(BoardState(board));
-                printBoard(); // 보드출력
-                chosen = choosePiece(game.han); // 기물선택
-                if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "한"} });
-                    while (true) {
-                        getline(cin, input);
-                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                while(true) {
+                    printBoard(); // 보드출력
+                    chosen = choosePiece(game.han); // 기물선택
+                    if (chosen->team == '.') {
+                        cout << format(msg[6], { {"player", "한"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                            else cout << msg[26];
+                        }
+                        break;
                     }
-                    break;
+                    else if (chosen->team == ',') {
+                        cout << format(msg[34], { {"player", "한"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0 || input.compare("N") == 0 || input.compare("n") == 0) break;
+                            else cout << msg[22];
+                        }
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+                    }
+                    else{
+                        break;
+                    }
                 }
+                if (chosen->team == '.') break;
                 chosen->movePiece(); // 기물이동
                 printBoard(); // 이동후 보드출력
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
 
+                game.turn++;
+
                 // 초나라 턴
                 previous.push(BoardState(board));
-                printBoard();
-                chosen = choosePiece(game.cho);
-                if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "초"} });
-                    while (true) {
-                        getline(cin, input);
-                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                while(true) {
+                    printBoard(); // 보드출력
+                    chosen = choosePiece(game.cho); // 기물선택
+                    if (chosen->team == '.') {
+                        cout << format(msg[6], { {"player", "초"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                            else cout << msg[26];
+                        }
+                        break;
                     }
-                    break;
+                    else if (chosen->team == ',') {
+                        cout << format(msg[34], { {"player", "초"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0 || input.compare("N") == 0 || input.compare("n") == 0) break;
+                            else cout << msg[22];
+                        }
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+                    }
+                    else{
+                        break;
+                    }
                 }
+                if (chosen->team == '.') break;
                 chosen->movePiece();
                 printBoard();
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
+
+                game.turn++;
             }
         }
         else { // 제거할 기물이 0개
@@ -816,36 +855,68 @@ int main() {
             while (true) {
                 // 초나라 턴
                 previous.push(BoardState(board));
-                printBoard(); // 보드출력
-                chosen = choosePiece(game.cho); // 기물선택
-                if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "한"} }) << msg[7] << msg[0];
-                    while (true) {
-                        getline(cin, input);
-                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                while(true) {
+                    printBoard(); // 보드출력
+                    chosen = choosePiece(game.cho); // 기물선택
+                    if (chosen->team == '.') {
+                        cout << format(msg[6], { {"player", "초"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                            else cout << msg[26];
+                        }
+                        break;
                     }
-                    break;
+                    else if (chosen->team == ',') {
+                        cout << format(msg[34], { {"player", "초"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0 || input.compare("N") == 0 || input.compare("n") == 0) break;
+                            else cout << msg[22];
+                        }
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+                    }
+                    else{
+                        break;
+                    }
                 }
+                if (chosen->team == '.') break;
                 chosen->movePiece(); // 기물이동
                 printBoard(); // 이동후 보드출력
 
                 if (choCheckWin()) break; // 승패여부 처리
                 cout << msg[7] << msg[0];
 
+                game.turn++;
+
                 // 한나라 턴
                 previous.push(BoardState(board));
-                printBoard();
-                chosen = choosePiece(game.han);
-                if (chosen == nullptr) {
-                    cout << format(msg[6], { {"player", "한"} });
-                    while (true) {
-                        getline(cin, input);
-                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                        else cout << msg[26];
+                while(true) {
+                    printBoard(); // 보드출력
+                    chosen = choosePiece(game.han); // 기물선택
+                    if (chosen->team == '.') {
+                        cout << format(msg[6], { {"player", "한"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                            else cout << msg[26];
+                        }
+                        break;
                     }
-                    break;
+                    else if (chosen->team == ',') {
+                        cout << format(msg[34], { {"player", "한"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0 || input.compare("N") == 0 || input.compare("n") == 0) break;
+                            else cout << msg[22];
+                        }
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+                    }
+                    else{
+                        break;
+                    }
                 }
+                if (chosen->team == '.') break;
                 chosen->movePiece();
                 printBoard();
 
@@ -856,6 +927,8 @@ int main() {
                     if (input.compare("Y") == 0 || input.compare("y") == 0) break;
                     else cout << msg[26];
                 }
+
+                game.turn++;
             }
         }
     }
@@ -918,6 +991,8 @@ void setupInitialPieces() {
 
 void setupBoard(Game& game, Player& player) {
 
+
+    setup_score();
     if (&player == &game.han) {
         while (true) { // while문
             int num;
@@ -1173,6 +1248,8 @@ void remove_select_piece(int num) {
 }
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
+
+
 Piece* choosePiece(Player& player) {
     int tmpx, tmpy;
     string coord;
@@ -1184,15 +1261,22 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << format(msg[5], {{"player", currentTurnTeam}}) << ">>>";
+        cout << format(msg[5], {{"player", currentTurnTeam}}) << msg[11];
+        if(game.turn > 1){
+            cout << msg[33];
+        }
+        cout << msg[0];
+
         getline(cin, coord);
         if (!coord.compare("quit")) {
-            return nullptr;
+            return quit;
         }
 
-        if (!coord.compare("cancel")) {
+        if (!coord.compare("cancel") && game.turn > 1) {
             //무르기 처리
-            undo();
+            // 
+            //
+            return cancel;
         }
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
@@ -1327,17 +1411,25 @@ bool isScoreUnder(double score1, double score2){
 
 //남경식
 bool choKingDie(Piece* piece){
-    return (piece->team == 'C');
+    return (piece->team != 'C');
 };
 
 //남경식
 void undo(){
-     if (!previous.empty()) {
-        BoardState lastState = previous.top();
+     if (previous.size() > 1) {
+        for(int i=0; i<9; i++){
+            for(int j=0; j<10; j++){
+                board[i][j] = nullptr;
+            }
+        }
         previous.pop();
+        previous.pop();
+        BoardState lastState = previous.top();
+        game.turn--;
+        game.turn--;
 
-        for (int i = 0; i < 9; ++i) {
-            for (int j = 0; j < 10; ++j) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
                 board[i][j] = lastState.state[i][j];
                 }
          }
