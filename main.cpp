@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
-// //#include <windows.h>
+#include <windows.h>
 #include <algorithm>
 #include <map>
 #include <cstring>
@@ -79,6 +79,20 @@ class Piece {
         this->y = y;
         this->team = team;
     }
+    string team2string() {
+        if (this->team == 'H') return "한나라";
+        else return "초나라";
+    }
+    string letter2string() {
+        if (this->letter == 'R' || this->letter == 'r') return "차";
+        else if (this->letter == 'C' || this->letter == 'c') return "포";
+        else if (this->letter == 'N' || this->letter == 'n') return "마";
+        else if (this->letter == 'E' || this->letter == 'e') return "상";
+        else if (this->letter == 'K' || this->letter == 'k') return "왕";
+        else if (this->letter == 'G' || this->letter == 'g') return "사";
+        else if (this->letter == 'P' || this->letter == 'p') return "졸";
+        else return "잘못된 기물";
+    }
 
     int movePiece();
     virtual vector<pair<int, int>> generatePaths() = 0;
@@ -143,6 +157,13 @@ int Piece::movePiece() {
 
         for (int i = 0; i < paths.size(); i++) {
             if (paths[i].first == tmpx && paths[i].second == tmpy) {
+                // 기물 잡았을 경우 메시지 출력
+                // ex) 초나라 '졸'이 한나라 '차'를 잡았습니다.
+                if (board[tmpx][tmpy] != nullptr) {
+                    cout << this->team2string() << " '" << this->letter2string() << "'이(가) " << board[tmpx][tmpy]->team2string() << " '" << board[tmpx][tmpy]->letter2string() << "'을(를) 잡았습니다." << endl;
+                    Sleep(2000);
+                }
+
                 board[tmpx][tmpy] = board[x][y];
                 board[x][y] = nullptr;
                 x = tmpx;
@@ -763,6 +784,9 @@ Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
 
 int main() {
+    // 컴파일 시 한글 깨짐 해결
+    system("chcp 65001");
+    system("cls");
     int remove;
     string input;
     Piece* chosen;
@@ -783,6 +807,7 @@ int main() {
             setupBoard(game, game.cho);
             gamestart = 1;
             cout << format(msg[32], { {"player", "한"} });
+            Sleep(2000);
             while (true) {
                 // 한나라 턴
                 previous.push(BoardState(board));
