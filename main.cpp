@@ -1398,6 +1398,11 @@ Piece* choosePiece(Player& player) {
         }
 
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
+
+        if(coord.length() == 1){
+            cout << "다시 입력하세요.\n";
+            continue;
+        }
         if (coord.length() !=2 || !isdigit(coord[0]) || (!(coord[1] >= 'a' && coord[1] <= 'i') && !(coord[1] >= 'A' && coord[1] <= 'I')))  {
             cout << msg[23] << msg[22] << endl;
             continue;
