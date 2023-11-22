@@ -1407,6 +1407,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove){
             turncho(chosen, quitOnMove);
                 
     }
+    else{ //밥먹고 추가
+ㄴ
+    }
 }
 
 Piece* choosePiece(Player& player) {
@@ -1551,46 +1554,47 @@ void turncho(Piece* chosen, int quitOnMove){
                             else cout << msg[26] << msg[0];
                         }
                             break;
+                    }
+                    else if (chosen->team == ',') {
+                        cout << format(msg[34], { {"player", "초"} });
+                        while (true) {
+                            getline(cin, input);
+                            if (input.compare("Y") == 0 || input.compare("y") == 0 || input.compare("N") == 0 || input.compare("n") == 0) break;
+                            else cout << msg[22];
                         }
-                        else if (chosen->team == ',') {
-                            cout << format(msg[34], { {"player", "초"} });
+                            if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+                    }
+                    else{
+                        quitOnMove = chosen->movePiece();
+                        if (quitOnMove == 1) {
+                            cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
                             while (true) {
                                 getline(cin, input);
-                                if (input.compare("Y") == 0 || input.compare("y") == 0 || input.compare("N") == 0 || input.compare("n") == 0) break;
-                                else cout << msg[22];
+                                if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                                else cout << msg[26] << msg[0];
                             }
-                            if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
-                        }
-                        else{
-                    quitOnMove = chosen->movePiece();
-                    if (quitOnMove == 1) {
-                        cout << format(msg[6], { {"player", "초"} }) << msg[7] << msg[0];
-                        while (true) {
-                            getline(cin, input);
-                            if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                            else cout << msg[26] << msg[0];
-                        }
-                        break;
-                    } else if (quitOnMove == 2) {
-                        continue;
-                    }
                             break;
                         }
-                    }
-                    if (quitOnMove == 2) break;
-                    if (chosen->team == '.') break;
-                    
-                    printBoard();
-
-                    if (choCheckWin()) {
-                        cout << msg[15] << msg[0];
-                        while (true) {
-                            getline(cin, input);
-                            if (input.compare("Y") == 0 || input.compare("y") == 0) break;
-                            else cout << msg[26] << msg[0];
+                        else if (quitOnMove == 2) {
+                            continue;
                         }
-                        break; // 승패여부 처리
+                        break;
                     }
+                }
+                if (quitOnMove == 2) break;
+                if (chosen->team == '.') break;
+                    
+                printBoard();
+
+                if (choCheckWin()) {
+                    cout << msg[15] << msg[0];
+                    while (true) {
+                        getline(cin, input);
+                        if (input.compare("Y") == 0 || input.compare("y") == 0) break;
+                        else cout << msg[26] << msg[0];
+                    }
+                        break; // 승패여부 처리
+                }
                     cout << msg[7] << msg[0];
                     while (true) {
                         getline(cin, input);
