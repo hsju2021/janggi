@@ -1,6 +1,8 @@
 #include <stdlib.h>
 
+#include <cstddef>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <stack>
 #include <string>
@@ -128,6 +130,22 @@ class BoardState {
         }
     }
 };
+
+class TurnTreeNode {
+   public:
+    BoardState state;
+    vector<unique_ptr<TurnTreeNode>> children;
+    TurnTreeNode* parent;
+
+    TurnTreeNode(BoardState state,  TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
+};
+
+void connect(TurnTreeNode parent, TurnTreeNode child) {
+    // add child to parent's children vector
+    parent.children.push_back(make_unique<TurnTreeNode>(child));
+    // add parent to child's parent pointer
+    child.parent = &parent;
+}
 
 Piece* board[9][10] = {
 
