@@ -54,6 +54,8 @@ string msg[] = {
     "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n"
 };
 
+string input;
+
 class Player {
    public:
     double score;
@@ -791,7 +793,6 @@ int main() {
     system("chcp 65001");
     system("cls");
     int remove;
-    string input;
     Piece* chosen;
     int quitOnMove;
     
@@ -1408,7 +1409,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove){
                 
     }
     else{ //밥먹고 추가
-ㄴ
+
     }
 }
 
