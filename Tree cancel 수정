@@ -152,12 +152,12 @@ class BoardState {
 };
 
 class TurnTreeNode {
-   public:
+public:
     BoardState state;
     set<TurnTreeNode*> children;
-    unique_ptr<TurnTreeNode> parent;
+    TurnTreeNode* parent;
 
-    TurnTreeNode(BoardState state, TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
+    TurnTreeNode(BoardState state, TurnTreeNode* parentNode = nullptr) : state(state), parent(parentNode) {}
 
     bool operator==(const TurnTreeNode& other) {
         return this->state == other.state;
@@ -166,34 +166,45 @@ class TurnTreeNode {
 };
 
 class TurnTree {
-   public:
-    unique_ptr<TurnTreeNode> root;
-    TurnTree(BoardState state) : root(make_unique<TurnTreeNode>(state)) {}
-
-   private:
-    void addNode(BoardState state, TurnTreeNode* parent) {
-        auto newNode = make_unique<TurnTreeNode>(state, parent);
-        parent->children.insert(newNode.get());
+public:
+    TurnTreeNode* root;
+    TurnTreeNode* currentNode;
+    TurnTree() {
+        root = nullptr;
+        currentNode = nullptr;
+    }
+    TurnTree(BoardState state) : root(new TurnTreeNode(state)) {
+        currentNode = root;
     }
 
-    void deleteNode(TurnTreeNode* node) {
-        for (auto child : node->children) {
-            deleteNode(child);
+    void addNode(BoardState state) {
+        if (currentNode == nullptr) {
+            auto newNode = new TurnTreeNode(state);
+            root = newNode;
+            currentNode = root;
         }
-        node->children.clear();
-        node->parent.reset();
+        else {
+            auto newNode = new TurnTreeNode(state, this->currentNode);
+            currentNode->children.insert(newNode);
+            currentNode = newNode;
+        }
     }
 
     int depth(TurnTreeNode* node) {
         if (node->parent == nullptr) {
             return 0;
-        } else {
-            return depth(node->parent.get()) + 1;
         }
+        else {
+            return depth(node->parent) + 1;
+        }
+    }
+
+    void undoTree() {
+        this->currentNode = this->currentNode->parent->parent;
     }
 };
 
-
+TurnTree *tree;
 
 Piece* board[9][10] = {
 
@@ -943,6 +954,7 @@ int main() {
         setupInitialPieces(game, game.han);
         gamestart = 0;
         remove = remove_piece_num();
+        tree = new TurnTree();
         gameplay(remove);
     } 
     return 0;
@@ -1516,7 +1528,8 @@ Piece* choosePiece(Player& player) {
 
 void turnhan() {
         // 한나라 턴
-        previous.push(BoardState(board));
+        //previous.push(BoardState(board));
+        tree->addNode(BoardState(board));
         while (true) {
             printBoard();                    // 보드출력
             chosen = choosePiece(game.han);  // 기물선택
@@ -1567,7 +1580,8 @@ void turnhan() {
 }
 
 void turncho() {
-        previous.push(BoardState(board));
+        //previous.push(BoardState(board));
+        tree->addNode(BoardState(board));
         while (true) {
             printBoard();                    // 보드출력
             chosen = choosePiece(game.cho);  // 기물선택
@@ -1758,15 +1772,14 @@ bool choKingDie(Piece* piece) { return (piece->team != 'C'); };
 
 // 남경식
 void undo() {
-    if (previous.size() > 1) {
+    if (tree->depth(tree->currentNode) > 1) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 10; j++) {
                 board[i][j] = nullptr;
             }
         }
-        previous.pop();
-        previous.pop();
-        BoardState lastState = previous.top();
+        tree->undoTree();
+        BoardState lastState = tree->currentNode->state;
         game.turn--;
         game.turn--;
 
