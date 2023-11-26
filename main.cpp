@@ -220,6 +220,7 @@ int Piece::movePiece() {
     }
 }
 int gamestart;
+int variable_remove;
 Game game;
 
 void mainMenu();
@@ -1133,6 +1134,7 @@ int remove_piece_num() {
                     cout << "6(차/포/마/상/사/졸)를 입력받았습니다\n";
                     break;
             }
+            variable_remove = num;
             return num;
         } else {
             cout << "0과 6 사이의 정수를 입력하시오.\n";
@@ -1764,5 +1766,5 @@ void setup_score() {
         }
     }
 
-    game.han.score += 1.5;
+    game.han.score += 1.5 + (3*variable_remove);
 }
