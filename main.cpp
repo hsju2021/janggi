@@ -876,6 +876,7 @@ string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. �
 
 Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
+Piece* pass = new Pawn(1, 1, '?');
 
 int main() {
     // 컴파일 시 한글 깨짐 해결
@@ -932,6 +933,9 @@ int main() {
                         }
                         if (input.compare("Y") == 0 || input.compare("y") == 0)
                             undo();
+                    } else if (chosen->team == '?') {
+                        break;
+                        // pass
                     } else {
                         quitOnMove = chosen->movePiece();  // 기물이동
                         if (quitOnMove == 1) {
@@ -1009,6 +1013,9 @@ int main() {
                         }
                         if (input.compare("Y") == 0 || input.compare("y") == 0)
                             undo();
+                    } else if (chosen->team == '?') {
+                        break;
+                        // pass
                     } else {
                         quitOnMove = chosen->movePiece();
                         if (quitOnMove == 1) {
@@ -1093,6 +1100,9 @@ int main() {
                         }
                         if (input.compare("Y") == 0 || input.compare("y") == 0)
                             undo();
+                    } else if (chosen->team == '?') {
+                        break;
+                        // pass
                     } else {
                         quitOnMove = chosen->movePiece();  // 기물이동
                         if (quitOnMove == 1) {
@@ -1170,6 +1180,9 @@ int main() {
                         }
                         if (input.compare("Y") == 0 || input.compare("y") == 0)
                             undo();
+                    } else if (chosen->team == '?') {
+                        break;
+                        // pass
                     } else {
                         quitOnMove = chosen->movePiece();
                         if (quitOnMove == 1) {
@@ -1689,6 +1702,9 @@ void turnhan(Piece* chosen, int quitOnMove) {
                         cout << msg[22];
                 }
                 if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+            } else if (chosen->team == '?') {
+                break;
+                // pass
             } else {
                 quitOnMove = chosen->movePiece();  // 기물이동
                 if (quitOnMove == 1) {
@@ -1764,6 +1780,9 @@ void turncho(Piece* chosen, int quitOnMove) {
                         cout << msg[22];
                 }
                 if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+            } else if (chosen->team == '?') {
+                break;
+                // pass
             } else {
                 quitOnMove = chosen->movePiece();
                 if (quitOnMove == 1) {
