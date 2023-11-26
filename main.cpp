@@ -58,7 +58,8 @@ string msg[] = {
     "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
     "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
     "무르기를 요청하려면 “cancel”을 입력하세요.\n",
-    "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n",
+    "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 "
+    "입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n",
     "턴을 넘기려면 “quit”을 입력하세요.\n",
     "무르기 취소를 요청하려면 “recancel”을 입력하세요.\n",
     "{player}나라가 턴 쉬기를 요청하였습니다.\n",
@@ -940,9 +941,8 @@ int main() {
         gamestart = 0;
         remove = remove_piece_num();
         gameplay(remove, chosen, quitOnMove);
-            return 0;
-        
     } 
+    return 0;
 } 
 
 void mainMenu() {
@@ -1341,7 +1341,6 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
             }
 
             game.turn++;
-            }
             turncho(chosen, quitOnMove);
             if (quitOnMove == 2) break;
             if (chosen->team == '.') break;
@@ -1370,7 +1369,8 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
 
             game.turn++;
         }
-    else {  // 밥먹고 추가
+    return;
+    } else {  // 밥먹고 추가
         setupBoard(game, game.cho);
         printBoard();
         remove_select_piece(remove);
@@ -1436,7 +1436,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
 
             game.turn++;
         }
+                
     }
+    
 }
 
 
@@ -1554,6 +1556,7 @@ void turnhan(Piece* chosen, int quitOnMove) {
                 break;
             }
         }
+        return;
 }
 
 void turncho(Piece* chosen, int quitOnMove) {
@@ -1604,7 +1607,7 @@ void turncho(Piece* chosen, int quitOnMove) {
                 break;
             }
         }
-        game.turn++;
+        return;
     }
 
 // 김종우 작성 - 보드 출력
