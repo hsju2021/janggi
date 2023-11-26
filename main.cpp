@@ -57,7 +57,14 @@ string msg[] = {
     "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
     "무르기를 요청하려면 “cancel”을 입력하세요.\n",
     "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 "
-    "입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n"};
+    "입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n",
+    "턴을 넘기려면 “quit”을 입력하세요.\n",
+    "무르기 취소를 요청하려면 “recancel”을 입력하세요.\n",
+    "{player}나라가 턴 쉬기를 요청하였습니다.\n",
+    "{player}나라가 무르기 취소를 요청하였습니다.\n",
+    "이전에 무른 경로입니다. 원하는 경로를 선택하세요.\n",
+    "무르기 취소가 불가능합니다.\n",
+    };
 
 string input;
 
@@ -876,6 +883,7 @@ string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. �
 
 Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
+Piece* pass = new Pawn(1, 1, '?');
 
 int main() {
     // 컴파일 시 한글 깨짐 해결
@@ -1481,6 +1489,9 @@ void turnhan(Piece* chosen, int quitOnMove) {
                         cout << msg[22];
                 }
                 if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+            } else if (chosen->team == '?') {
+                break;
+                // pass
             } else {
                 quitOnMove = chosen->movePiece();  // 기물이동
                 if (quitOnMove == 1) {
@@ -1527,8 +1538,10 @@ void turncho(Piece* chosen, int quitOnMove) {
                     else
                         cout << msg[22];
                 }
-                if (input.compare("Y") == 0 || input.compare("y") == 0)
-                    undo();
+                if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+            } else if (chosen->team == '?') {
+                break;
+                // pass
             } else {
                 quitOnMove = chosen->movePiece();
                 if (quitOnMove == 1) {
