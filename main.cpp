@@ -152,78 +152,47 @@ class BoardState {
 };
 
 class TurnTreeNode {
-public:
-    using Ptr = std::shared_ptr<TurnTreeNode>;
+   public:
+    BoardState state;
+    set<TurnTreeNode*> children;
+    unique_ptr<TurnTreeNode> parent;
 
-private:
-    BoardState boardState; // This  represents the current state of the board.
-    Ptr parent; // Pointer to the parent node (previous turn).
-    std::vector<Ptr> children; // Pointers to child nodes (next turns).
+    TurnTreeNode(BoardState state, TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
 
-public:
-    TurnTreeNode(const BoardState& state, Ptr parent = nullptr)
-        : boardState(state), parent(parent) {}
-
-    void addChild(const BoardState& state) {
-        children.push_back(std::make_shared<TurnTreeNode>(state));
+    bool operator==(const TurnTreeNode& other) {
+        return this->state == other.state;
     }
 
-    Ptr getParent() const {
-        return parent;
-    }
-
-    const std::vector<Ptr>& getChildren() const {
-        return children;
-    }
-
-    const BoardState& getBoardState() const {
-        return boardState;
-    }
-    
-    // Additional functions can be added as needed.
 };
+
 class TurnTree {
-private:
-    TurnTreeNode::Ptr root;
-    TurnTreeNode::Ptr currentTurn;
+   public:
+    unique_ptr<TurnTreeNode> root;
+    TurnTree(BoardState state) : root(make_unique<TurnTreeNode>(state)) {}
 
-public:
-    TurnTree(const std::string& initialState) {
-        root = std::make_shared<TurnTreeNode>(initialState);
-        currentTurn = root;
+   private:
+    void addNode(BoardState state, TurnTreeNode* parent) {
+        auto newNode = make_unique<TurnTreeNode>(state, parent);
+        parent->children.insert(newNode.get());
     }
 
-    void addTurn(const BoardState& state) {
-        currentTurn->addChild(state);
-        currentTurn = currentTurn->getChildren().back(); // Move to the new turn.
+    void deleteNode(TurnTreeNode* node) {
+        for (auto child : node->children) {
+            deleteNode(child);
+        }
+        node->children.clear();
+        node->parent.reset();
     }
 
-    bool canUndo() const {
-        return currentTurn->getParent() != nullptr;
-    }
-
-    bool canRedo() const {
-        return !currentTurn->getChildren().empty();
-    }
-
-    void undo() {
-        if (canUndo()) {
-            currentTurn = currentTurn->getParent();
+    int depth(TurnTreeNode* node) {
+        if (node->parent == nullptr) {
+            return 0;
+        } else {
+            return depth(node->parent.get()) + 1;
         }
     }
-
-    void redo() {
-        if (canRedo()) {
-            currentTurn = currentTurn->getChildren().front();
-        }
-    }
-
-    const BoardState& getCurrentBoardState() const {
-        return currentTurn->getBoardState();
-    }
-    
-    // Additional functionalities can be added as needed.
 };
+
 
 
 Piece* board[9][10] = {
