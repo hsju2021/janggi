@@ -237,9 +237,9 @@ int variable_remove;
 Game game;
 
 void mainMenu();
-void gameplay(int remove, Piece* chosen, int quitOnMove);
-void turnhan(Piece* chosen, int quitOnMove);
-void turncho(Piece* chosen, int quitOnMove);
+void gameplay(int remove);
+void turnhan();
+void turncho();
 void setupBoard(Game& game, Player& player);
 void printBoard();
 Piece* choosePiece(Player& player);
@@ -899,20 +899,23 @@ Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
 Piece* pass = new Pawn(1, 1, '?');
 
+int quitOnMove;
+Piece* chosen;
+
 int main() {
     // 컴파일 시 한글 깨짐 해결
     system("chcp 65001");
     system("cls");
     int remove;
-    Piece* chosen;
-    int quitOnMove;
 
     while (true) {
+        quitOnMove = 18;
+        chosen = nullptr;
         mainMenu();
         setupInitialPieces(game, game.han);
         gamestart = 0;
         remove = remove_piece_num();
-        gameplay(remove, chosen, quitOnMove);
+        gameplay(remove);
     } 
     return 0;
 } 
@@ -1273,7 +1276,7 @@ void remove_select_piece(int num) {
 
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
 
-void gameplay(int remove, Piece* chosen, int quitOnMove) {
+void gameplay(int remove) {
     if (remove >= 1) {  // 제거할 기물이 1개 이상
         // 한나라, 초나라 포진 과정
         setupBoard(game, game.han);
@@ -1286,9 +1289,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
         cout << format(msg[32], {{"player", "한"}});
         // Sleep(2000);
         while(1){ //한나라 선공
-            turnhan(chosen, quitOnMove);
-            if (quitOnMove == 2) break;
-            if (chosen->team == '.') break;
+            turnhan();
+            if (quitOnMove == 2) return;
+            if (chosen->team == '.') return;
             printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
@@ -1300,7 +1303,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
                     else
                         cout << msg[26] << msg[0];
                 }
-                break;  // 승패여부 처리
+                return;  // 승패여부 처리
             }
 
             cout << msg[7] << msg[0];
@@ -1313,9 +1316,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
             }
 
             game.turn++;
-            turncho(chosen, quitOnMove);
-            if (quitOnMove == 2) break;
-            if (chosen->team == '.') break;
+            turncho();
+            if (quitOnMove == 2) return;
+            if (chosen->team == '.') return;
             printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
@@ -1327,7 +1330,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
                     else
                         cout << msg[26] << msg[0];
                 }
-                break;  // 승패여부 처리
+                return;  // 승패여부 처리
             }
 
             cout << msg[7] << msg[0];
@@ -1352,9 +1355,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
         cout << format(msg[32], {{"player", "한"}});
         // Sleep(2000);
         while(1){ //초나라 선공
-            turncho(chosen, quitOnMove);
-            if (quitOnMove == 2) break;
-            if (chosen->team == '.') break;
+            turncho();
+            if (quitOnMove == 2) return;
+            if (chosen->team == '.') return;
             printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
@@ -1366,7 +1369,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
                     else
                         cout << msg[26] << msg[0];
                 }
-                break;  // 승패여부 처리
+                return;  // 승패여부 처리
             }
 
             cout << msg[7] << msg[0];
@@ -1379,9 +1382,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
             }
 
             game.turn++;
-            turnhan(chosen, quitOnMove);
-            if (quitOnMove == 2) break;
-            if (chosen->team == '.') break;
+            turnhan();
+            if (quitOnMove == 2) return;
+            if (chosen->team == '.') return;
             printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
@@ -1393,7 +1396,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
                     else
                         cout << msg[26] << msg[0];
                 }
-                break;  // 승패여부 처리
+                return;  // 승패여부 처리
             }
 
             cout << msg[7] << msg[0];
@@ -1408,8 +1411,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
             game.turn++;
         }
                 
-    }
-    return;
+    };
 }
 
 Piece* choosePiece(Player& player) {
@@ -1477,7 +1479,7 @@ Piece* choosePiece(Player& player) {
     }
 }
 
-void turnhan(Piece* chosen, int quitOnMove) {
+void turnhan() {
         // 한나라 턴
         previous.push(BoardState(board));
         while (true) {
@@ -1529,7 +1531,7 @@ void turnhan(Piece* chosen, int quitOnMove) {
         return;
 }
 
-void turncho(Piece* chosen, int quitOnMove) {
+void turncho() {
         previous.push(BoardState(board));
         while (true) {
             printBoard();                    // 보드출력
