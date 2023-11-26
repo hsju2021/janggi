@@ -3,9 +3,11 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <stack>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -136,6 +138,17 @@ class BoardState {
             }
         }
     }
+
+    bool operator==(const BoardState& other) {
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                if (this->state[i][j] != other.state[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 };
 
 // class TurnTreeNode {
@@ -220,6 +233,7 @@ int Piece::movePiece() {
     }
 }
 int gamestart;
+int variable_remove;
 Game game;
 
 void mainMenu();
@@ -899,9 +913,8 @@ int main() {
         gamestart = 0;
         remove = remove_piece_num();
         gameplay(remove, chosen, quitOnMove);
-            return 0;
-        
     } 
+    return 0;
 } 
 
 void mainMenu() {
@@ -1133,6 +1146,7 @@ int remove_piece_num() {
                     cout << "6(차/포/마/상/사/졸)를 입력받았습니다\n";
                     break;
             }
+            variable_remove = num;
             return num;
         } else {
             cout << "0과 6 사이의 정수를 입력하시오.\n";
@@ -1395,6 +1409,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
         }
                 
     }
+    return;
 }
 
 Piece* choosePiece(Player& player) {
@@ -1511,6 +1526,7 @@ void turnhan(Piece* chosen, int quitOnMove) {
                 break;
             }
         }
+        return;
 }
 
 void turncho(Piece* chosen, int quitOnMove) {
@@ -1561,7 +1577,7 @@ void turncho(Piece* chosen, int quitOnMove) {
                 break;
             }
         }
-        game.turn++;
+        return;
     }
 
 // 김종우 작성 - 보드 출력
@@ -1764,5 +1780,5 @@ void setup_score() {
         }
     }
 
-    game.han.score += 1.5;
+    game.han.score += 1.5 + (3*variable_remove);
 }
