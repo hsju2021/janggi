@@ -182,6 +182,14 @@ class TurnTree {
         node->children.clear();
         node->parent.reset();
     }
+
+    int depth(TurnTreeNode* node) {
+        if (node->parent == nullptr) {
+            return 0;
+        } else {
+            return depth(node->parent.get()) + 1;
+        }
+    }
 };
 
 
@@ -1362,7 +1370,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
 
             game.turn++;
         }
-    }else {  // 밥먹고 추가
+    else {  // 밥먹고 추가
         setupBoard(game, game.cho);
         printBoard();
         remove_select_piece(remove);
@@ -1428,8 +1436,9 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
 
             game.turn++;
         }
-                
     }
+}
+
 
 Piece* choosePiece(Player& player) {
     int tmpx, tmpy;
