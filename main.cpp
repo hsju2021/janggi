@@ -151,21 +151,49 @@ class BoardState {
     }
 };
 
-// class TurnTreeNode {
-//    public:
-//     BoardState state;
-//     vector<unique_ptr<TurnTreeNode>> children;
-//     TurnTreeNode* parent;
+class TurnTreeNode {
+   public:
+    BoardState state;
+    set<TurnTreeNode*> children;
+    unique_ptr<TurnTreeNode> parent;
 
-//     TurnTreeNode(BoardState state,  TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
-// };
+    TurnTreeNode(BoardState state, TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
 
-// void connect(TurnTreeNode parent, TurnTreeNode child) {
-//     // add child to parent's children vector
-//     parent.children.push_back(make_unique<TurnTreeNode>(child));
-//     // add parent to child's parent pointer
-//     child.parent = &parent;
-// }
+    bool operator==(const TurnTreeNode& other) {
+        return this->state == other.state;
+    }
+
+};
+
+class TurnTree {
+   public:
+    unique_ptr<TurnTreeNode> root;
+    TurnTree(BoardState state) : root(make_unique<TurnTreeNode>(state)) {}
+
+   private:
+    void addNode(BoardState state, TurnTreeNode* parent) {
+        auto newNode = make_unique<TurnTreeNode>(state, parent);
+        parent->children.insert(newNode.get());
+    }
+
+    void deleteNode(TurnTreeNode* node) {
+        for (auto child : node->children) {
+            deleteNode(child);
+        }
+        node->children.clear();
+        node->parent.reset();
+    }
+
+    int depth(TurnTreeNode* node) {
+        if (node->parent == nullptr) {
+            return 0;
+        } else {
+            return depth(node->parent.get()) + 1;
+        }
+    }
+};
+
+
 
 Piece* board[9][10] = {
 
@@ -1344,7 +1372,8 @@ void gameplay(int remove) {
 
             game.turn++;
         }
-    }else {  // 밥먹고 추가
+    return;
+    } else {  // 밥먹고 추가
         setupBoard(game, game.cho);
         printBoard();
         remove_select_piece(remove);
@@ -1411,8 +1440,10 @@ void gameplay(int remove) {
             game.turn++;
         }
                 
-    };
+    }
+    
 }
+
 
 Piece* choosePiece(Player& player) {
     int tmpx, tmpy;
