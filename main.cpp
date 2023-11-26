@@ -138,21 +138,21 @@ class BoardState {
     }
 };
 
-class TurnTreeNode {
-   public:
-    BoardState state;
-    vector<unique_ptr<TurnTreeNode>> children;
-    TurnTreeNode* parent;
+// class TurnTreeNode {
+//    public:
+//     BoardState state;
+//     vector<unique_ptr<TurnTreeNode>> children;
+//     TurnTreeNode* parent;
 
-    TurnTreeNode(BoardState state,  TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
-};
+//     TurnTreeNode(BoardState state,  TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
+// };
 
-void connect(TurnTreeNode parent, TurnTreeNode child) {
-    // add child to parent's children vector
-    parent.children.push_back(make_unique<TurnTreeNode>(child));
-    // add parent to child's parent pointer
-    child.parent = &parent;
-}
+// void connect(TurnTreeNode parent, TurnTreeNode child) {
+//     // add child to parent's children vector
+//     parent.children.push_back(make_unique<TurnTreeNode>(child));
+//     // add parent to child's parent pointer
+//     child.parent = &parent;
+// }
 
 Piece* board[9][10] = {
 
@@ -1299,7 +1299,6 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
             }
 
             game.turn++;
-            }
             turncho(chosen, quitOnMove);
             if (quitOnMove == 2) break;
             if (chosen->team == '.') break;
@@ -1396,6 +1395,7 @@ void gameplay(int remove, Piece* chosen, int quitOnMove) {
         }
                 
     }
+}
 
 Piece* choosePiece(Player& player) {
     int tmpx, tmpy;
