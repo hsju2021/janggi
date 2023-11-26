@@ -1467,6 +1467,10 @@ Piece* choosePiece(Player& player) {
             return quit;
         }
 
+        if (!coord.compare("pass")) {
+            return pass;
+        }
+
         if (!coord.compare("cancel") && game.turn > 1) {
             // 무르기 처리
             //
