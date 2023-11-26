@@ -3,9 +3,11 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <stack>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -56,8 +58,7 @@ string msg[] = {
     "한나라는 제거할 {num}()개의 좌표를 입력하세요.\n",
     "접장기 규칙에 따라 한나라의 선공으로 진행합니다.\n",
     "무르기를 요청하려면 “cancel”을 입력하세요.\n",
-    "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 "
-    "입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n"};
+    "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n"};
 
 string input;
 
@@ -129,23 +130,54 @@ class BoardState {
             }
         }
     }
+
+    bool operator==(const BoardState& other) {
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                if (this->state[i][j] != other.state[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 };
 
 class TurnTreeNode {
    public:
     BoardState state;
-    vector<unique_ptr<TurnTreeNode>> children;
-    TurnTreeNode* parent;
+    set<TurnTreeNode*> children;
+    unique_ptr<TurnTreeNode> parent;
 
-    TurnTreeNode(BoardState state,  TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
+    TurnTreeNode(BoardState state, TurnTreeNode* parentNode=nullptr) : state(state), parent(parentNode) {}
+
+    bool operator==(const TurnTreeNode& other) {
+        return this->state == other.state;
+    }
+
 };
 
-void connect(TurnTreeNode parent, TurnTreeNode child) {
-    // add child to parent's children vector
-    parent.children.push_back(make_unique<TurnTreeNode>(child));
-    // add parent to child's parent pointer
-    child.parent = &parent;
-}
+class TurnTree {
+   public:
+    unique_ptr<TurnTreeNode> root;
+    TurnTree(BoardState state) : root(make_unique<TurnTreeNode>(state)) {}
+
+   private:
+    void addNode(BoardState state, TurnTreeNode* parent) {
+        auto newNode = make_unique<TurnTreeNode>(state, parent);
+        parent->children.insert(newNode.get());
+    }
+
+    void deleteNode(TurnTreeNode* node) {
+        for (auto child : node->children) {
+            deleteNode(child);
+        }
+        node->children.clear();
+        node->parent.reset();
+    }
+};
+
+
 
 Piece* board[9][10] = {
 
