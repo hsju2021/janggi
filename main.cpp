@@ -214,7 +214,8 @@ public:
         }
         int i = 1;
         for (TurnTreeNode* t : children2) {
-            cout << i++ << endl;
+            cout << i++ << ')' << endl;
+            this->currentNode = t;
             printBoard(2);
         }
         int sel = 0;
