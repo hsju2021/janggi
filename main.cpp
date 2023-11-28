@@ -66,26 +66,26 @@ string msg[] = {
     "{player}나라가 무르기 취소를 요청하였습니다.\n",
     "이전에 무른 경로입니다. 원하는 경로를 선택하세요.\n",
     "무르기 취소가 불가능합니다.\n",
-    };
+};
 
 string input;
 
 class Player {
-   public:
+public:
     double score;
     int* pieces;
     string placement;
 };
 
 class Game {
-   public:
+public:
     int turn;
     Player cho;
     Player han;
 };
 
 class Piece {
-   public:
+public:
     int x, y;
     char team;
     char letter;
@@ -128,7 +128,7 @@ class Piece {
 
 Piece* King_Location;
 class BoardState {
-   public:
+public:
     Piece* state[9][10];
 
     BoardState(Piece* initialBoard[9][10]) {
@@ -164,6 +164,7 @@ public:
     }
 
 };
+void printBoard(int gamestart);
 
 class TurnTree {
 public:
@@ -202,9 +203,31 @@ public:
     void undoTree() {
         this->currentNode = this->currentNode->parent->parent;
     }
+
+    void recancelTree() {
+        set<TurnTreeNode*> children1 = this->currentNode->children;
+        vector<TurnTreeNode*> children2;
+        for (TurnTreeNode* t : children1) {
+            for (TurnTreeNode* sel : t->children) {
+                children2.push_back(sel);
+            }
+        }
+        int i = 1;
+        for (TurnTreeNode* t : children2) {
+            cout << i++ << ')' << endl;
+            this->currentNode = t;
+            printBoard(2);
+        }
+        int sel = 0;
+        cin >> sel;
+        //getline(cin, sel);
+
+        this->currentNode = children2.at(sel);
+
+    }
 };
 
-TurnTree *tree;
+TurnTree* tree;
 
 Piece* board[9][10] = {
 
@@ -239,7 +262,7 @@ int Piece::movePiece() {
         // 혹은 대문자인지)
         if (coord.length() != 2 || !isdigit(coord[0]) ||
             (!(coord[1] >= 'a' && coord[1] <= 'i') &&
-             !(coord[1] >= 'A' && coord[1] <= 'I'))) {
+                !(coord[1] >= 'A' && coord[1] <= 'I'))) {
             cout << msg[24] << msg[22] << endl;
             continue;
         }
@@ -247,7 +270,7 @@ int Piece::movePiece() {
         // 규칙에 맞을 경우 숫자로 변환
         tmpy = coord[0] - '0';
         tmpx = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a'
-                                                    : coord[1] - 'A';
+            : coord[1] - 'A';
 
         for (int i = 0; i < paths.size(); i++) {
             if (paths[i].first == tmpx && paths[i].second == tmpy) {
@@ -255,9 +278,9 @@ int Piece::movePiece() {
                 // ex) 초나라 '졸'이 한나라 '차'를 잡았습니다.
                 if (board[tmpx][tmpy] != nullptr) {
                     cout << this->team2string() << " '" << this->letter2string()
-                         << "'이(가) " << board[tmpx][tmpy]->team2string()
-                         << " '" << board[tmpx][tmpy]->letter2string()
-                         << "'을(를) 잡았습니다." << endl;
+                        << "'이(가) " << board[tmpx][tmpy]->team2string()
+                        << " '" << board[tmpx][tmpy]->letter2string()
+                        << "'을(를) 잡았습니다." << endl;
                     // Sleep(2000);
                 }
 
@@ -271,7 +294,7 @@ int Piece::movePiece() {
         cout << msg[24] << msg[22] << endl;
     }
 }
-int gamestart;
+
 int variable_remove;
 Game game;
 
@@ -280,7 +303,7 @@ void gameplay(int remove);
 void turnhan();
 void turncho();
 void setupBoard(Game& game, Player& player);
-void printBoard();
+
 Piece* choosePiece(Player& player);
 int isMovable(int x, int y, char team);
 void kill();
@@ -309,7 +332,7 @@ void kill() {}
 
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
-   public:
+public:
     Rook(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'R';
@@ -320,14 +343,14 @@ class Rook : public Piece {
     // 가능한 모든 경로를 생성하는 함수
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;  // 반환할 경로 저장
-        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        int directions[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
         // 움직일 수 있는 4방향
         for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
             int x = this->x + directions[i][0];
             int y = this->y + directions[i][1];
 
             while (x >= 0 && x < BOARD_WIDTH && y >= 0 &&
-                   y < BOARD_HEIGHT) {  // 보드를 벗어나기 전까지 확장
+                y < BOARD_HEIGHT) {  // 보드를 벗어나기 전까지 확장
                 int movableFlag = isMovable(x, y, this->team);
 
                 if (movableFlag ==
@@ -336,18 +359,20 @@ class Rook : public Piece {
                         x, y));  // 빈 칸일 경우 validMoves에 추가 후 계속 진행
                     x += directions[i][0];
                     y += directions[i][1];
-                } else if (movableFlag ==
-                           1) {  // 적 기물을 만났을 경우 validMoves에 추가하고
-                                 // 탐색 종료
+                }
+                else if (movableFlag ==
+                    1) {  // 적 기물을 만났을 경우 validMoves에 추가하고
+                    // 탐색 종료
                     validMoves.push_back(make_pair(x, y));
                     break;
-                } else  // 아군 기물을 만났을 경우 탐색 종료
+                }
+                else  // 아군 기물을 만났을 경우 탐색 종료
                     break;
             }
         }
         // 궁성 내부 이동 - 김종우 추가
-        int starpointsHan[4][2] = {{3, 0}, {5, 0}, {5, 2}, {3, 2}};
-        int starpointsCho[4][2] = {{3, 7}, {5, 7}, {5, 9}, {3, 9}};
+        int starpointsHan[4][2] = { {3, 0}, {5, 0}, {5, 2}, {3, 2} };
+        int starpointsCho[4][2] = { {3, 7}, {5, 7}, {5, 9}, {3, 9} };
         if ((this->x == 4) && (this->y == 1)) {  // 차가 가운데 있을 때 (4, 1)
             for (int i = 0; i < 4; i++) {  // 모서리 이동 가능 확인
                 int x = starpointsHan[i][0];
@@ -357,8 +382,9 @@ class Rook : public Piece {
                 else
                     validMoves.push_back(make_pair(x, y));
             }
-        } else if ((this->x == 4) &&
-                   (this->y == 8)) {       // 차가 가운데 있을 때 (4, 8)
+        }
+        else if ((this->x == 4) &&
+            (this->y == 8)) {       // 차가 가운데 있을 때 (4, 8)
             for (int i = 0; i < 4; i++) {  // 모서리 이동 가능 확인
                 int x = starpointsCho[i][0];
                 int y = starpointsCho[i][1];
@@ -367,7 +393,8 @@ class Rook : public Piece {
                 else
                     validMoves.push_back(make_pair(x, y));
             }
-        } else {           // 모서리에 차가 있는지 확인
+        }
+        else {           // 모서리에 차가 있는지 확인
             if (y <= 2) {  // 한나라
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsHan[i][0];
@@ -382,20 +409,24 @@ class Rook : public Piece {
                             if (isMovable(x, y, this->team) ==
                                 2) {  // 반대편 확인
                                 break;
-                            } else {
+                            }
+                            else {
                                 validMoves.push_back(make_pair(x, y));
                                 break;
                             }
-                        } else if (isMovable(4, 1, this->team) ==
-                                   1) {  // 가운데 적 기물있을 때
+                        }
+                        else if (isMovable(4, 1, this->team) ==
+                            1) {  // 가운데 적 기물있을 때
                             validMoves.push_back(make_pair(4, 1));
                             break;
-                        } else {  // 가운데 내 기물있을 때
+                        }
+                        else {  // 가운데 내 기물있을 때
                             break;
                         }
                     }
                 }
-            } else if (y >= 7) {
+            }
+            else if (y >= 7) {
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsCho[i][0];
                     int y = starpointsCho[i][1];
@@ -408,20 +439,24 @@ class Rook : public Piece {
                             if (isMovable(x, y, this->team) ==
                                 2) {  // 반대편 확인
                                 break;
-                            } else {
+                            }
+                            else {
                                 validMoves.push_back(make_pair(x, y));
                                 break;
                             }
-                        } else if (isMovable(4, 8, this->team) ==
-                                   1) {  // 가운데 적 기물있을 때
+                        }
+                        else if (isMovable(4, 8, this->team) ==
+                            1) {  // 가운데 적 기물있을 때
                             validMoves.push_back(make_pair(4, 8));
                             break;
-                        } else {  // 가운데 내 기물있을 때
+                        }
+                        else {  // 가운데 내 기물있을 때
                             break;
                         }
                     }
                 }
-            } else {
+            }
+            else {
             }
         }
         return validMoves;
@@ -429,7 +464,7 @@ class Rook : public Piece {
 };
 
 class Cannon : public Piece {
-   public:
+public:
     Cannon(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'C';
@@ -442,14 +477,15 @@ class Cannon : public Piece {
     bool isCannon(Piece& cannon) {
         if ((cannon.letter == 'C') || (cannon.letter == 'c')) {
             return true;
-        } else
+        }
+        else
             return false;
     }
 
     // 가능한 모든 경로를 생성하는 함수
     vector<pair<int, int>> generatePaths() override {  // 김종우 수정 사항
         vector<pair<int, int>> validMoves;  // 반환할 경로 저장
-        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        int directions[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
         // 움직일 수 있는 4방향
         for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
             int x = this->x + directions[i][0];
@@ -457,62 +493,69 @@ class Cannon : public Piece {
 
             int canJump = 0;  // 해당 방향에서 넘을 기물이 있는지 체크
             while (x >= 0 && x < BOARD_WIDTH && y >= 0 &&
-                   y < BOARD_HEIGHT) {  // 보드를 벗어나기 전까지 확장 (한쪽
-                                        // 방향으로)
+                y < BOARD_HEIGHT) {  // 보드를 벗어나기 전까지 확장 (한쪽
+                // 방향으로)
                 int movableFlag = isMovable(x, y, this->team);
                 if (movableFlag ==
                     0) {  // isMoveable로 이동 예정 칸의 상태 체크 (빈칸,
-                          // 상대기물, 내 기물 3가지 경우로 나누어 수행)
+                    // 상대기물, 내 기물 3가지 경우로 나누어 수행)
                     if (canJump == 1) {
                         validMoves.push_back(make_pair(
                             x,
                             y));  // 빈 칸이고 넘을 기물이 있을 경우 경로에 저장
                         x += directions[i][0];
                         y += directions[i][1];
-                    } else {  // 빈칸인데 넘을 기물이 없다면 다음 탐색 진행
+                    }
+                    else {  // 빈칸인데 넘을 기물이 없다면 다음 탐색 진행
                         x += directions[i][0];
                         y += directions[i][1];
                     }
-                } else if (movableFlag == 1) {
+                }
+                else if (movableFlag == 1) {
                     if (isCannon(*board[x][y])) {
                         break;
-                    } else if (canJump == 0) {  // 이전까지 넘을 기물 없었음
+                    }
+                    else if (canJump == 0) {  // 이전까지 넘을 기물 없었음
                         canJump =
                             1;  // 해당 방향에 처음으로 넘을 적 기물이 나타남
                         x += directions[i][0];
                         y += directions[i][1];
-                    } else {
+                    }
+                    else {
                         validMoves.push_back(make_pair(
                             x, y));  // canJump == 1이고 (넘을 기물이 있고)
-                                     // 상대방 기물을 만나게 되면 해당 경로 저장
+                        // 상대방 기물을 만나게 되면 해당 경로 저장
                         break;  // 적 기물을 잡을 수 있는 경우이므로 탐색 종료
                     }
-                } else {
+                }
+                else {
                     if (isCannon(*board[x][y])) {
                         break;
-                    } else if (canJump == 0) {
+                    }
+                    else if (canJump == 0) {
                         canJump =
                             1;  // 해당 방향에서 처음으로 넘을 내 기물이 나타남
                         x += directions[i][0];
                         y += directions[i][1];
-                    } else
+                    }
+                    else
                         break;  // 넘을 수 있는데 내 기물이 나타나면 해당
-                                // 방향으로 더이상 이동 불가능 - 탐색 종료
+                    // 방향으로 더이상 이동 불가능 - 탐색 종료
                 }
             }
         }
 
         int starpointsHan[4][2] = {
-            {3, 0}, {5, 0}, {5, 2}, {3, 2}};  // 한나라 궁성 모서리 좌표 저장
+            {3, 0}, {5, 0}, {5, 2}, {3, 2} };  // 한나라 궁성 모서리 좌표 저장
         int starpointsCho[4][2] = {
-            {3, 7}, {5, 7}, {5, 9}, {3, 9}};  // 한나라 궁성 모서리 좌표 저장
+            {3, 7}, {5, 7}, {5, 9}, {3, 9} };  // 한나라 궁성 모서리 좌표 저장
 
         for (int i = 0; i < 4; i++) {
             if ((this->x == starpointsHan[i][0]) &&
                 (this->y == starpointsHan[i][1])) {  // 모서리 좌표 확인
                 if (board[4][1] != nullptr) {  // 가운데 기물 있는지 확인
                     if (isCannon(
-                            *board[4][1])) {  // 가운데 기물이 cannon인지 확인
+                        *board[4][1])) {  // 가운데 기물이 cannon인지 확인
                         break;
                     }
                     int x = starpointsHan[((i + 2) % 4)][0];
@@ -521,15 +564,18 @@ class Cannon : public Piece {
                         0) {  // jump했을 때 이동 가능한지 확인
                         validMoves.push_back(make_pair(x, y));
                         break;
-                    } else if (isMovable(x, y, this->team) == 1) {
+                    }
+                    else if (isMovable(x, y, this->team) == 1) {
                         if (isCannon(*board[x][y])) {
                             break;
                         }
                         validMoves.push_back(make_pair(x, y));
                         break;
-                    } else
+                    }
+                    else
                         break;
-                } else
+                }
+                else
                     break;
             }
         }
@@ -538,7 +584,7 @@ class Cannon : public Piece {
                 (this->y == starpointsCho[i][1])) {
                 if (board[4][8] != nullptr) {
                     if (isCannon(
-                            *board[4][8])) {  // 가운데 기물이 cannon인지 확인
+                        *board[4][8])) {  // 가운데 기물이 cannon인지 확인
                         break;
                     }
                     int x = starpointsCho[((i + 2) % 4)][0];
@@ -547,15 +593,18 @@ class Cannon : public Piece {
                         0) {  // jump했을 때 이동 가능한지 확인
                         validMoves.push_back(make_pair(x, y));
                         break;
-                    } else if (isMovable(x, y, this->team) == 1) {
+                    }
+                    else if (isMovable(x, y, this->team) == 1) {
                         if (isCannon(*board[x][y])) {
                             break;
                         }
                         validMoves.push_back(make_pair(x, y));
                         break;
-                    } else
+                    }
+                    else
                         break;
-                } else
+                }
+                else
                     break;
             }
         }
@@ -564,7 +613,7 @@ class Cannon : public Piece {
 };
 
 class Knight : public Piece {
-   public:
+public:
     Knight(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'N';
@@ -579,12 +628,12 @@ class Knight : public Piece {
             {1, 2},   {1, -2}, {-1, 2},
             {-1, -2},  // knight가 최종적으로 이동하는 위치 8개 (최종 좌표)
             {2, 1},   {2, -1}, {-2, 1},
-            {-2, -1}};
+            {-2, -1} };
         int blockcheck[8][2] = {
             {0, 1},  {0, -1},
             {0, 1},  {0, -1},  // knight의 최종 좌표 별 지나가는 좌표 8개
             {1, 0},  {1, 0},
-            {-1, 0}, {-1, 0}};
+            {-1, 0}, {-1, 0} };
         for (int i = 0; i < 8; i++) {            // 8개 좌표 모두 검사
             int x = this->x + blockcheck[i][0];  // 지나가는 좌표 x, y 값 저장
             int y = this->y + blockcheck[i][1];
@@ -612,7 +661,7 @@ class Knight : public Piece {
 };
 
 class Elephant : public Piece {
-   public:
+public:
     Elephant(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'E';
@@ -627,32 +676,32 @@ class Elephant : public Piece {
             {2, 3},   {2, -3}, {-2, 3},
             {-2, -3},  // Elephant가 최종적으로 이동하는 위치 8개 (최종 좌표)
             {3, 2},   {3, -2}, {-3, 2},
-            {-3, -2}};
+            {-3, -2} };
         int blockcheck1[8][2] = {
             {0, 1},  {0, -1}, {0, 1},
             {0, -1},  // Elephant의 최종 좌표 별 첫번째로 지나가는 좌표 8개
             {1, 0},  {1, 0},  {-1, 0},
-            {-1, 0}};
+            {-1, 0} };
         int blockcheck2[8][2] = {
             {1, 2},   {1, -2}, {-1, 2},
             {-1, -2},  // Elephant의 최종 좌표 별 두번째로 지나가는 좌표 8개
             {2, 1},   {2, -1}, {-2, 1},
-            {-2, -1}};
+            {-2, -1} };
         for (int i = 0; i < 8; i++) {
             int x = this->x +
-                    blockcheck1[i][0];  // 첫번째로 지나가는 좌표 x, y값 저장
+                blockcheck1[i][0];  // 첫번째로 지나가는 좌표 x, y값 저장
             int y = this->y + blockcheck1[i][1];
             if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
                 !isMovable(x, y,
-                           this->team)) {  // 첫번째 좌표가 판을 벗어나는지,
-                                           // 해당 좌표가 비었는지 검사
+                    this->team)) {  // 첫번째 좌표가 판을 벗어나는지,
+                // 해당 좌표가 비었는지 검사
                 x = this->x +
                     blockcheck2[i][0];  // 두번째로 지나가는 좌표 x, y값 저장
                 y = this->y + blockcheck2[i][1];
                 if (x >= 0 && x < 9 && y >= 0 && y < 10 &&
                     !isMovable(x, y,
-                               this->team)) {  // 두번째 좌표가 판을 벗어나는지,
-                                               // 해당 좌표가 비었는지 검사
+                        this->team)) {  // 두번째 좌표가 판을 벗어나는지,
+                    // 해당 좌표가 비었는지 검사
                     x = this->x + moves[i][0];  // 최종 좌표 x, y 값 저장
                     y = this->y + moves[i][1];
                     if (x >= 0 && x < 9 && y >= 0 &&
@@ -662,7 +711,7 @@ class Elephant : public Piece {
                         else
                             validMoves.push_back(
                                 make_pair(x, y));  // 최종 좌표가 비었거나 상대
-                                                   // 기물이 있다면 경로 저장
+                        // 기물이 있다면 경로 저장
                     }
                 }
             }
@@ -672,7 +721,7 @@ class Elephant : public Piece {
 };
 
 class King : public Piece {
-   public:
+public:
     King(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'K';
@@ -684,10 +733,10 @@ class King : public Piece {
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
         int starpointsHan[4][2] = {
-            {3, 0}, {5, 0}, {5, 2}, {3, 2}};  // 한나라 궁성 모서리 좌표 저장
+            {3, 0}, {5, 0}, {5, 2}, {3, 2} };  // 한나라 궁성 모서리 좌표 저장
         int starpointsCho[4][2] = {
-            {3, 7}, {5, 7}, {5, 9}, {3, 9}};  // 한나라 궁성 모서리 좌표 저장
-        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            {3, 7}, {5, 7}, {5, 9}, {3, 9} };  // 한나라 궁성 모서리 좌표 저장
+        int directions[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
 
         for (int i = 0; i < 4; i++) {  // 십자 방향
             int x = this->x + directions[i][0];
@@ -701,7 +750,8 @@ class King : public Piece {
                     }
                 }
 
-            } else {
+            }
+            else {
                 if (x >= 3 && x <= 5 && y >= 7 && y <= 9) {
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
@@ -719,7 +769,8 @@ class King : public Piece {
                         validMoves.push_back(make_pair(x, y));
                     }
                 }
-            } else {  // 궁성 모서리
+            }
+            else {  // 궁성 모서리
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsHan[i][0];
                     int y = starpointsHan[i][1];
@@ -728,12 +779,14 @@ class King : public Piece {
                         if (movableFlag == 0 || movableFlag == 1) {
                             validMoves.push_back(make_pair(4, 1));
                             break;
-                        } else
+                        }
+                        else
                             break;
                     }
                 }
             }
-        } else {                                 // 초나라
+        }
+        else {                                 // 초나라
             if (this->x == 4 && this->y == 8) {  // 궁성 가운데
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsCho[i][0];
@@ -743,7 +796,8 @@ class King : public Piece {
                         validMoves.push_back(make_pair(x, y));
                     }
                 }
-            } else {
+            }
+            else {
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsCho[i][0];
                     int y = starpointsCho[i][1];
@@ -752,7 +806,8 @@ class King : public Piece {
                         if (movableFlag == 0 || movableFlag == 1) {
                             validMoves.push_back(make_pair(4, 8));
                             break;
-                        } else
+                        }
+                        else
                             break;
                     }
                 }
@@ -763,7 +818,7 @@ class King : public Piece {
 };
 
 class Guard : public Piece {
-   public:
+public:
     Guard(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'G';
@@ -775,10 +830,10 @@ class Guard : public Piece {
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
         int starpointsHan[4][2] = {
-            {3, 0}, {5, 0}, {5, 2}, {3, 2}};  // 한나라 궁성 모서리 좌표 저장
+            {3, 0}, {5, 0}, {5, 2}, {3, 2} };  // 한나라 궁성 모서리 좌표 저장
         int starpointsCho[4][2] = {
-            {3, 7}, {5, 7}, {5, 9}, {3, 9}};  // 한나라 궁성 모서리 좌표 저장
-        int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            {3, 7}, {5, 7}, {5, 9}, {3, 9} };  // 한나라 궁성 모서리 좌표 저장
+        int directions[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
 
         for (int i = 0; i < 4; i++) {  // 십자 방향
             int x = this->x + directions[i][0];
@@ -792,7 +847,8 @@ class Guard : public Piece {
                     }
                 }
 
-            } else {
+            }
+            else {
                 if (x >= 3 && x <= 5 && y >= 7 && y <= 9) {
                     if (movableFlag == 0 || movableFlag == 1) {
                         validMoves.push_back(make_pair(x, y));
@@ -810,7 +866,8 @@ class Guard : public Piece {
                         validMoves.push_back(make_pair(x, y));
                     }
                 }
-            } else {  // 궁성 모서리
+            }
+            else {  // 궁성 모서리
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsHan[i][0];
                     int y = starpointsHan[i][1];
@@ -819,12 +876,14 @@ class Guard : public Piece {
                         if (movableFlag == 0 || movableFlag == 1) {
                             validMoves.push_back(make_pair(4, 1));
                             break;
-                        } else
+                        }
+                        else
                             break;
                     }
                 }
             }
-        } else {                                 // 초나라
+        }
+        else {                                 // 초나라
             if (this->x == 4 && this->y == 8) {  // 궁성 가운데
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsCho[i][0];
@@ -834,7 +893,8 @@ class Guard : public Piece {
                         validMoves.push_back(make_pair(x, y));
                     }
                 }
-            } else {
+            }
+            else {
                 for (int i = 0; i < 4; i++) {
                     int x = starpointsCho[i][0];
                     int y = starpointsCho[i][1];
@@ -843,7 +903,8 @@ class Guard : public Piece {
                         if (movableFlag == 0 || movableFlag == 1) {
                             validMoves.push_back(make_pair(4, 8));
                             break;
-                        } else
+                        }
+                        else
                             break;
                     }
                 }
@@ -854,7 +915,7 @@ class Guard : public Piece {
 };
 
 class Pawn : public Piece {
-   public:
+public:
     Pawn(int x, int y, char team) : Piece(x, y, team) {
         if (team == 'H')
             letter = 'P';
@@ -865,8 +926,8 @@ class Pawn : public Piece {
 
     vector<pair<int, int>> generatePaths() override {
         vector<pair<int, int>> validMoves;
-        int hanDirections[3][2] = {{0, 1}, {1, 0}, {-1, 0}};
-        int choDirections[3][2] = {{0, -1}, {1, 0}, {-1, 0}};
+        int hanDirections[3][2] = { {0, 1}, {1, 0}, {-1, 0} };
+        int choDirections[3][2] = { {0, -1}, {1, 0}, {-1, 0} };
         if (this->team == 'H') {
             for (int i = 0; i < 3; i++) {
                 int x = this->x + hanDirections[i][0];
@@ -885,7 +946,8 @@ class Pawn : public Piece {
                 if (movableFlag == 0 || movableFlag == 1) {
                     validMoves.push_back(make_pair(4, 8));
                 }
-            } else if (this->x == 4 && this->y == 8) {  // 가운데 있을 때
+            }
+            else if (this->x == 4 && this->y == 8) {  // 가운데 있을 때
                 int movableFlag = isMovable(3, 9, team);
                 if (movableFlag == 0 || movableFlag == 1) {
                     validMoves.push_back(make_pair(3, 9));
@@ -894,9 +956,11 @@ class Pawn : public Piece {
                 if (movableFlag == 0 || movableFlag == 1) {
                     validMoves.push_back(make_pair(5, 9));
                 }
-            } else
+            }
+            else
                 ;
-        } else {
+        }
+        else {
             for (int i = 0; i < 3; i++) {
                 int x = this->x + choDirections[i][0];
                 int y = this->y + choDirections[i][1];
@@ -914,7 +978,8 @@ class Pawn : public Piece {
                 if (movableFlag == 0 || movableFlag == 1) {
                     validMoves.push_back(make_pair(4, 1));
                 }
-            } else if (this->x == 4 && this->y == 1) {  // 가운데 있을 때
+            }
+            else if (this->x == 4 && this->y == 1) {  // 가운데 있을 때
                 int movableFlag = isMovable(3, 0, team);
                 if (movableFlag == 0 || movableFlag == 1) {
                     validMoves.push_back(make_pair(3, 0));
@@ -923,7 +988,8 @@ class Pawn : public Piece {
                 if (movableFlag == 0 || movableFlag == 1) {
                     validMoves.push_back(make_pair(5, 0));
                 }
-            } else
+            }
+            else
                 ;
         }
         return validMoves;
@@ -932,7 +998,7 @@ class Pawn : public Piece {
 
 stack<BoardState> previous;
 
-string setup[] = {"1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상"};
+string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 상마마상" };
 
 Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
@@ -952,13 +1018,12 @@ int main() {
         chosen = nullptr;
         mainMenu();
         setupInitialPieces(game, game.han);
-        gamestart = 0;
         remove = remove_piece_num();
         tree = new TurnTree();
         gameplay(remove);
-    } 
+    }
     return 0;
-} 
+}
 
 void mainMenu() {
     // clear the console
@@ -1018,65 +1083,65 @@ void setupBoard(Game& game, Player& player) {
         while (true) {  // while문
             int num;
             string input;
-            cout << format(msg[30], {{"player", "한"}});
+            cout << format(msg[30], { {"player", "한"} });
             cout << "    <한나라 포진>\n\n"
-                 << setup[0] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
-                 << setup[1] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
-                 << setup[2] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
-                 << setup[3] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
+                << setup[0] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 0 |R|N|E|G| |G|E|N|R|\n\n"
+                << setup[1] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 0 |R|N|E|G| |G|N|E|R|\n\n"
+                << setup[2] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 0 |R|E|N|G| |G|E|N|R|\n\n"
+                << setup[3] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 0 |R|E|N|G| |G|N|E|R|\n\n";
             cout << msg[4] << msg[0];
             getline(cin, input);  // 사용자로부터 문자열로 입력을 받습니다.
             stringstream ss(input);  // 입력받은 문자열을 스트림으로 변환합니다.
             if (ss >> num && num > 0 && num < 5) {  // if문
                 switch (num) {                      // switch문
-                    case 1:
-                        cout << format(msg[19],
-                                       {{"player", "한"}, {"setup", setup[0]}})
-                             << endl;
-                        game.han.placement = setup[0];
-                        board[1][0] = new Knight(1, 0, 'H');
-                        board[7][0] = new Knight(7, 0, 'H');
-                        board[2][0] = new Elephant(2, 0, 'H');
-                        board[6][0] = new Elephant(6, 0, 'H');
-                        break;
-                    case 2:
-                        cout << format(msg[19],
-                                       {{"player", "한"}, {"setup", setup[1]}})
-                             << endl;
-                        game.han.placement = setup[1];
-                        board[1][0] = new Knight(1, 0, 'H');
-                        board[6][0] = new Knight(6, 0, 'H');
-                        board[2][0] = new Elephant(2, 0, 'H');
-                        board[7][0] = new Elephant(7, 0, 'H');
-                        break;
-                    case 3:
-                        cout << format(msg[19],
-                                       {{"player", "한"}, {"setup", setup[2]}})
-                             << endl;
-                        game.han.placement = setup[2];
-                        board[2][0] = new Knight(2, 0, 'H');
-                        board[7][0] = new Knight(7, 0, 'H');
-                        board[1][0] = new Elephant(1, 0, 'H');
-                        board[6][0] = new Elephant(6, 0, 'H');
-                        break;
-                    case 4:
-                        cout << format(msg[19],
-                                       {{"player", "한"}, {"setup", setup[3]}})
-                             << endl;
-                        game.han.placement = setup[3];
-                        board[2][0] = new Knight(2, 0, 'H');
-                        board[6][0] = new Knight(6, 0, 'H');
-                        board[1][0] = new Elephant(1, 0, 'H');
-                        board[7][0] = new Elephant(7, 0, 'H');
-                        break;
+                case 1:
+                    cout << format(msg[19],
+                        { {"player", "한"}, {"setup", setup[0]} })
+                        << endl;
+                    game.han.placement = setup[0];
+                    board[1][0] = new Knight(1, 0, 'H');
+                    board[7][0] = new Knight(7, 0, 'H');
+                    board[2][0] = new Elephant(2, 0, 'H');
+                    board[6][0] = new Elephant(6, 0, 'H');
+                    break;
+                case 2:
+                    cout << format(msg[19],
+                        { {"player", "한"}, {"setup", setup[1]} })
+                        << endl;
+                    game.han.placement = setup[1];
+                    board[1][0] = new Knight(1, 0, 'H');
+                    board[6][0] = new Knight(6, 0, 'H');
+                    board[2][0] = new Elephant(2, 0, 'H');
+                    board[7][0] = new Elephant(7, 0, 'H');
+                    break;
+                case 3:
+                    cout << format(msg[19],
+                        { {"player", "한"}, {"setup", setup[2]} })
+                        << endl;
+                    game.han.placement = setup[2];
+                    board[2][0] = new Knight(2, 0, 'H');
+                    board[7][0] = new Knight(7, 0, 'H');
+                    board[1][0] = new Elephant(1, 0, 'H');
+                    board[6][0] = new Elephant(6, 0, 'H');
+                    break;
+                case 4:
+                    cout << format(msg[19],
+                        { {"player", "한"}, {"setup", setup[3]} })
+                        << endl;
+                    game.han.placement = setup[3];
+                    board[2][0] = new Knight(2, 0, 'H');
+                    board[6][0] = new Knight(6, 0, 'H');
+                    board[1][0] = new Elephant(1, 0, 'H');
+                    board[7][0] = new Elephant(7, 0, 'H');
+                    break;
                 }  // switch문
                 break;
             }  // if문
@@ -1090,63 +1155,63 @@ void setupBoard(Game& game, Player& player) {
         while (true) {  // while문
             int num;
             string input;
-            cout << format(msg[30], {{"player", "초"}});
+            cout << format(msg[30], { {"player", "초"} });
             cout << "    <초나라 포진>\n\n"
-                 << setup[0] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
-                 << setup[1] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
-                 << setup[2] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
-                 << setup[3] << " 포진"
-                 << "\n    A B C D E F G H I"
-                 << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
+                << setup[0] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 9 |R|N|E|G| |G|E|N|R|\n\n"
+                << setup[1] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 9 |R|N|E|G| |G|N|E|R|\n\n"
+                << setup[2] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 9 |R|E|N|G| |G|E|N|R|\n\n"
+                << setup[3] << " 포진"
+                << "\n    A B C D E F G H I"
+                << "\n 9 |R|E|N|G| |G|N|E|R|\n\n";
             cout << format(msg[19],
-                           {{"player", "한"}, {"setup", game.han.placement}})
-                 << msg[4] << msg[0];
+                { {"player", "한"}, {"setup", game.han.placement} })
+                << msg[4] << msg[0];
             getline(cin, input);  // 사용자로부터 문자열로 입력을 받습니다.
             stringstream ss(input);  // 입력받은 문자열을 스트림으로 변환합니다.
             if (ss >> num && num > 0 && num < 5) {  // if문
                 switch (num) {                      // switch문
-                    case 1:
-                        cout << format(msg[19],
-                                       {{"player", "초"}, {"setup", setup[0]}})
-                             << endl;
-                        board[1][9] = new Knight(1, 9, 'C');
-                        board[7][9] = new Knight(7, 9, 'C');
-                        board[2][9] = new Elephant(2, 9, 'C');
-                        board[6][9] = new Elephant(6, 9, 'C');
-                        break;
-                    case 2:
-                        cout << format(msg[19],
-                                       {{"player", "초"}, {"setup", setup[1]}})
-                             << endl;
-                        board[1][9] = new Knight(1, 9, 'C');
-                        board[6][9] = new Knight(6, 9, 'C');
-                        board[2][9] = new Elephant(2, 9, 'C');
-                        board[7][9] = new Elephant(7, 9, 'C');
-                        break;
-                    case 3:
-                        cout << format(msg[19],
-                                       {{"player", "초"}, {"setup", setup[2]}})
-                             << endl;
-                        board[2][9] = new Knight(2, 9, 'C');
-                        board[7][9] = new Knight(7, 9, 'C');
-                        board[1][9] = new Elephant(1, 9, 'C');
-                        board[6][9] = new Elephant(6, 9, 'C');
-                        break;
-                    case 4:
-                        cout << format(msg[19],
-                                       {{"player", "초"}, {"setup", setup[3]}})
-                             << endl;
-                        board[2][9] = new Knight(2, 9, 'C');
-                        board[6][9] = new Knight(6, 9, 'C');
-                        board[1][9] = new Elephant(1, 9, 'C');
-                        board[7][9] = new Elephant(7, 9, 'C');
-                        break;
+                case 1:
+                    cout << format(msg[19],
+                        { {"player", "초"}, {"setup", setup[0]} })
+                        << endl;
+                    board[1][9] = new Knight(1, 9, 'C');
+                    board[7][9] = new Knight(7, 9, 'C');
+                    board[2][9] = new Elephant(2, 9, 'C');
+                    board[6][9] = new Elephant(6, 9, 'C');
+                    break;
+                case 2:
+                    cout << format(msg[19],
+                        { {"player", "초"}, {"setup", setup[1]} })
+                        << endl;
+                    board[1][9] = new Knight(1, 9, 'C');
+                    board[6][9] = new Knight(6, 9, 'C');
+                    board[2][9] = new Elephant(2, 9, 'C');
+                    board[7][9] = new Elephant(7, 9, 'C');
+                    break;
+                case 3:
+                    cout << format(msg[19],
+                        { {"player", "초"}, {"setup", setup[2]} })
+                        << endl;
+                    board[2][9] = new Knight(2, 9, 'C');
+                    board[7][9] = new Knight(7, 9, 'C');
+                    board[1][9] = new Elephant(1, 9, 'C');
+                    board[6][9] = new Elephant(6, 9, 'C');
+                    break;
+                case 4:
+                    cout << format(msg[19],
+                        { {"player", "초"}, {"setup", setup[3]} })
+                        << endl;
+                    board[2][9] = new Knight(2, 9, 'C');
+                    board[6][9] = new Knight(6, 9, 'C');
+                    board[1][9] = new Elephant(1, 9, 'C');
+                    board[7][9] = new Elephant(7, 9, 'C');
+                    break;
                 }  // switch문
                 break;
             }  // if문
@@ -1167,31 +1232,32 @@ int remove_piece_num() {
         stringstream ss(input);  // 입력받은 문자열을 스트림으로 변환합니다.
         if (ss >> num && num >= 0 && num <= 6) {
             switch (num) {
-                case 0:
-                    cout << "0을 입력받았습니다\n";
-                    break;
-                case 1:
-                    cout << "1(차)를 입력받았습니다\n";
-                    break;
-                case 2:
-                    cout << "2(차/포)를 입력받았습니다\n";
-                    break;
-                case 3:
-                    cout << "3(차/포/마)를 입력받았습니다\n";
-                    break;
-                case 4:
-                    cout << "4(차/포/마/상)를 입력받았습니다\n";
-                    break;
-                case 5:
-                    cout << "5(차/포/마/상/사)를 입력받았습니다\n";
-                    break;
-                case 6:
-                    cout << "6(차/포/마/상/사/졸)를 입력받았습니다\n";
-                    break;
+            case 0:
+                cout << "0을 입력받았습니다\n";
+                break;
+            case 1:
+                cout << "1(차)를 입력받았습니다\n";
+                break;
+            case 2:
+                cout << "2(차/포)를 입력받았습니다\n";
+                break;
+            case 3:
+                cout << "3(차/포/마)를 입력받았습니다\n";
+                break;
+            case 4:
+                cout << "4(차/포/마/상)를 입력받았습니다\n";
+                break;
+            case 5:
+                cout << "5(차/포/마/상/사)를 입력받았습니다\n";
+                break;
+            case 6:
+                cout << "6(차/포/마/상/사/졸)를 입력받았습니다\n";
+                break;
             }
             variable_remove = num;
             return num;
-        } else {
+        }
+        else {
             cout << "0과 6 사이의 정수를 입력하시오.\n";
         }
     }
@@ -1200,53 +1266,53 @@ int remove_piece_num() {
 void remove_select_piece(int num) {
     vector<string> piecesToRemove;
     switch (num) {
-        case 1:
-            cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << msg[0];
-            piecesToRemove.push_back("R");
-            break;
-        case 2:
-            cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n"
-                 << msg[0];
-            piecesToRemove.push_back("R");
-            piecesToRemove.push_back("C");
-            break;
-        case 3:
-            cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n"
-                 << msg[0];
-            piecesToRemove.push_back("R");
-            piecesToRemove.push_back("C");
-            piecesToRemove.push_back("N");
-            break;
-        case 4:
-            cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n"
-                 << msg[0];
-            piecesToRemove.push_back("R");
-            piecesToRemove.push_back("C");
-            piecesToRemove.push_back("N");
-            piecesToRemove.push_back("E");
-            break;
-        case 5:
-            cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n"
-                 << msg[0];
-            piecesToRemove.push_back("R");
-            piecesToRemove.push_back("C");
-            piecesToRemove.push_back("N");
-            piecesToRemove.push_back("E");
-            piecesToRemove.push_back("G");
-            break;
-        case 6:
-            cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 "
-                    "입력하세요.\n"
-                 << msg[0];
-            piecesToRemove.push_back("R");
-            piecesToRemove.push_back("C");
-            piecesToRemove.push_back("N");
-            piecesToRemove.push_back("E");
-            piecesToRemove.push_back("G");
-            piecesToRemove.push_back("P");
-            break;
-        default:
-            return;
+    case 1:
+        cout << "한나라는 제거할 1(차)개의 좌표를 입력하세요.\n" << msg[0];
+        piecesToRemove.push_back("R");
+        break;
+    case 2:
+        cout << "한나라는 제거할 2(차/포)개의 좌표를 입력하세요.\n"
+            << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        break;
+    case 3:
+        cout << "한나라는 제거할 3(차/포/마)개의 좌표를 입력하세요.\n"
+            << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        break;
+    case 4:
+        cout << "한나라는 제거할 4(차/포/마/상)개의 좌표를 입력하세요.\n"
+            << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        break;
+    case 5:
+        cout << "한나라는 제거할 5(차/포/마/상/사)개의 좌표를 입력하세요.\n"
+            << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        break;
+    case 6:
+        cout << "한나라는 제거할 6(차/포/마/상/사/졸)개의 좌표를 "
+            "입력하세요.\n"
+            << msg[0];
+        piecesToRemove.push_back("R");
+        piecesToRemove.push_back("C");
+        piecesToRemove.push_back("N");
+        piecesToRemove.push_back("E");
+        piecesToRemove.push_back("G");
+        piecesToRemove.push_back("P");
+        break;
+    default:
+        return;
     }
     bool inputValid = true;
     vector<pair<int, int>> coordinates;
@@ -1263,14 +1329,16 @@ void remove_select_piece(int num) {
             if (token.size() == 2 && isdigit(token[0]) && isalpha(token[1])) {
                 int y = token[0] - '0';  // 첫 번째 문자를 숫자로 변환
                 int x = toupper(token[1]) -
-                        'A';  // 두 번째문자를 알파벳 인덱스로 변환
+                    'A';  // 두 번째문자를 알파벳 인덱스로 변환
                 if (x >= 0 && x < 9 && y >= 0 && y < 10) {
-                    coordinates.push_back({x, y});
-                } else {
+                    coordinates.push_back({ x, y });
+                }
+                else {
                     inputValid = false;  // 좌표 범위를 벗어났습니다.
                     break;
                 }
-            } else {
+            }
+            else {
                 inputValid = false;  // 잘못된 형식입니다.
                 break;
             }
@@ -1278,8 +1346,8 @@ void remove_select_piece(int num) {
 
         if (!inputValid || coordinates.size() != piecesToRemove.size()) {
             cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 "
-                    "입력하세요."
-                 << endl;
+                "입력하세요."
+                << endl;
             return remove_select_piece(num);
         }
     } while (!inputValid || coordinates.size() != piecesToRemove.size());
@@ -1292,22 +1360,24 @@ void remove_select_piece(int num) {
         if (board[x][y] && board[x][y]->team == 'H') {
             string currentPiece(1, board[x][y]->letter);
             auto it = find(piecesToRemove.begin(), piecesToRemove.end(),
-                           currentPiece);
+                currentPiece);
             if (it != piecesToRemove.end()) {
                 delete board[x][y];
                 board[x][y] = nullptr;
                 piecesToRemove.erase(it);  // 이미 제거된 기물은 리스트에서 제거
-            } else {
+            }
+            else {
                 cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 "
-                        "입력하세요."
-                     << endl;
+                    "입력하세요."
+                    << endl;
                 return remove_select_piece(
                     num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
             }
-        } else {
+        }
+        else {
             cout << "입력된 좌표에 해당하는 기물이 존재하지 않습니다. 다시 "
-                    "입력하세요."
-                 << endl;
+                "입력하세요."
+                << endl;
             return remove_select_piece(
                 num);  // 잘못된 좌표가 있으면 다시 입력받습니다.
         }
@@ -1320,19 +1390,18 @@ void gameplay(int remove) {
     if (remove >= 1) {  // 제거할 기물이 1개 이상
         // 한나라, 초나라 포진 과정
         setupBoard(game, game.han);
-        printBoard();
+        printBoard(0);
         remove_select_piece(remove);
-        printBoard();
+        printBoard(0);
         setupInitialPieces(game, game.cho);
         setupBoard(game, game.cho);
-        gamestart = 1;
-        cout << format(msg[32], {{"player", "한"}});
+        cout << format(msg[32], { {"player", "한"} });
         // Sleep(2000);
-        while(1){ //한나라 선공
+        while (1) { //한나라 선공
             turnhan();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            printBoard();  // 이동후 보드출력
+            printBoard(1);  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1359,7 +1428,7 @@ void gameplay(int remove) {
             turncho();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            printBoard();  // 이동후 보드출력
+            printBoard(1);  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1384,22 +1453,22 @@ void gameplay(int remove) {
 
             game.turn++;
         }
-    return;
-    } else {  // 밥먹고 추가
+        return;
+    }
+    else {  // 밥먹고 추가
         setupBoard(game, game.cho);
-        printBoard();
+        printBoard(0);
         remove_select_piece(remove);
-        printBoard();
+        printBoard(0);
         setupInitialPieces(game, game.cho);
         setupBoard(game, game.han);
-        gamestart = 1;
-        cout << format(msg[32], {{"player", "한"}});
+        cout << format(msg[32], { {"player", "한"} });
         // Sleep(2000);
-        while(1){ //초나라 선공
+        while (1) { //초나라 선공
             turncho();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            printBoard();  // 이동후 보드출력
+            printBoard(1);  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1426,7 +1495,7 @@ void gameplay(int remove) {
             turnhan();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            printBoard();  // 이동후 보드출력
+            printBoard(1);  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1451,9 +1520,9 @@ void gameplay(int remove) {
 
             game.turn++;
         }
-                
+
     }
-    
+
 }
 
 
@@ -1468,7 +1537,7 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << format(msg[5], {{"player", currentTurnTeam}}) << msg[11];
+        cout << format(msg[5], { {"player", currentTurnTeam} }) << msg[11];
         if (game.turn > 1) {
             cout << msg[33];
         }
@@ -1488,8 +1557,14 @@ Piece* choosePiece(Player& player) {
             //
             //
             return cancel;
-        } else if (!coord.compare("cancel") && game.turn <= 1) {
+        }
+        else if (!coord.compare("cancel") && game.turn <= 1) {
             cout << "더 이상 무를 수 없습니다. 다시 입력하세요.\n";
+            continue;
+        }
+
+        if (!coord.compare("recancel")) {
+            tree->recancelTree();
             continue;
         }
 
@@ -1502,13 +1577,13 @@ Piece* choosePiece(Player& player) {
         }
         if (coord.length() != 2 || !isdigit(coord[0]) ||
             (!(coord[1] >= 'a' && coord[1] <= 'i') &&
-             !(coord[1] >= 'A' && coord[1] <= 'I'))) {
+                !(coord[1] >= 'A' && coord[1] <= 'I'))) {
             cout << msg[23] << msg[22] << endl;
             continue;
         }
 
         tmpx = (coord[1] >= 'a' && coord[1] <= 'i') ? coord[1] - 'a'
-                                                    : coord[1] - 'A';
+            : coord[1] - 'A';
         tmpy = coord[0] - '0';
 
         if (board[tmpx][tmpy] == nullptr) {
@@ -1527,14 +1602,44 @@ Piece* choosePiece(Player& player) {
 }
 
 void turnhan() {
-        // 한나라 턴
-        //previous.push(BoardState(board));
-        tree->addNode(BoardState(board));
-        while (true) {
-            printBoard();                    // 보드출력
-            chosen = choosePiece(game.han);  // 기물선택
-            if (chosen->team == '.') {
-                cout << format(msg[6], {{"player", "한"}}) << msg[15];
+    // 한나라 턴
+    //previous.push(BoardState(board));
+    tree->addNode(BoardState(board));
+    while (true) {
+        printBoard(1);                    // 보드출력
+        chosen = choosePiece(game.han);  // 기물선택
+        if (chosen->team == '.') {
+            cout << format(msg[6], { {"player", "한"} }) << msg[15];
+            while (true) {
+                getline(cin, input);
+                if (input.compare("Y") == 0 || input.compare("y") == 0)
+                    break;
+                else
+                    cout << msg[26] << msg[0];
+            }
+            break;
+        }
+        else if (chosen->team == ',') {
+            cout << format(msg[34], { {"player", "한"} });
+            while (true) {
+                getline(cin, input);
+                if (input.compare("Y") == 0 || input.compare("y") == 0 ||
+                    input.compare("N") == 0 || input.compare("n") == 0)
+                    break;
+                else
+                    cout << msg[22];
+            }
+            if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+        }
+        else if (chosen->team == '?') {
+            break;
+            // pass
+        }
+        else {
+            quitOnMove = chosen->movePiece();  // 기물이동
+            if (quitOnMove == 1) {
+                cout << format(msg[6], { {"player", "한"} }) << msg[7]
+                    << msg[0];
                 while (true) {
                     getline(cin, input);
                     if (input.compare("Y") == 0 || input.compare("y") == 0)
@@ -1542,51 +1647,55 @@ void turnhan() {
                     else
                         cout << msg[26] << msg[0];
                 }
-                break;
-            } else if (chosen->team == ',') {
-                cout << format(msg[34], {{"player", "한"}});
-                while (true) {
-                    getline(cin, input);
-                    if (input.compare("Y") == 0 || input.compare("y") == 0 ||
-                        input.compare("N") == 0 || input.compare("n") == 0)
-                        break;
-                    else
-                        cout << msg[22];
-                }
-                if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
-            } else if (chosen->team == '?') {
-                break;
-                // pass
-            } else {
-                quitOnMove = chosen->movePiece();  // 기물이동
-                if (quitOnMove == 1) {
-                    cout << format(msg[6], {{"player", "한"}}) << msg[7]
-                         << msg[0];
-                    while (true) {
-                        getline(cin, input);
-                        if (input.compare("Y") == 0 || input.compare("y") == 0)
-                            break;
-                        else
-                            cout << msg[26] << msg[0];
-                    }
-                    continue;
-                } else if (quitOnMove == 2) {
-                    continue;
-                }
-                break;
+                continue;
             }
+            else if (quitOnMove == 2) {
+                continue;
+            }
+            break;
         }
-        return;
+    }
+    return;
 }
 
 void turncho() {
-        //previous.push(BoardState(board));
-        tree->addNode(BoardState(board));
-        while (true) {
-            printBoard();                    // 보드출력
-            chosen = choosePiece(game.cho);  // 기물선택
-            if (chosen->team == '.') {
-                cout << format(msg[6], {{"player", "초"}}) << msg[15];
+    //previous.push(BoardState(board));
+    tree->addNode(BoardState(board));
+    while (true) {
+        printBoard(1);                    // 보드출력
+        chosen = choosePiece(game.cho);  // 기물선택
+        if (chosen->team == '.') {
+            cout << format(msg[6], { {"player", "초"} }) << msg[15];
+            while (true) {
+                getline(cin, input);
+                if (input.compare("Y") == 0 || input.compare("y") == 0)
+                    break;
+                else
+                    cout << msg[26] << msg[0];
+            }
+            break;
+        }
+        else if (chosen->team == ',') {
+            cout << format(msg[34], { {"player", "초"} });
+            while (true) {
+                getline(cin, input);
+                if (input.compare("Y") == 0 || input.compare("y") == 0 ||
+                    input.compare("N") == 0 || input.compare("n") == 0)
+                    break;
+                else
+                    cout << msg[22];
+            }
+            if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
+        }
+        else if (chosen->team == '?') {
+            break;
+            // pass
+        }
+        else {
+            quitOnMove = chosen->movePiece();
+            if (quitOnMove == 1) {
+                cout << format(msg[6], { {"player", "초"} }) << msg[7]
+                    << msg[0];
                 while (true) {
                     getline(cin, input);
                     if (input.compare("Y") == 0 || input.compare("y") == 0)
@@ -1595,64 +1704,39 @@ void turncho() {
                         cout << msg[26] << msg[0];
                 }
                 break;
-            } else if (chosen->team == ',') {
-                cout << format(msg[34], {{"player", "초"}});
-                while (true) {
-                    getline(cin, input);
-                    if (input.compare("Y") == 0 || input.compare("y") == 0 ||
-                        input.compare("N") == 0 || input.compare("n") == 0)
-                        break;
-                    else
-                        cout << msg[22];
-                }
-                if (input.compare("Y") == 0 || input.compare("y") == 0) undo();
-            } else if (chosen->team == '?') {
-                break;
-                // pass
-            } else {
-                quitOnMove = chosen->movePiece();
-                if (quitOnMove == 1) {
-                    cout << format(msg[6], {{"player", "초"}}) << msg[7]
-                         << msg[0];
-                    while (true) {
-                        getline(cin, input);
-                        if (input.compare("Y") == 0 || input.compare("y") == 0)
-                            break;
-                        else
-                            cout << msg[26] << msg[0];
-                    }
-                    break;
-                } else if (quitOnMove == 2) {
-                    continue;
-                }
-                break;
             }
+            else if (quitOnMove == 2) {
+                continue;
+            }
+            break;
         }
-        return;
     }
+    return;
+}
 
 // 김종우 작성 - 보드 출력
-void printBoard() {
+void printBoard(int gamestart) {
     setup_score();
     int starpoints[10][2] = {
         {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},  // 궁성 좌표 저장
-        {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9}};
-    system("cls");  // 프롬프트 clear
+        {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
     if (gamestart == 0) {
+        system("cls");  // 프롬프트 clear
         cout << "    A B C D E F G H I   " << endl;  // 가장 윗줄 출력
         for (int row = 0; row < 10; row++) {
             cout << " " << row << " |";  // 세로 숫자 줄 출력 + "|"
             for (int col = 0; col < 9; col++) {  // 보드 출력 과정
                 if (board[col][row] != nullptr) {
                     cout << board[col][row]->letter
-                         << "|";  // Piece 있으면 letter 출력 + "|"
-                } else {
+                        << "|";  // Piece 있으면 letter 출력 + "|"
+                }
+                else {
                     int isStarpoint = 0;  // 궁성인지 아닌지 저장 (궁성 아닐 때
-                                          // 빈 자리 출력하기 위해 사용)
+                    // 빈 자리 출력하기 위해 사용)
                     for (int i = 0; i < 10; i++) {
                         if ((col == starpoints[i][0]) &&
                             (row == starpoints[i][1])) {  // 궁성의 10가지
-                                                          // 경우의 수와 비교
+                            // 경우의 수와 비교
                             cout << "*|";
                             isStarpoint = 1;
                             break;
@@ -1664,22 +1748,54 @@ void printBoard() {
             }
             cout << endl;
         }
-    } else {
+    }
+    
+    else if (gamestart == 2) {
+        cout << "    A B C D E F G H I   " << endl;  // 가장 윗줄 출력
+        for (int row = 0; row < 10; row++) {
+            cout << " " << row << " |";  // 세로 숫자 줄 출력 + "|"
+            for (int col = 0; col < 9; col++) {  // 보드 출력 과정
+                if (tree->currentNode->state.state[col][row] != nullptr) {
+                    cout << tree->currentNode->state.state[col][row]->letter
+                        << "|";  // Piece 있으면 letter 출력 + "|"
+                }
+                else {
+                    int isStarpoint = 0;  // 궁성인지 아닌지 저장 (궁성 아닐 때
+                    // 빈 자리 출력하기 위해 사용)
+                    for (int i = 0; i < 10; i++) {
+                        if ((col == starpoints[i][0]) &&
+                            (row == starpoints[i][1])) {  // 궁성의 10가지
+                            // 경우의 수와 비교
+                            cout << "*|";
+                            isStarpoint = 1;
+                            break;
+                        }
+                    }
+                    if (isStarpoint == 0)
+                        cout << " |";  // 궁성 아닌 빈자리 <공백문자> + "|" 출력
+                }
+            }
+            cout << endl;
+        }
+    }
+    else {
+        system("cls");  // 프롬프트 clear
         cout << "    A B C D E F G H I   turn : " << game.turn
-             << endl;  // 가장 윗줄 출력
+            << endl;  // 가장 윗줄 출력
         for (int row = 0; row < 10; row++) {
             cout << " " << row << " |";  // 세로 숫자 줄 출력 + "|"
             for (int col = 0; col < 9; col++) {  // 보드 출력 과정
                 if (board[col][row] != nullptr) {
                     cout << board[col][row]->letter
-                         << "|";  // Piece 있으면 letter 출력 + "|"
-                } else {
+                        << "|";  // Piece 있으면 letter 출력 + "|"
+                }
+                else {
                     int isStarpoint = 0;  // 궁성인지 아닌지 저장 (궁성 아닐 때
-                                          // 빈 자리 출력하기 위해 사용)
+                    // 빈 자리 출력하기 위해 사용)
                     for (int i = 0; i < 10; i++) {
                         if ((col == starpoints[i][0]) &&
                             (row == starpoints[i][1])) {  // 궁성의 10가지
-                                                          // 경우의 수와 비교
+                            // 경우의 수와 비교
                             cout << "*|";
                             isStarpoint = 1;
                             break;
@@ -1705,38 +1821,44 @@ bool choCheckWin() {  // 남경식
         isScoreUnder(game.cho.score, game.han.score)) {
         if (isKingDie()) {
             if (choKingDie(King_Location)) {
-                cout << format(msg[13], {{"lose_player", "초"}})
-                     << format(msg[13], {{"win_player", "한"}});
-                return true;
-            } else {
-                cout << format(msg[13], {{"lose_player", "한"}})
-                     << format(msg[13], {{"win_player", "초"}});
+                cout << format(msg[13], { {"lose_player", "초"} })
+                    << format(msg[13], { {"win_player", "한"} });
                 return true;
             }
-        } else if (isTurnOver(game.turn)) {
-            cout << msg[16];
-            cout << "점수 총합 : 초나라 " << game.cho.score << "점, 한나라 "
-                 << game.han.score << "점\n";
-            if (game.cho.score > game.han.score) {
-                cout << format(msg[14], {{"win_player", "초"}});
-                return true;
-            } else {
-                cout << format(msg[14], {{"win_player", "한"}});
-                return true;
-            }
-        } else {
-            cout << msg[17];
-            cout << "점수 총합 : 초나라 " << game.cho.score << "점, 한나라 "
-                 << game.han.score << "점\n";
-            if (game.cho.score > game.han.score) {
-                cout << format(msg[14], {{"win_player", "초"}});
-                return true;
-            } else {
-                cout << format(msg[14], {{"win_player", "한"}});
+            else {
+                cout << format(msg[13], { {"lose_player", "한"} })
+                    << format(msg[13], { {"win_player", "초"} });
                 return true;
             }
         }
-    } else {
+        else if (isTurnOver(game.turn)) {
+            cout << msg[16];
+            cout << "점수 총합 : 초나라 " << game.cho.score << "점, 한나라 "
+                << game.han.score << "점\n";
+            if (game.cho.score > game.han.score) {
+                cout << format(msg[14], { {"win_player", "초"} });
+                return true;
+            }
+            else {
+                cout << format(msg[14], { {"win_player", "한"} });
+                return true;
+            }
+        }
+        else {
+            cout << msg[17];
+            cout << "점수 총합 : 초나라 " << game.cho.score << "점, 한나라 "
+                << game.han.score << "점\n";
+            if (game.cho.score > game.han.score) {
+                cout << format(msg[14], { {"win_player", "초"} });
+                return true;
+            }
+            else {
+                cout << format(msg[14], { {"win_player", "한"} });
+                return true;
+            }
+        }
+    }
+    else {
         return false;
     }
 };
@@ -1754,7 +1876,8 @@ bool isKingDie() {  // 남경식
     }
     if (count == 2) {  // 모든 좌표에 대해서 king이 2개있는지 확인, 수정
         return false;
-    } else {
+    }
+    else {
         return true;
     }
 };
@@ -1824,11 +1947,12 @@ void setup_score() {
 
             if (board[i][j]->team == 'C') {
                 game.cho.score += board[i][j]->score;
-            } else if (board[i][j]->team == 'H') {
+            }
+            else if (board[i][j]->team == 'H') {
                 game.han.score += board[i][j]->score;
             }
         }
     }
 
-    game.han.score += 1.5 + (3*variable_remove);
+    game.han.score += 1.5 + (3 * variable_remove);
 }
