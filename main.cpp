@@ -204,7 +204,6 @@ public:
         this->currentNode = this->currentNode->parent->parent;
     }
 
-    void recancelTree();
 };
 
 TurnTree* tree;
@@ -328,14 +327,15 @@ void recancelTree() {
         }
         int sel = 0;
         cin >> sel;
+        cin.ignore();
         sel--;
         //getline(cin, sel);
 
         tree->currentNode = children2.at(sel);
 
         BoardState lastState = tree->currentNode->state;
-        game.turn--;
-        game.turn--;
+        game.turn++;
+        game.turn++;
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 10; j++) {
@@ -1477,14 +1477,14 @@ void gameplay(int remove) {
         }
         return;
     }
-    else {  // 밥먹고 추가
+    else {  
         setupBoard(game, game.han);
         printBoard(0);
         remove_select_piece(remove);
         printBoard(0);
-        setupInitialPieces(game, game.han);
+        setupInitialPieces(game, game.cho);
         setupBoard(game, game.cho);
-        cout << format(msg[32], { {"player", "한"} });
+        cout << format(msg[32], { {"player", "초"} });
         // Sleep(2000);
         while (1) { //초나라 선공
             turncho();
@@ -1587,6 +1587,7 @@ Piece* choosePiece(Player& player) {
 
         if (!coord.compare("recancel")) {
             recancelTree();
+            printBoard(1);
             continue;
         }
 
