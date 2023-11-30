@@ -60,7 +60,7 @@ string msg[] = {
     "무르기를 요청하려면 “cancel”을 입력하세요.\n",
     "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 "
     "입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n",
-    "턴을 넘기려면 “pass”를 입력하세요.\n",
+    "턴을 넘기려면 “quit”을 입력하세요.\n",
     "무르기 취소를 요청하려면 “recancel”을 입력하세요.\n",
     "{player}나라가 턴 쉬기를 요청하였습니다.\n",
     "{player}나라가 무르기 취소를 요청하였습니다.\n",
@@ -160,16 +160,19 @@ public:
     TurnTreeNode(BoardState state, TurnTreeNode* parentNode = nullptr) : state(state), parent(parentNode) {}
 
     bool operator==(const TurnTreeNode& other) {
+        cout << (this->state == other.state) << endl;
         return this->state == other.state;
     }
 
 };
-void printBoard(int gamestart);
+
+void printBoard(int recancelPrint = 0);
 
 class TurnTree {
 public:
     TurnTreeNode* root;
     TurnTreeNode* currentNode;
+    
     TurnTree() {
         root = nullptr;
         currentNode = nullptr;
@@ -190,7 +193,6 @@ public:
             currentNode = newNode;
         }
     }
-
     int depth(TurnTreeNode* node) {
         if (node->parent == nullptr) {
             return 0;
@@ -199,11 +201,45 @@ public:
             return depth(node->parent) + 1;
         }
     }
-
-    void undoTree() {
-        this->currentNode = this->currentNode->parent->parent;
+    int height(TurnTreeNode* node) {
+        if (node == nullptr) {
+            return 0;
+        }
+        else {
+            int maxHeight = 0;
+            for (TurnTreeNode* n : node->children) {
+                maxHeight = (maxHeight < height(n)) ? height(n) : maxHeight;
+            }
+            return maxHeight + 1;
+        }
     }
 
+    void undoTree() {
+        this->currentNode = this->currentNode->parent->parent;  // 현재 노드에서 root 방향으로 두번 이동
+    }
+
+    void recancelTree() {
+        set<TurnTreeNode*> children1 = this->currentNode->children;
+        vector<TurnTreeNode*> children2;
+        for (TurnTreeNode* t : children1) {
+            for (TurnTreeNode* sel : t->children) {
+                children2.push_back(sel);
+            }
+        }
+        int i = 1;
+        for (TurnTreeNode* t : children2) {
+            cout << i++ << ')' << endl;
+            this->currentNode = t;
+            printBoard(1);
+        }
+        int sel = 0;
+        cout << "돌아갈 보드의 번호를 입력하세요. : ";    // 입력부분 추가로 수정 필요
+        cin >> sel;
+        string a;
+        getline(cin, a);
+        sel--;   // 최신 추가
+        this->currentNode = children2.at(sel);
+    }
 };
 
 TurnTree* tree;
@@ -211,7 +247,6 @@ TurnTree* tree;
 Piece* board[9][10] = {
 
 };
-
 
 int Piece::movePiece() {
     vector<pair<int, int>> paths = generatePaths();
@@ -274,7 +309,7 @@ int Piece::movePiece() {
         cout << msg[24] << msg[22] << endl;
     }
 }
-
+int gamestart;
 int variable_remove;
 Game game;
 
@@ -293,6 +328,7 @@ bool isScoreUnder(double score1, double score2);
 bool isTurnOver(int turn);
 bool isKingDie();
 void undo();
+void recancelTree();
 void setup_score();
 void setupInitialPieces(Game& game, Player& player);
 int remove_piece_num();
@@ -310,47 +346,6 @@ int isMovable(int x, int y, char team) {
 
 void kill() {}
 
-void recancelTree() {
-    
-        set<TurnTreeNode*> children1 = tree->currentNode->children;
-        vector<TurnTreeNode*> children2;
-        for (TurnTreeNode* t : children1) {
-            for (TurnTreeNode* sel : t->children) {
-                children2.push_back(sel);
-            }
-        }
-        int i = 1;
-        for (TurnTreeNode* t : children2) {
-            cout << i++ << ')' << endl;
-            tree->currentNode = t;
-            printBoard(2);
-        }
-        int sel = 0;
-        cin >> sel;
-        cin.ignore();
-        sel--;
-        //getline(cin, sel);
-
-        tree->currentNode = children2.at(sel);
-
-        BoardState lastState = tree->currentNode->state;
-        game.turn++;
-        game.turn++;
-
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 10; j++) {
-                board[i][j] = lastState.state[i][j];
-            }
-        }
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (board[i][j] != nullptr) {
-                    board[i][j]->x = i;
-                    board[i][j]->y = j;
-                }
-            }
-        }
-}
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
 public:
@@ -476,8 +471,6 @@ public:
                         }
                     }
                 }
-            }
-            else {
             }
         }
         return validMoves;
@@ -1024,6 +1017,7 @@ string setup[] = { "1. 마상상마", "2. 마상마상", "3. 상마상마", "4. 
 Piece* quit = new Pawn(1, 1, '.');
 Piece* cancel = new Pawn(1, 1, ',');
 Piece* pass = new Pawn(1, 1, '?');
+Piece* recancel = new Pawn(1, 1, '!');
 
 int quitOnMove;
 Piece* chosen;
@@ -1035,11 +1029,11 @@ int main() {
     int remove;
 
     while (true) {
-        remove = 0;
         quitOnMove = 18;
         chosen = nullptr;
         mainMenu();
         setupInitialPieces(game, game.han);
+        gamestart = 0;
         remove = remove_piece_num();
         tree = new TurnTree();
         gameplay(remove);
@@ -1412,18 +1406,19 @@ void gameplay(int remove) {
     if (remove >= 1) {  // 제거할 기물이 1개 이상
         // 한나라, 초나라 포진 과정
         setupBoard(game, game.han);
-        printBoard(0);
+        printBoard();
         remove_select_piece(remove);
-        printBoard(0);
+        printBoard();
         setupInitialPieces(game, game.cho);
         setupBoard(game, game.cho);
+        gamestart = 1;
         cout << format(msg[32], { {"player", "한"} });
         // Sleep(2000);
         while (1) { //한나라 선공
             turnhan();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            printBoard(1);  // 이동후 보드출력
+            printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1450,7 +1445,7 @@ void gameplay(int remove) {
             turncho();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            printBoard(1);  // 이동후 보드출력
+            printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1477,30 +1472,21 @@ void gameplay(int remove) {
         }
         return;
     }
-    else {  
-        setupBoard(game, game.han);
-        printBoard(0);
-        remove_select_piece(remove);
-        printBoard(0);
-        setupInitialPieces(game, game.cho);
+    else {  // 밥먹고 추가
         setupBoard(game, game.cho);
-        cout << format(msg[32], { {"player", "초"} });
+        printBoard();
+        remove_select_piece(remove);
+        printBoard();
+        setupInitialPieces(game, game.cho);
+        setupBoard(game, game.han);
+        gamestart = 1;
+        cout << format(msg[32], { {"player", "한"} });
         // Sleep(2000);
         while (1) { //초나라 선공
             turncho();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            if (chosen->team == '?') {
-                cout << format(msg[37], {{"player", "초"}}) << msg[7] << msg[0];
-                while (true) {
-                    getline(cin, input);
-                    if (input.compare("Y") == 0 || input.compare("y") == 0)
-                        break;
-                    else
-                        cout << msg[26] << msg[0];
-                }
-            }
-            printBoard(1);  // 이동후 보드출력
+            printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1527,17 +1513,7 @@ void gameplay(int remove) {
             turnhan();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
-            if (chosen->team == '?') {
-                cout << format(msg[37], {{"player", "한"}}) << msg[7] << msg[0];
-                while (true) {
-                    getline(cin, input);
-                    if (input.compare("Y") == 0 || input.compare("y") == 0)
-                        break;
-                    else
-                        cout << msg[26] << msg[0];
-                }
-            }
-            printBoard(1);  // 이동후 보드출력
+            printBoard();  // 이동후 보드출력
 
             if (choCheckWin()) {
                 cout << msg[15] << msg[0];
@@ -1579,12 +1555,11 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << format(msg[5], { {"player", currentTurnTeam} }) << msg[35] << msg[11];
+        cout << format(msg[5], { {"player", currentTurnTeam} }) << msg[11];
         if (game.turn > 1) {
             cout << msg[33];
         }
         cout << msg[0];
-        // if (recancel 입력이 가능) { cout << msg[37]; }
 
         getline(cin, coord);
         if (!coord.compare("quit")) {
@@ -1606,13 +1581,12 @@ Piece* choosePiece(Player& player) {
             continue;
         }
 
-        if (!coord.compare("recancel")) {
-            recancelTree();
-            printBoard(1);
-            continue;
-        }
+        // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자
+        // 혹은 대문자인지)
 
-        // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
+        if (!coord.compare("recancel")) {   // 최신 추가
+            return recancel;
+        }
 
         if (coord.length() == 1) {
             cout << "다시 입력하세요.\n";
@@ -1646,10 +1620,9 @@ Piece* choosePiece(Player& player) {
 
 void turnhan() {
     // 한나라 턴
-    //previous.push(BoardState(board));
     tree->addNode(BoardState(board));
     while (true) {
-        printBoard(1);                    // 보드출력
+        printBoard();                    // 보드출력
         chosen = choosePiece(game.han);  // 기물선택
         if (chosen->team == '.') {
             cout << format(msg[6], { {"player", "한"} }) << msg[15];
@@ -1678,6 +1651,20 @@ void turnhan() {
             break;
             // pass
         }
+
+        else if (chosen->team == '!') {
+            cout << format(msg[34], { {"player", "한"} });
+            while (true) {
+                getline(cin, input);
+                if (input.compare("Y") == 0 || input.compare("y") == 0 )
+                    break;
+                else
+                    cout << msg[22];
+            }
+            recancelTree();
+            continue;
+        }
+
         else {
             quitOnMove = chosen->movePiece();  // 기물이동
             if (quitOnMove == 1) {
@@ -1702,10 +1689,9 @@ void turnhan() {
 }
 
 void turncho() {
-    //previous.push(BoardState(board));
     tree->addNode(BoardState(board));
     while (true) {
-        printBoard(1);                    // 보드출력
+        printBoard();                    // 보드출력
         chosen = choosePiece(game.cho);  // 기물선택
         if (chosen->team == '.') {
             cout << format(msg[6], { {"player", "초"} }) << msg[15];
@@ -1734,6 +1720,18 @@ void turncho() {
             break;
             // pass
         }
+        else if (chosen->team == '!') {
+            cout << format(msg[34], { {"player", "초"} });
+            while (true) {
+                getline(cin, input);
+                if (input.compare("Y") == 0 || input.compare("y") == 0 )
+                    break;
+                else
+                    cout << msg[22];
+            }
+            recancelTree();
+            continue;
+        }
         else {
             quitOnMove = chosen->movePiece();
             if (quitOnMove == 1) {
@@ -1758,13 +1756,44 @@ void turncho() {
 }
 
 // 김종우 작성 - 보드 출력
-void printBoard(int gamestart) {
+void printBoard(int recancelPrint) {
     setup_score();
     int starpoints[10][2] = {
         {3, 0}, {5, 0}, {4, 1}, {3, 2}, {5, 2},  // 궁성 좌표 저장
         {3, 7}, {5, 7}, {4, 8}, {3, 9}, {5, 9} };
+    // recancel시에만 사용
+    if (recancelPrint == 1) {
+        cout << "    A B C D E F G H I   " << endl;  // 가장 윗줄 출력
+        for (int row = 0; row < 10; row++) {
+            cout << " " << row << " |";  // 세로 숫자 줄 출력 + "|"
+            for (int col = 0; col < 9; col++) {  // 보드 출력 과정
+                if (tree->currentNode->state.state[col][row] != nullptr) {
+                    cout << tree->currentNode->state.state[col][row]->letter
+                        << "|";  // Piece 있으면 letter 출력 + "|"
+                }
+                else {
+                    int isStarpoint = 0;  // 궁성인지 아닌지 저장 (궁성 아닐 때
+                    // 빈 자리 출력하기 위해 사용)
+                    for (int i = 0; i < 10; i++) {
+                        if ((col == starpoints[i][0]) &&
+                            (row == starpoints[i][1])) {  // 궁성의 10가지
+                            // 경우의 수와 비교
+                            cout << "*|";
+                            isStarpoint = 1;
+                            break;
+                        }
+                    }
+                    if (isStarpoint == 0)
+                        cout << " |";  // 궁성 아닌 빈자리 <공백문자> + "|" 출력
+                }
+            }
+            cout << endl;
+        }
+        return;
+    }
+
+    system("cls");  // 프롬프트 clear
     if (gamestart == 0) {
-        system("cls");  // 프롬프트 clear
         cout << "    A B C D E F G H I   " << endl;  // 가장 윗줄 출력
         for (int row = 0; row < 10; row++) {
             cout << " " << row << " |";  // 세로 숫자 줄 출력 + "|"
@@ -1792,37 +1821,7 @@ void printBoard(int gamestart) {
             cout << endl;
         }
     }
-    
-    else if (gamestart == 2) {
-        cout << "    A B C D E F G H I   " << endl;  // 가장 윗줄 출력
-        for (int row = 0; row < 10; row++) {
-            cout << " " << row << " |";  // 세로 숫자 줄 출력 + "|"
-            for (int col = 0; col < 9; col++) {  // 보드 출력 과정
-                if (tree->currentNode->state.state[col][row] != nullptr) {
-                    cout << tree->currentNode->state.state[col][row]->letter
-                        << "|";  // Piece 있으면 letter 출력 + "|"
-                }
-                else {
-                    int isStarpoint = 0;  // 궁성인지 아닌지 저장 (궁성 아닐 때
-                    // 빈 자리 출력하기 위해 사용)
-                    for (int i = 0; i < 10; i++) {
-                        if ((col == starpoints[i][0]) &&
-                            (row == starpoints[i][1])) {  // 궁성의 10가지
-                            // 경우의 수와 비교
-                            cout << "*|";
-                            isStarpoint = 1;
-                            break;
-                        }
-                    }
-                    if (isStarpoint == 0)
-                        cout << " |";  // 궁성 아닌 빈자리 <공백문자> + "|" 출력
-                }
-            }
-            cout << endl;
-        }
-    }
     else {
-        system("cls");  // 프롬프트 clear
         cout << "    A B C D E F G H I   turn : " << game.turn
             << endl;  // 가장 윗줄 출력
         for (int row = 0; row < 10; row++) {
@@ -1948,6 +1947,34 @@ void undo() {
         BoardState lastState = tree->currentNode->state;
         game.turn--;
         game.turn--;
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                board[i][j] = lastState.state[i][j];
+            }
+        }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (board[i][j] != nullptr) {
+                    board[i][j]->x = i;
+                    board[i][j]->y = j;
+                }
+            }
+        }
+    }
+}
+
+void recancelTree() {
+    if (tree->height(tree->currentNode) > 1) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                board[i][j] = nullptr;
+            }
+        }
+        tree->recancelTree();
+        BoardState lastState = tree->currentNode->state;
+        game.turn++;
+        game.turn++;
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 10; j++) {
