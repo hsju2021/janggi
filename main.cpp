@@ -204,27 +204,7 @@ public:
         this->currentNode = this->currentNode->parent->parent;
     }
 
-    void recancelTree() {
-        set<TurnTreeNode*> children1 = this->currentNode->children;
-        vector<TurnTreeNode*> children2;
-        for (TurnTreeNode* t : children1) {
-            for (TurnTreeNode* sel : t->children) {
-                children2.push_back(sel);
-            }
-        }
-        int i = 1;
-        for (TurnTreeNode* t : children2) {
-            cout << i++ << ')' << endl;
-            this->currentNode = t;
-            printBoard(2);
-        }
-        int sel = 0;
-        cin >> sel;
-        //getline(cin, sel);
-
-        this->currentNode = children2.at(sel);
-
-    }
+    void recancelTree();
 };
 
 TurnTree* tree;
@@ -232,6 +212,7 @@ TurnTree* tree;
 Piece* board[9][10] = {
 
 };
+
 
 int Piece::movePiece() {
     vector<pair<int, int>> paths = generatePaths();
@@ -330,6 +311,46 @@ int isMovable(int x, int y, char team) {
 
 void kill() {}
 
+void recancelTree() {
+    
+        set<TurnTreeNode*> children1 = tree->currentNode->children;
+        vector<TurnTreeNode*> children2;
+        for (TurnTreeNode* t : children1) {
+            for (TurnTreeNode* sel : t->children) {
+                children2.push_back(sel);
+            }
+        }
+        int i = 1;
+        for (TurnTreeNode* t : children2) {
+            cout << i++ << ')' << endl;
+            tree->currentNode = t;
+            printBoard(2);
+        }
+        int sel = 0;
+        cin >> sel;
+        sel--;
+        //getline(cin, sel);
+
+        tree->currentNode = children2.at(sel);
+
+        BoardState lastState = tree->currentNode->state;
+        game.turn--;
+        game.turn--;
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                board[i][j] = lastState.state[i][j];
+            }
+        }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (board[i][j] != nullptr) {
+                    board[i][j]->x = i;
+                    board[i][j]->y = j;
+                }
+            }
+        }
+}
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
 public:
@@ -1564,7 +1585,7 @@ Piece* choosePiece(Player& player) {
         }
 
         if (!coord.compare("recancel")) {
-            tree->recancelTree();
+            recancelTree();
             continue;
         }
 
