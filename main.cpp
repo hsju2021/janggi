@@ -154,7 +154,7 @@ public:
 class TurnTreeNode {
 public:
     BoardState state;
-    set<TurnTreeNode*> children;
+    vector<TurnTreeNode*> children;
     TurnTreeNode* parent;
 
     TurnTreeNode(BoardState state, TurnTreeNode* parentNode = nullptr) : state(state), parent(parentNode) {}
@@ -189,7 +189,13 @@ public:
         }
         else {
             auto newNode = new TurnTreeNode(state, this->currentNode);
-            currentNode->children.insert(newNode);
+            for (TurnTreeNode* t : currentNode->children) {
+                if (t->state == newNode->state) {
+                    currentNode = t;
+                    return;
+                }
+            }
+            currentNode->children.push_back(newNode);
             currentNode = newNode;
         }
     }
@@ -219,7 +225,7 @@ public:
     }
 
     void recancelTree() {
-        set<TurnTreeNode*> children1 = this->currentNode->children;
+        vector<TurnTreeNode*> children1 = this->currentNode->children;
         vector<TurnTreeNode*> children2;
         for (TurnTreeNode* t : children1) {
             for (TurnTreeNode* sel : t->children) {
