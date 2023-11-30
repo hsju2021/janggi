@@ -1035,6 +1035,7 @@ int main() {
     int remove;
 
     while (true) {
+        remove = 0;
         quitOnMove = 18;
         chosen = nullptr;
         mainMenu();
@@ -1477,12 +1478,12 @@ void gameplay(int remove) {
         return;
     }
     else {  // 밥먹고 추가
-        setupBoard(game, game.cho);
+        setupBoard(game, game.han);
         printBoard(0);
         remove_select_piece(remove);
         printBoard(0);
-        setupInitialPieces(game, game.cho);
-        setupBoard(game, game.han);
+        setupInitialPieces(game, game.han);
+        setupBoard(game, game.cho);
         cout << format(msg[32], { {"player", "한"} });
         // Sleep(2000);
         while (1) { //초나라 선공
