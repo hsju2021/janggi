@@ -60,7 +60,7 @@ string msg[] = {
     "무르기를 요청하려면 “cancel”을 입력하세요.\n",
     "{player}나라가 무르기 요청을 하였습니다.\n수락하려면 ‘y’또는 ‘Y’를 "
     "입력하세요.\n거절하려면 ‘n’또는 ‘N’를 입력하세요.\n",
-    "턴을 넘기려면 “quit”을 입력하세요.\n",
+    "턴을 넘기려면 “pass”를 입력하세요.\n",
     "무르기 취소를 요청하려면 “recancel”을 입력하세요.\n",
     "{player}나라가 턴 쉬기를 요청하였습니다.\n",
     "{player}나라가 무르기 취소를 요청하였습니다.\n",
@@ -204,27 +204,7 @@ public:
         this->currentNode = this->currentNode->parent->parent;
     }
 
-    void recancelTree() {
-        set<TurnTreeNode*> children1 = this->currentNode->children;
-        vector<TurnTreeNode*> children2;
-        for (TurnTreeNode* t : children1) {
-            for (TurnTreeNode* sel : t->children) {
-                children2.push_back(sel);
-            }
-        }
-        int i = 1;
-        for (TurnTreeNode* t : children2) {
-            cout << i++ << ')' << endl;
-            this->currentNode = t;
-            printBoard(2);
-        }
-        int sel = 0;
-        cin >> sel;
-        //getline(cin, sel);
-
-        this->currentNode = children2.at(sel);
-
-    }
+    void recancelTree();
 };
 
 TurnTree* tree;
@@ -232,6 +212,7 @@ TurnTree* tree;
 Piece* board[9][10] = {
 
 };
+
 
 int Piece::movePiece() {
     vector<pair<int, int>> paths = generatePaths();
@@ -330,6 +311,46 @@ int isMovable(int x, int y, char team) {
 
 void kill() {}
 
+void recancelTree() {
+    
+        set<TurnTreeNode*> children1 = tree->currentNode->children;
+        vector<TurnTreeNode*> children2;
+        for (TurnTreeNode* t : children1) {
+            for (TurnTreeNode* sel : t->children) {
+                children2.push_back(sel);
+            }
+        }
+        int i = 1;
+        for (TurnTreeNode* t : children2) {
+            cout << i++ << ')' << endl;
+            tree->currentNode = t;
+            printBoard(2);
+        }
+        int sel = 0;
+        cin >> sel;
+        sel--;
+        //getline(cin, sel);
+
+        tree->currentNode = children2.at(sel);
+
+        BoardState lastState = tree->currentNode->state;
+        game.turn--;
+        game.turn--;
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                board[i][j] = lastState.state[i][j];
+            }
+        }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (board[i][j] != nullptr) {
+                    board[i][j]->x = i;
+                    board[i][j]->y = j;
+                }
+            }
+        }
+}
 // derived class (Rook, Cannon, Knight, Elephant, King, Guard, Pawn)
 class Rook : public Piece {
 public:
@@ -1469,6 +1490,16 @@ void gameplay(int remove) {
             turncho();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
+            if (chosen->team == '?') {
+                cout << format(msg[37], {{"player", "초"}}) << msg[7] << msg[0];
+                while (true) {
+                    getline(cin, input);
+                    if (input.compare("Y") == 0 || input.compare("y") == 0)
+                        break;
+                    else
+                        cout << msg[26] << msg[0];
+                }
+            }
             printBoard(1);  // 이동후 보드출력
 
             if (choCheckWin()) {
@@ -1496,6 +1527,16 @@ void gameplay(int remove) {
             turnhan();
             if (quitOnMove == 2) return;
             if (chosen->team == '.') return;
+            if (chosen->team == '?') {
+                cout << format(msg[37], {{"player", "한"}}) << msg[7] << msg[0];
+                while (true) {
+                    getline(cin, input);
+                    if (input.compare("Y") == 0 || input.compare("y") == 0)
+                        break;
+                    else
+                        cout << msg[26] << msg[0];
+                }
+            }
             printBoard(1);  // 이동후 보드출력
 
             if (choCheckWin()) {
@@ -1538,11 +1579,12 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << format(msg[5], { {"player", currentTurnTeam} }) << msg[11];
+        cout << format(msg[5], { {"player", currentTurnTeam} }) << msg[35] << msg[11];
         if (game.turn > 1) {
             cout << msg[33];
         }
         cout << msg[0];
+        // if (recancel 입력이 가능) { cout << msg[37]; }
 
         getline(cin, coord);
         if (!coord.compare("quit")) {
@@ -1565,12 +1607,11 @@ Piece* choosePiece(Player& player) {
         }
 
         if (!coord.compare("recancel")) {
-            tree->recancelTree();
+            recancelTree();
             continue;
         }
 
-        // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자
-        // 혹은 대문자인지)
+        // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자 혹은 대문자인지)
 
         if (coord.length() == 1) {
             cout << "다시 입력하세요.\n";
