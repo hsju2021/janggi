@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-// #include <windows.h>
+#include <windows.h>
 #include <algorithm>
 #include <cstring>
 #include <map>
@@ -311,7 +311,7 @@ int Piece::movePiece() {
                         << "'이(가) " << board[tmpx][tmpy]->team2string()
                         << " '" << board[tmpx][tmpy]->letter2string()
                         << "'을(를) 잡았습니다." << endl;
-                    // Sleep(2000);
+                    Sleep(2000);
                 }
 
                 board[tmpx][tmpy] = board[x][y];
@@ -1068,7 +1068,7 @@ void mainMenu() {
         }
         if (s == "2") exit(0);
         if (s == "1") return;
-        // Sleep(1000);
+        Sleep(1000);
     }
 }
 
@@ -1429,7 +1429,7 @@ void gameplay(int remove) {
         setupBoard(game, game.cho);
         gamestart = 1;
         cout << format(msg[32], { {"player", "한"} });
-        // Sleep(2000);
+        Sleep(2000);
         while (1) { //한나라 선공
             turnhan();
             if (quitOnMove == 2) return;
@@ -1497,7 +1497,7 @@ void gameplay(int remove) {
         setupBoard(game, game.cho);
         gamestart = 1;
         cout << format(msg[32], { {"player", "한"} });
-        // Sleep(2000);
+        Sleep(2000);
         while (1) { //초나라 선공
             turncho();
             if (quitOnMove == 2) return;
