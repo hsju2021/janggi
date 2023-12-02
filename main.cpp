@@ -239,7 +239,7 @@ public:
             printBoard(1);
         }
         int sel = 0;
-        cout << "돌아갈 보드의 번호를 입력하세요. : ";    // 입력부분 추가로 수정 필요
+        cout << "이전에 무른 경로입니다. 원하는 경로를 선택하세요.\n";    // 입력부분 추가로 수정 필요
         cin >> sel;
         string a;
         getline(cin, a);
@@ -1561,10 +1561,14 @@ Piece* choosePiece(Player& player) {
         else
             currentTurnTeam = "초";
 
-        cout << format(msg[5], { {"player", currentTurnTeam} }) << msg[11];
+        cout << format(msg[5], { {"player", currentTurnTeam} }) << "턴을 넘기려면 \"pass\"를 입력하세요\n" <<msg[11];
         if (game.turn > 1) {
             cout << msg[33];
         }
+        if (tree->height(tree->currentNode)>1){
+            cout << "무르기 취소를 요청하려면 \"recancel\'을 입력하세요\n";
+        }
+        
         cout << msg[0];
 
         getline(cin, coord);
@@ -1590,7 +1594,11 @@ Piece* choosePiece(Player& player) {
         // 좌표 입력 규칙 확인 (2글자이고, 첫번째는 숫자이고, 두번째는 소문자
         // 혹은 대문자인지)
 
-        if (!coord.compare("recancel")) {   // 최신 추가
+        if (!coord.compare("recancel") && tree->height(tree->currentNode) < 2 ) {   // 최신 추가
+            cout << "무르기 취소가 불가능합니다.\n";
+            continue;
+        }
+        if (!coord.compare("recancel")){
             return recancel;
         }
 
