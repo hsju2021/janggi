@@ -238,13 +238,22 @@ public:
             this->currentNode = t;
             printBoard(1);
         }
+        // 입력 수정
         int sel = 0;
-        cout << "이전에 무른 경로입니다. 원하는 경로를 선택하세요.\n";    // 입력부분 추가로 수정 필요
-        cin >> sel;
-        string a;
-        getline(cin, a);
-        sel--;   // 최신 추가
-        this->currentNode = children2.at(sel);
+        string input;
+        while (true) {
+            cout << msg[0];    
+            getline(cin, input);  // 사용자로부터 문자열로 입력을 받습니다.
+            stringstream ss(input);  // 입력받은 문자열을 스트림으로 변환합니다.
+            if (ss >> sel && sel > 0 && sel < i) {  // if문
+                sel--;
+                this->currentNode = children2.at(sel);
+                break;
+            }
+            else {
+                cout << "잘못된 입력입니다." << endl;
+            }
+        }
     }
 };
 
@@ -1668,14 +1677,8 @@ void turnhan() {
         }
 
         else if (chosen->team == '!') {
-            cout << format(msg[34], { {"player", "한"} });
-            while (true) {
-                getline(cin, input);
-                if (input.compare("Y") == 0 || input.compare("y") == 0 )
-                    break;
-                else
-                    cout << msg[22];
-            }
+            cout << format(msg[38], { {"player", "한"} });
+            cout << msg[39];
             recancelTree();
             continue;
         }
@@ -1736,16 +1739,10 @@ void turncho() {
             // pass
         }
         else if (chosen->team == '!') {
-            cout << format(msg[34], { {"player", "초"} });
-            while (true) {
-                getline(cin, input);
-                if (input.compare("Y") == 0 || input.compare("y") == 0 )
-                    break;
-                else
-                    cout << msg[22];
-            }
+            cout << format(msg[38], { {"player", "초"} });
+            cout << msg[39];
             recancelTree();
-            continue;
+            continue; 
         }
         else {
             quitOnMove = chosen->movePiece();
