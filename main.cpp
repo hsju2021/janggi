@@ -1409,6 +1409,7 @@ void remove_select_piece(int num) {
 // 백창현 작성, 좌표 입력은 잘 되는데 board랑은 확인해봐야함
 
 void gameplay(int remove) {
+    game.turn = 0;
     if (remove >= 1) {  // 제거할 기물이 1개 이상
         // 한나라, 초나라 포진 과정
         setupBoard(game, game.han);
@@ -1478,7 +1479,7 @@ void gameplay(int remove) {
         }
         return;
     }
-    else {  // 밥먹고 추가
+    else {
         setupBoard(game, game.cho);
         printBoard();
         remove_select_piece(remove);
