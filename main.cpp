@@ -1480,12 +1480,12 @@ void gameplay(int remove) {
         return;
     }
     else {
-        setupBoard(game, game.cho);
+        setupBoard(game, game.han);
         printBoard();
         remove_select_piece(remove);
         printBoard();
         setupInitialPieces(game, game.cho);
-        setupBoard(game, game.han);
+        setupBoard(game, game.cho);
         gamestart = 1;
         cout << format(msg[32], { {"player", "한"} });
         // Sleep(2000);
